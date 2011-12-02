@@ -1,3 +1,20 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.grid.internal.listener;
 
 import org.junit.Assert;
@@ -6,6 +23,7 @@ import org.junit.Test;
 import org.openqa.grid.common.RegistrationRequest;
 import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.RemoteProxy;
+import org.openqa.grid.internal.SessionTerminationReason;
 import org.openqa.grid.internal.TestSession;
 import org.openqa.grid.internal.listeners.TestSessionListener;
 import org.openqa.grid.internal.listeners.TimeoutListener;
@@ -61,7 +79,7 @@ public class SessionListenerTest {
     req.process();
     TestSession session = req.getTestSession();
     Assert.assertEquals(true, session.get("FLAG"));
-    session.terminate();
+    registry.terminate(session, SessionTerminationReason.CLIENT_STOPPED_SESSION);
     try {
       Thread.sleep(250);
     } catch (InterruptedException e) {
@@ -103,7 +121,12 @@ public class SessionListenerTest {
     registry.add(new MyBuggyBeforeRemoteProxy(req, registry));
 
     MockedNewSessionRequestHandler req = new MockedNewSessionRequestHandler(registry, app1);
-    req.process();
+    try {
+      req.process();
+    } catch (Exception ignore) {
+      // the listener exception will bubble up.
+    }
+
     // reserve throws an exception, that calls session.terminate, which is
     // in a separate thread. Gives some time for this thread to finish
     // before doing the validations
@@ -157,7 +180,7 @@ public class SessionListenerTest {
       TestSession session = req.getTestSession();
       Assert.assertEquals(registry.getActiveSessions().size(), 1);
       Assert.assertNotNull(session);
-      session.terminate();
+      registry.terminate(session, SessionTerminationReason.CLIENT_STOPPED_SESSION);
       try {
         Thread.sleep(250);
       } catch (InterruptedException e) {
@@ -218,7 +241,7 @@ public class SessionListenerTest {
     }
 
     public void beforeRelease(TestSession session) {
-      session.terminate();
+      getRegistry().terminate(session, SessionTerminationReason.CLIENT_STOPPED_SESSION);
     }
   }
 
@@ -255,7 +278,7 @@ public class SessionListenerTest {
       Assert.assertEquals(session.get("after"), true);
 
       // manually closing the session, starting a 2nd release process.
-      session.terminate();
+      registry.terminate(session, SessionTerminationReason.CLIENT_STOPPED_SESSION);
 
       // the 2nd release process shouldn't be executed as one is already
       // processed.

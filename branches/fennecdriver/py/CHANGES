@@ -1,3 +1,29 @@
+Selenium 2.14
+* Fix for LD_PRELOAD being polluted by WebDriver
+* Added Orientation API
+* A fix for Error Handling
+
+Selenium 2.13
+* Fixed switch_to_window so that it didnt crash Firefox Bug 2633
+* Fixed Screenshot handling to work in all browsers. Bug 2829
+* Force Firefox to the Foreground
+
+Selenium 2.12
+* Added Select as a support pacakge
+* Added Beta window size / position api's
+* Bug Fixes
+
+Selenium 2.11.0 2.11.1
+* no changes just packaging
+
+Selenum 2.10
+* "Choose which apps" dialog has been disabled
+* Bug Fixes
+
+Selenium 2.9
+* Bug Fixes
+* Documentation
+
 Selenium 2.8
 * Actions updates
 * Bug Fixes

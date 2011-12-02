@@ -19,7 +19,7 @@ package org.openqa.selenium.server.browserlaunchers;
 import com.google.common.base.Throwables;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.browserlaunchers.AsyncExecute;
+import org.openqa.selenium.browserlaunchers.Sleeper;
 import org.openqa.selenium.browserlaunchers.LauncherUtils;
 import org.openqa.selenium.browserlaunchers.WindowsProxyManager;
 import org.openqa.selenium.browserlaunchers.locators.BrowserInstallation;
@@ -39,10 +39,9 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
   private static final Logger log = Logger.getLogger(InternetExplorerCustomProxyLauncher.class
       .getName());
 
-  private File customProxyPACDir;
   private String[] cmdarray;
   private BrowserInstallation browserInstallation;
-  private Process process;
+  private CommandLine process;
   protected boolean customPACappropriate = true;
   protected WindowsProxyManager wpm;
 
@@ -72,27 +71,21 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
   public void launch(String url) {
     try {
       setupSystem(url);
-      log.info("Launching Internet Explorer...");
-      CommandLine exe = new CommandLine(cmdarray);
-      process = exe.executeAsync();
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+    log.info("Launching Internet Explorer...");
+    process = new CommandLine(cmdarray);
+    process.executeAsync();
   }
 
   private void setupSystem(String url) throws IOException {
     if (WindowsUtils.thisIsWindows()) {
-      final File killableProcessWrapper;
 
       if (!browserConfigurationOptions.is("honorSystemProxy")) {
         setupSystemProxy();
       }
-      customProxyPACDir = wpm.getCustomProxyPACDir();
-      killableProcessWrapper = new File(customProxyPACDir, "killableprocess.exe");
-      ResourceExtractor.extractResourcePath(InternetExplorerCustomProxyLauncher.class,
-          "/killableprocess/killableprocess.exe", killableProcessWrapper);
       cmdarray = new String[] {
-          killableProcessWrapper.getAbsolutePath(),
           browserInstallation.launcherFilePath(),
           "-new",
           url
@@ -118,16 +111,7 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
     if (browserConfigurationOptions.is("killProcessesByName")) {
       WindowsUtils.tryToKillByName("iexplore.exe");
     }
-    try { // DGF killableprocess.exe should commit suicide if we send it a newline
-      process.getOutputStream().write('\n');
-      process.getOutputStream().flush();
-      Thread.sleep(200);
-    } catch (Exception ignored) {
-    }
-    AsyncExecute.killProcess(process);
-    if (customPACappropriate) {
-      LauncherUtils.recursivelyDeleteDir(customProxyPACDir);
-    }
+    process.destroy();
   }
 
   private void restoreSystemProxy() {
@@ -136,7 +120,7 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
   }
 
   public Process getProcess() {
-    return process;
+    return null;
   }
 
   public static void main(String[] args) {
@@ -146,7 +130,7 @@ public class InternetExplorerCustomProxyLauncher extends AbstractBrowserLauncher
     l.launch("http://www.google.com/");
     int seconds = 5;
     System.out.println("Killing browser in " + Integer.toString(seconds) + " seconds");
-    AsyncExecute.sleepTight(seconds * 1000);
+    Sleeper.sleepTight(seconds * 1000);
     l.close();
     System.out.println("He's dead now, right?");
   }

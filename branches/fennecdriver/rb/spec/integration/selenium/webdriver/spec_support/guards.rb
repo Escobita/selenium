@@ -11,13 +11,20 @@ module Selenium
           def record(guard_name, options, data)
             options.each do |opts|
               opts = current_env.merge(opts)
-              key = "#{opts[:browser]}/#{opts[:driver]}/#{opts[:platform]}"
+              key = opts.values_at(:browser, :driver, :platform, :native).join('.')
               guards[key] << [guard_name, data]
             end
           end
 
           def report
-            gs = guards["#{GlobalTestEnv.browser}/#{GlobalTestEnv.driver}/#{Platform.os}"]
+            key = [
+              GlobalTestEnv.browser,
+              GlobalTestEnv.driver,
+              Platform.os,
+              GlobalTestEnv.native_events?
+            ].join(".")
+
+            gs = guards[key]
 
             print "\n\nSpec guards for this implementation: "
 
@@ -32,7 +39,12 @@ module Selenium
           end
 
           def current_env
-            {:browser => GlobalTestEnv.browser, :driver => GlobalTestEnv.driver, :platform => Platform.os}
+            {
+              :browser  => GlobalTestEnv.browser,
+              :driver   => GlobalTestEnv.driver,
+              :platform => Platform.os,
+              :native   => GlobalTestEnv.native_events?
+            }
           end
 
           #
@@ -60,15 +72,13 @@ module Selenium
           yield unless Guards.env_matches?(opts)
         end
 
-        def deviates_on(*opts, &blk)
-          Guards.record(:deviates, opts, :file => caller.first)
-          yield unless Guards.env_matches?(opts)
-        end
-
         def compliant_on(*opts, &blk)
           Guards.record(:compliant_on, opts, :file => caller.first)
           yield if Guards.env_matches?(opts)
         end
+
+        alias_method :not_compliant_when, :not_compliant_on
+        alias_method :compliant_when,     :compliant_on
 
       end # Guards
     end # SpecSupport

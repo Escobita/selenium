@@ -19,7 +19,7 @@ package org.openqa.selenium.server.browserlaunchers;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.browserlaunchers.AsyncExecute;
+import org.openqa.selenium.browserlaunchers.Sleeper;
 import org.openqa.selenium.browserlaunchers.LauncherUtils;
 import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.browserlaunchers.locators.BrowserInstallation;
@@ -42,7 +42,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
   private File customProfileDir = null;
   private boolean closed = false;
   private BrowserInstallation browserInstallation;
-  private Process process = null;
+  private CommandLine process = null;
 
   private boolean changeMaxConnections = false;
 
@@ -90,13 +90,13 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
       populateCustomProfileDirectory(profilePath);
 
       log.info("Launching Firefox...");
-      CommandLine command = prepareCommand(
+      process = prepareCommand(
           browserInstallation.launcherFilePath(),
           "-profile",
           profilePath
           );
-      command.setEnvironmentVariable("NO_EM_RESTART", "1");
-      process = command.executeAsync();
+      process.setEnvironmentVariable("NO_EM_RESTART", "1");
+      process.executeAsync();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -290,7 +290,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
    */
   protected void killFirefoxProcess() throws FileLockRemainedException {
     log.info("Killing Firefox...");
-    int exitValue = AsyncExecute.killProcess(process);
+    int exitValue = process.destroy();
     if (exitValue == 0) {
       log.warning("Firefox seems to have ended on its own (did we kill the real browser???)");
     }
@@ -298,7 +298,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
   }
 
   public Process getProcess() {
-    return process;
+    return null;
   }
 
   /**
@@ -313,7 +313,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
       throws FileLockRemainedException {
     File lock = new File(customProfileDir, "parent.lock");
     for (long start = System.currentTimeMillis(); System.currentTimeMillis() < start + timeout;) {
-      AsyncExecute.sleepTight(500);
+      Sleeper.sleepTight(500);
       if (!lock.exists() && makeSureFileLockRemainsGone(lock, timeToWait)) {
         return;
       }
@@ -335,7 +335,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
    */
   private boolean makeSureFileLockRemainsGone(File lock, long timeToWait) {
     for (long start = System.currentTimeMillis(); System.currentTimeMillis() < start + timeToWait;) {
-      AsyncExecute.sleepTight(500);
+      Sleeper.sleepTight(500);
       if (lock.exists()) {
         return false;
       }
@@ -355,7 +355,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
     long start = System.currentTimeMillis();
     for (; System.currentTimeMillis() < start + timeout;) {
 
-      AsyncExecute.sleepTight(500);
+      Sleeper.sleepTight(500);
       if (testFile.exists()) {
         break;
       }
@@ -380,7 +380,7 @@ public class FirefoxChromeLauncher extends AbstractBrowserLauncher {
 
   // visible for testing
 
-  protected void setProcess(Process p) {
+  protected void setCommandLine(CommandLine p) {
     process = p;
   }
 

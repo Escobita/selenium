@@ -17,6 +17,7 @@
 
 
 import os
+import pytest
 import re
 import tempfile
 import time
@@ -153,6 +154,8 @@ class ApiExampleTest (unittest.TestCase):
         self.assertFalse(elem.is_enabled())
 
     def testIsSelectedAndToggle(self):
+        if self.driver.capabilities['browserName'] == 'chrome' and int(self.driver.capabilities['version'].split('.')[0]) < 16:
+            pytest.skip("deselecting preselected values only works on chrome >= 16")
         self._loadPage("formPage")
         elem = self.driver.find_element_by_id("multi")
         option_elems = elem.find_elements_by_xpath("option")
@@ -224,6 +227,34 @@ class ApiExampleTest (unittest.TestCase):
         not_visible = self.driver.find_element_by_id("hidden").is_displayed()
         self.assertTrue(visible, "Should be visible")
         self.assertFalse(not_visible, "Should not be visible")
+
+    def testMoveWindowPosition(self):
+        self._loadPage("blank")
+        loc = self.driver.get_window_position()
+        # note can't test 0,0 since some OS's dont allow that location
+        # because of system toolbars
+        newLoc = [50,50]
+        if loc['x'] == 50:
+            newLoc[0] = 60
+        if loc['y'] == 50:
+            newLoc[1] = 60
+        self.driver.set_window_position(newLoc[0], newLoc[1])
+        loc = self.driver.get_window_position()
+        self.assertEquals(loc['x'], newLoc[0])
+        self.assertEquals(loc['y'], newLoc[1])
+
+    def testChangeWindowSize(self):
+        self._loadPage("blank")
+        size = self.driver.get_window_size()
+        newSize = [600,600]
+        if size['width'] == 600:
+            newSize[0] = 500
+        if size['height'] == 600:
+            newSize[1] = 500
+        self.driver.set_window_size(newSize[0], newSize[1])
+        size = self.driver.get_window_size()
+        self.assertEquals(size['width'], newSize[0])
+        self.assertEquals(size['height'], newSize[1])
 
     def _pageURL(self, name):
         return "http://localhost:%d/%s.html" % (self.webserver.port, name)

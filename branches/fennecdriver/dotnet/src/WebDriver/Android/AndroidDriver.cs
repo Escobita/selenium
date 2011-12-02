@@ -1,7 +1,7 @@
 ﻿// <copyright file="AndroidDriver.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ namespace OpenQA.Selenium.Android
     /// Using the Android driver requires the Android device or emulator
     /// to be running, and the WebDriver application be active on the device.
     /// </remarks>
-    public class AndroidDriver : RemoteWebDriver, ITakesScreenshot
+    public class AndroidDriver : RemoteWebDriver, ITakesScreenshot, IRotatable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AndroidDriver"/> class.
@@ -89,6 +89,27 @@ namespace OpenQA.Selenium.Android
             base(remoteAddress, GetAndroidCapabilities())
         {
         }
+
+        #region IRotatable Members
+        /// <summary>
+        /// Gets or sets the screen orientation of the browser on the device.
+        /// </summary>
+        public ScreenOrientation Orientation
+        {
+            get
+            {
+                Response orientationResponse = Execute(DriverCommand.GetOrientation, null);
+                return (ScreenOrientation)Enum.Parse(typeof(ScreenOrientation), orientationResponse.Value.ToString(), true);
+            }
+
+            set
+            {
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+                parameters.Add("orientation", value.ToString().ToUpperInvariant());
+                this.Execute(DriverCommand.SetOrientation, parameters);
+            }
+        }
+        #endregion
 
         #region ITakesScreenshot Members
         /// <summary>

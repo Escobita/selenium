@@ -19,7 +19,6 @@ package org.openqa.selenium;
 
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
-import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
@@ -321,7 +320,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
   }
 
   @NoDriverAfterTest
-  @Ignore({IPHONE})
+  @Ignore({IPHONE, OPERA})
   public void testClosingTheFinalBrowserWindowShouldNotCauseAnExceptionToBeThrown() {
     driver.get(pages.simpleTestPage);
     try {
@@ -378,7 +377,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     assertThat(driver.getCurrentUrl(), equalTo(url));
   }
 
-  @Ignore(value = {ANDROID, HTMLUNIT, OPERA}, reason = "Appears to uncover an HtmlUnit bug")
+  @Ignore(value = {ANDROID, OPERA})
   @JavascriptEnabled
   public void testShouldBeAbleToCarryOnWorkingIfTheFrameIsDeletedFromUnderUs() {
     driver.get(pages.deletingFrame);
@@ -397,7 +396,7 @@ public class FrameSwitchingTest extends AbstractDriverTestCase {
     driver.switchTo().frame("iframe1");
 
     try {
-      driver.findElement(By.id("checkbox"));
+      waitFor(elementToExist(driver, "checkbox"));
     } catch (WebDriverException web) {
       fail("Could not find element after switching frame");
     }

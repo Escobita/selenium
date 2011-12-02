@@ -245,7 +245,7 @@ bot.action.focusOnElement = function(element, opt_activeElement) {
 /**
  * Clears a textual form field.
  *
- * <p/>Throws an exception if the element is not shown, disabled, or editable.
+ * <p/>Throws an exception if the element is not shown, disabled, or not editable.
  *
  * @param {!Element} element The element to clear.
  */
@@ -253,13 +253,22 @@ bot.action.clear = function(element) {
   bot.action.checkInteractable_(element);
   if (!bot.dom.isEditable(element)) {
     throw new bot.Error(bot.ErrorCode.INVALID_ELEMENT_STATE,
-        'Element cannot contain user-editable text');
+        'Element must be user-editable in order to clear it.');
   }
 
   bot.action.focusOnElement(element);
   if (element.value) {
     element.value = '';
     bot.events.fire(element, goog.events.EventType.CHANGE);
+    return;
+  }
+  
+  if (bot.dom.isContentEditable(element)) {
+    // A single space is required, if you put empty string here you'll not be able
+    // to interact with this element anymore in Firefox
+    element.innerHTML = ' ';
+    // contentEditable does not generate onchange event
+    return;
   }
 };
 
@@ -604,3 +613,25 @@ bot.action.drag = function(element, dx, dy, opt_coords) {
   mouse.releaseButton();
 };
 
+
+
+/**
+ * Scrolls the element in to the current viewport. Aims to do the minimum
+ * scrolling necessary
+ * @param {!Element} element The element to scroll in to view.
+ * @param {!goog.math.Coordinate=} opt_coords Offset relative to the top-left
+ *     corner of the element, to ensure is scrolled in to view.
+ * @return {boolean} Whether the element is in view after scrolling.
+ */
+bot.action.scrollIntoViewIfNecessary = function(element, opt_coords) {
+  var coords = opt_coords;
+  if (!coords) {
+    var size = goog.style.getSize(element);
+    coords = new goog.math.Coordinate(size.width / 2, size.height /2);
+  }
+
+  if (!bot.dom.isCurrentlyScrolledIntoView(element, coords)) {
+    element.scrollIntoView();
+  }
+  return bot.dom.isCurrentlyScrolledIntoView(element, coords);
+};

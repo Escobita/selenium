@@ -2,21 +2,39 @@
   "capabilities":
       [
         {
+          "browserName": "*firefox",
+          "maxInstances": 5,
+          "seleniumProtocol": "Selenium"
+        },
+        {
+          "browserName": "*googlechrome",
+          "maxInstances": 5,
+          "seleniumProtocol": "Selenium"
+        },
+        {
+          "browserName": "*iexplore",
+          "maxInstances": 1,
+          "seleniumProtocol": "Selenium"
+        },
+        {
           "browserName": "firefox",
-          "maxInstances": 5
+          "maxInstances": 5,
+          "seleniumProtocol": "WebDriver"
         },
         {
           "browserName": "chrome",
-          "maxInstances": 5
+          "maxInstances": 5,
+          "seleniumProtocol": "WebDriver"
         },
         {
           "browserName": "internet explorer",
-          "maxInstances": 1
+          "maxInstances": 1,
+          "seleniumProtocol": "WebDriver"
         }
       ],
   "configuration":
   {
-    "proxy": "org.openqa.grid.selenium.proxy.WebDriverRemoteProxy",
+    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
     "maxSession": 5,
     "port": 5555,
     "host": ip,

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("serial")
 public class DesiredCapabilities implements Serializable, Capabilities {
   private final Map<String, Object> capabilities = new HashMap<String, Object>();
 
@@ -128,7 +129,9 @@ public class DesiredCapabilities implements Serializable, Capabilities {
 
   public void merge(
       org.openqa.selenium.Capabilities extraCapabilities) {
-    capabilities.putAll(extraCapabilities.asMap());
+    if (extraCapabilities != null) {
+      capabilities.putAll(extraCapabilities.asMap());
+    }
   }
 
   public void setCapability(String capabilityName, boolean value) {
@@ -174,19 +177,12 @@ public class DesiredCapabilities implements Serializable, Capabilities {
     return capabilities;
   }
 
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public static DesiredCapabilities htmlUnitWithJavascript() {
-    DesiredCapabilities htmlUnitWithJS =
-        new DesiredCapabilities("htmlunit", "firefox", Platform.ANY);
-    htmlUnitWithJS.setJavascriptEnabled(true);
-    return htmlUnitWithJS;
-  }
-
   public static DesiredCapabilities iphone() {
-    return new DesiredCapabilities("iphone", "", Platform.MAC);
+    return new DesiredCapabilities("iPhone", "", Platform.MAC);
+  }
+  
+  public static DesiredCapabilities ipad() {
+    return new DesiredCapabilities("iPad", "", Platform.MAC);
   }
 
   public static DesiredCapabilities opera() {

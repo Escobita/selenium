@@ -1,7 +1,7 @@
 ﻿// <copyright file="RemoteOptions.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,16 @@ namespace OpenQA.Selenium.Remote
         public ICookieJar Cookies
         {
             get { return new RemoteCookieJar(this.driver); }
+        }
+
+        /// <summary>
+        /// Gets an object allowing the user to manipulate the currently-focused browser window.
+        /// </summary>
+        /// <remarks>"Currently-focused" is defined as the browser window having the window handle
+        /// returned when IWebDriver.CurrentWindowHandle is called.</remarks>
+        public IWindow Window
+        {
+            get { return new RemoteWindow(this.driver); }
         }
 
         /// <summary>

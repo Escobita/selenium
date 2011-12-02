@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,11 +13,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
+
 package org.openqa.grid.selenium;
 
 import org.openqa.selenium.server.SeleniumServer;
+import org.openqa.selenium.server.cli.RemoteControlLauncher;
 
+import org.openqa.grid.common.CommandLineOptionHelper;
 import org.openqa.grid.common.GridDocHelper;
 import org.openqa.grid.common.GridRole;
 import org.openqa.grid.common.RegistrationRequest;
@@ -33,6 +37,15 @@ public class GridLauncher {
 
   public static void main(String[] args) throws Exception {
 
+    CommandLineOptionHelper helper = new CommandLineOptionHelper(args);
+    if (helper.isParamPresent("-help")){
+      String separator = "\n----------------------------------\n";
+      RemoteControlLauncher.usage(separator+"To use as a standalone server"+separator);
+      GridDocHelper.printHelp(separator+"To use in a grid environement :"+separator,false);
+      return;
+    }
+    
+    
     GridRole role = GridRole.find(args);
 
     switch (role) {
@@ -51,8 +64,7 @@ public class GridLauncher {
           GridDocHelper.printHelp(e.getMessage());
         }
         break;
-      case WEBDRIVER:
-      case REMOTE_CONTROL:
+      case NODE:
         log.info("Launching a selenium grid node");
         try {
           RegistrationRequest c = RegistrationRequest.build(args);

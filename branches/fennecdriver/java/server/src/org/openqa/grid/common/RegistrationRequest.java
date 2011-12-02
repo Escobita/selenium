@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,23 +13,12 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 package org.openqa.grid.common;
 
-import com.google.common.collect.Maps;
-
-import org.openqa.selenium.net.NetworkUtils;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.server.RemoteControlConfiguration;
-import org.openqa.selenium.server.cli.RemoteControlLauncher;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.grid.common.exception.GridConfigurationException;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,7 +29,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.grid.common.exception.GridConfigurationException;
+import org.openqa.grid.common.exception.GridException;
+import org.openqa.selenium.internal.seleniumemulation.GetValue;
+import org.openqa.selenium.net.NetworkUtils;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.server.RemoteControlConfiguration;
+import org.openqa.selenium.server.cli.RemoteControlLauncher;
+
+import com.google.common.collect.Maps;
 
 /**
  * helper to register to the grid. Using JSON to exchange the object between the node and grid.
@@ -57,12 +62,14 @@ public class RegistrationRequest {
   private String[] args;
   private String nodeJSON;
 
-  private static final Logger log = Logger
-      .getLogger(RegistrationRequest.class.getName());
+  private static final Logger log = Logger.getLogger(RegistrationRequest.class.getName());
 
   // some special param for capability
   public static final String APP = "applicationName";
   public static final String MAX_INSTANCES = "maxInstances";
+  // see enum SeleniumProtocol
+  public static final String SELENIUM_PROTOCOL = "seleniumProtocol";
+  public static final String PATH = "path";
   public static final String BROWSER = CapabilityType.BROWSER_NAME;
   public static final String PLATFORM = CapabilityType.PLATFORM;
   public static final String VERSION = CapabilityType.VERSION;
@@ -73,11 +80,13 @@ public class RegistrationRequest {
   public static final String CLEAN_UP_CYCLE = "cleanUpCycle";
   public static final String TIME_OUT = "timeout";
 
-  public static final String REMOTE_URL = "url";
+  // TODO delete to keep only HUB_HOSt and HUB_PORT
+  public static final String REMOTE_HOST = "remoteHost";
 
   public static final String MAX_SESSION = "maxSession";
   public static final String AUTO_REGISTER = "register";
   public static final String NODE_POLLING = "nodePolling";
+  public static final String UNREGISTER_IF_STILL_DOWN_AFTER = "unregisterIfStillDownAfter";
 
   public static final String MAX_TESTS_BEFORE_CLEAN = "maxTestBeforeClean";
   public static final String CLEAN_SNAPSHOT = "cleanSnapshot";
@@ -162,8 +171,7 @@ public class RegistrationRequest {
       }
       res.put("capabilities", caps);
     } catch (JSONException e) {
-      throw new RuntimeException("Error encoding to JSON "
-          + e.getMessage(), e);
+      throw new RuntimeException("Error encoding to JSON " + e.getMessage(), e);
     }
 
     return res;
@@ -186,13 +194,58 @@ public class RegistrationRequest {
     try {
       return Integer.parseInt(o.toString());
     } catch (Throwable t) {
-      log.warning("Error." + name
-          + " is supposed to be an int. Keeping default of "
-          + defaultValue);
+      log.warning("Error." + name + " is supposed to be an int. Keeping default of " + defaultValue);
       return defaultValue;
     }
 
   }
+
+
+  /**
+  * fixing a backward compatibility issue causing #2738 After 2.9 release, the remoteProxy for a
+  * node changed for 2 type of nodes to single node answering both sel1 and webdriver protocol.
+  * <p>
+  * That means the hub now need to handle registration request containing
+  * "url":"http://ip:port/selenium-server/driver" ( 2.9- , RC ),"url":"http://ip:port/wd/hub"
+  * (2.9-, wb)
+  * <p>
+  * and "remoteHost":"http://ip:port" ( 2.9+ ).
+  *
+  * The pre 2.9 registration requests need to be updated and take the "url" config param and
+  * generate the "remoteHost" out of it.
+  */
+
+  // TODO freynaud : remove that when 2.9- nodes are history.
+
+  private void ensureBackwardCompatibility() {
+    // new param after 2.9
+    String url = (String) configuration.get(REMOTE_HOST);
+
+    if (url != null) {
+      return;
+    } else {
+      // could be a pre 2.9 node
+      url = (String) configuration.get("url");
+      if (url == null) {
+        return;
+      } else {
+        // was a legacy RC node. Needs to set that on the capabilities, as webdriver is the default.
+        if (url.contains("selenium-server/driver")) {
+          for (DesiredCapabilities capability : capabilities) {
+            capability.setCapability(SELENIUM_PROTOCOL, SeleniumProtocol.Selenium);
+          }
+        }
+        URL tmp;
+        try {
+          tmp = new URL(url);
+        } catch (MalformedURLException e) {
+          throw new GridException("specified URL for the node isn't valid :" + url);
+        }
+        configuration.put(REMOTE_HOST, "http://" + tmp.getHost() + ":" + tmp.getPort());
+      }
+    }
+  }
+
 
   /**
    * Create an object from a registration request formatted as a json string.
@@ -207,12 +260,9 @@ public class RegistrationRequest {
     try {
       JSONObject o = new JSONObject(json);
 
-      if (o.has("id"))
-        request.setId(o.getString("id"));
-      if (o.has("name"))
-        request.setName(o.getString("name"));
-      if (o.has("description"))
-        request.setDescription(o.getString("description"));
+      if (o.has("id")) request.setId(o.getString("id"));
+      if (o.has("name")) request.setName(o.getString("name"));
+      if (o.has("description")) request.setDescription(o.getString("description"));
       JSONObject config = o.getJSONObject("configuration");
 
       Map<String, Object> configuration = Maps.newHashMap();
@@ -227,13 +277,13 @@ public class RegistrationRequest {
       for (int i = 0; i < capabilities.length(); i++) {
         JSONObject capability = capabilities.getJSONObject(i);
         DesiredCapabilities cap = new DesiredCapabilities();
-        for (Iterator<String> iterator = capability.keys(); iterator
-            .hasNext();) {
+        for (Iterator<String> iterator = capability.keys(); iterator.hasNext();) {
           String key = iterator.next();
           cap.setCapability(key, capability.get(key));
         }
         request.capabilities.add(cap);
       }
+      request.ensureBackwardCompatibility();
       return request;
     } catch (JSONException e) {
       // Check if it was a Selenium Grid 1.0 request.
@@ -273,33 +323,28 @@ public class RegistrationRequest {
         registrationInfo.put(URLDecoder.decode(configItem[0], "UTF-8"),
             URLDecoder.decode(configItem[1], "UTF-8"));
       } catch (UnsupportedEncodingException e) {
-        log.warning(String.format(
-            "Unable to decode registration request portion: %s",
-            part));
+        log.warning(String.format("Unable to decode registration request portion: %s", part));
       }
     }
 
     // Now validate the query string.
-    if ((registrationInfo.get("port") != null)
-        && (registrationInfo.get("environment") != null)) {
+    if ((registrationInfo.get("port") != null) && (registrationInfo.get("environment") != null)) {
       RegistrationRequest request = new RegistrationRequest();
 
       Map<String, Object> configuration = Maps.newHashMap();
-      configuration.put(PROXY_CLASS,
-          "org.openqa.grid.selenium.proxy.SeleniumRemoteProxy");
+      configuration.put(SELENIUM_PROTOCOL, SeleniumProtocol.Selenium.toString());
       configuration
-          .put(REMOTE_URL, String.format(
-              "http://%s:%s/selenium-server/driver",
-              registrationInfo.get("host"),
-              registrationInfo.get("port")));
+          .put(
+              REMOTE_HOST,
+              String.format("http://%s:%s", registrationInfo.get("host"),
+                  registrationInfo.get("port")));
       request.setConfiguration(configuration);
 
       DesiredCapabilities cap = new DesiredCapabilities();
       // cap.put(CapabilityType.PLATFORM, "LINUX");
       // TODO freynaud envt or browser ?
       cap.setCapability(BROWSER, registrationInfo.get("environment"));
-      cap.setCapability("environment",
-          registrationInfo.get("environment"));
+      cap.setCapability("environment", registrationInfo.get("environment"));
       request.capabilities.add(cap);
 
       return request;
@@ -321,13 +366,19 @@ public class RegistrationRequest {
     CommandLineOptionHelper helper = new CommandLineOptionHelper(args);
 
     res.role = GridRole.find(args);
-    // default
-    String defaultConfig = "defaults/DefaultNode.json";
-    res.loadFromJSON(defaultConfig);
 
-    if (res.role == GridRole.REMOTE_CONTROL) {
-      res.configuration.put(PROXY_CLASS, "org.openqa.grid.selenium.proxy.SeleniumRemoteProxy");
+
+    String defaultConfig = "defaults/DefaultNode.json";
+    String nodeType = helper.getParamValue("-role");
+    if (GridRole.RCAliases().contains(nodeType)) {
+      defaultConfig = "defaults/DefaultNodeSelenium.json";
     }
+    if (GridRole.WDAliases().contains(nodeType)) {
+      defaultConfig = "defaults/DefaultNodeWebDriver.json";
+    }
+
+   
+    res.loadFromJSON(defaultConfig);
 
     // -file *.json ?
     if (helper.isParamPresent("-nodeConfig")) {
@@ -335,6 +386,9 @@ public class RegistrationRequest {
       res.nodeJSON = value;
       res.loadFromJSON(value);
     }
+
+    // from command line
+    res.loadFromCommandLine(args);
 
     String host = (String) res.configuration.get(HOST);
     if ("ip".equalsIgnoreCase(host)) {
@@ -347,24 +401,12 @@ public class RegistrationRequest {
       res.configuration.put(HOST, guessedHost);
     }
 
-    // from command line
-    res.loadFromCommandLine(args);
+
 
     // some values can be calculated.
-    if (res.configuration.get(REMOTE_URL) == null) {
-      String base = "http://" + res.configuration.get(HOST) + ":" + res.configuration.get(PORT);
-      String url;
-      switch (res.getRole()) {
-        case REMOTE_CONTROL:
-          url = base + "/selenium-server/driver";
-          break;
-        case WEBDRIVER:
-          url = base + "/wd/hub";
-          break;
-        default:
-          throw new GridConfigurationException("Cannot launch a node with role " + res.getRole());
-      }
-      res.configuration.put(REMOTE_URL, url);
+    if (res.configuration.get(REMOTE_HOST) == null) {
+      String url = "http://" + res.configuration.get(HOST) + ":" + res.configuration.get(PORT);
+      res.configuration.put(REMOTE_HOST, url);
     }
     String u = (String) res.configuration.get("hub");
     if (u != null) {
@@ -400,33 +442,26 @@ public class RegistrationRequest {
       configuration.put(HUB_HOST, helper.getParamValue("-hubHost"));
     }
     if (helper.isParamPresent("-" + HUB_PORT)) {
-      configuration.put(HUB_PORT,
-          Integer.parseInt(helper.getParamValue("-" + HUB_PORT)));
+      configuration.put(HUB_PORT, Integer.parseInt(helper.getParamValue("-" + HUB_PORT)));
     }
     if (helper.isParamPresent("-host")) {
       configuration.put(HOST, helper.getParamValue("-host"));
     }
     if (helper.isParamPresent("-port")) {
-      configuration.put(PORT,
-          Integer.parseInt(helper.getParamValue("-port")));
+      configuration.put(PORT, Integer.parseInt(helper.getParamValue("-port")));
     }
     if (helper.isParamPresent("-cleanUpCycle")) {
-      configuration.put(CLEAN_UP_CYCLE,
-          Integer.parseInt(helper.getParamValue("-cleanUpCycle")));
+      configuration.put(CLEAN_UP_CYCLE, Integer.parseInt(helper.getParamValue("-cleanUpCycle")));
     }
     if (helper.isParamPresent("-timeout")) {
-      configuration.put(TIME_OUT,
-          Integer.parseInt(helper.getParamValue("-timeout")));
+      configuration.put(TIME_OUT, Integer.parseInt(helper.getParamValue("-timeout")));
     }
     if (helper.isParamPresent("-maxSession")) {
-      configuration.put(MAX_SESSION,
-          Integer.parseInt(helper.getParamValue("-maxSession")));
+      configuration.put(MAX_SESSION, Integer.parseInt(helper.getParamValue("-maxSession")));
     }
     if (helper.isParamPresent("-" + AUTO_REGISTER)) {
-      configuration.put(
-          AUTO_REGISTER,
-          Boolean.parseBoolean(helper.getParamValue("-"
-              + AUTO_REGISTER)));
+      configuration.put(AUTO_REGISTER,
+          Boolean.parseBoolean(helper.getParamValue("-" + AUTO_REGISTER)));
     }
 
     if (helper.isParamPresent("-servlets")) {
@@ -450,16 +485,13 @@ public class RegistrationRequest {
     System.out.println("adding " + capability);
     String[] s = capability.split(",");
     if (s.length == 0) {
-      throw new GridConfigurationException(
-          "-browser must be followed by a browser description");
+      throw new GridConfigurationException("-browser must be followed by a browser description");
     }
     DesiredCapabilities res = new DesiredCapabilities();
     for (String capabilityPair : s) {
       if (capabilityPair.split("=").length != 2) {
-        throw new GridConfigurationException(
-            "-browser format is key1=value1,key2=value2 "
-                + capabilityPair
-                + " deosn't follow that format.");
+        throw new GridConfigurationException("-browser format is key1=value1,key2=value2 "
+            + capabilityPair + " deosn't follow that format.");
       }
       String key = capabilityPair.split("=")[0];
       String value = capabilityPair.split("=")[1];
@@ -486,8 +518,7 @@ public class RegistrationRequest {
       res.put("configuration", new JSONObject(configuration));
       return res;
     } catch (JSONException e) {
-      throw new GridConfigurationException(
-          "error generating the node config : " + e.getMessage());
+      throw new GridConfigurationException("error generating the node config : " + e.getMessage());
     }
   }
 
@@ -496,7 +527,7 @@ public class RegistrationRequest {
    * 
    * @param resource
    */
-  private void loadFromJSON(String resource) {
+  public void loadFromJSON(String resource) {
     try {
       JSONObject base = JSONConfigurationUtils.loadJSON(resource);
 
@@ -509,11 +540,6 @@ public class RegistrationRequest {
           for (Iterator iterator = cap.keys(); iterator.hasNext();) {
             String name = (String) iterator.next();
             Object value = cap.get(name);
-            if (role == GridRole.REMOTE_CONTROL
-                && CapabilityType.BROWSER_NAME.equals(name)) {
-              value = Utils
-                  .getSelenium1Equivalent((String) value);
-            }
             c.setCapability(name, value);
           }
           capabilities.add(c);
@@ -537,8 +563,8 @@ public class RegistrationRequest {
       }
 
     } catch (Throwable e) {
-      throw new GridConfigurationException(
-          "Error with the JSON of the config : " + e.getMessage(), e);
+      throw new GridConfigurationException("Error with the JSON of the config : " + e.getMessage(),
+          e);
     }
   }
 
@@ -555,12 +581,11 @@ public class RegistrationRequest {
     for (String key : configuration.keySet()) {
       params.add("-" + key);
 
-      if (! configuration.get(key).toString().trim().isEmpty()) {
+      if (!configuration.get(key).toString().trim().isEmpty()) {
         params.add("" + configuration.get(key));
       }
     }
-    return RemoteControlLauncher.parseLauncherOptions(params
-        .toArray(new String[params.size()]));
+    return RemoteControlLauncher.parseLauncherOptions(params.toArray(new String[params.size()]));
   }
 
   public String[] getArgs() {
@@ -576,12 +601,12 @@ public class RegistrationRequest {
     String hub = (String) configuration.get(HUB_HOST);
     Integer port = (Integer) configuration.get(HUB_PORT);
     if (hub == null || port == null) {
-      throw new GridConfigurationException(
-          "You need to specify a hub to register to using -"
-              + HUB_HOST + " X -" + HUB_PORT
-              + " 5555. The specified config was -" + HUB_HOST
-              + " " + hub + " -" + HUB_PORT + " " + port);
+      throw new GridConfigurationException("You need to specify a hub to register to using -"
+          + HUB_HOST + " X -" + HUB_PORT + " 5555. The specified config was -" + HUB_HOST + " "
+          + hub + " -" + HUB_PORT + " " + port);
     }
   }
+  
+ 
 
 }

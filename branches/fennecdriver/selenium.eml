@@ -6,6 +6,26 @@
 		<testFolder url="file://$MODULE_DIR$/java/server/test"/>
 		<excludeFolder url="file://$MODULE_DIR$/build"/>
 		<excludeFolder url="file://$MODULE_DIR$/common/build"/>
+		<excludeFolder url="file://$MODULE_DIR$/cpp"/>
+		<excludeFolder url="file://$MODULE_DIR$/docs"/>
+		<excludeFolder url="file://$MODULE_DIR$/dotnet"/>
+		<excludeFolder url="file://$MODULE_DIR$/iphone"/>
+		<excludeFolder url="file://$MODULE_DIR$/out"/>
+		<excludeFolder url="file://$MODULE_DIR$/py/docs"/>
+		<excludeFolder url="file://$MODULE_DIR$/selenium.egg-info"/>
+		<excludeFolder url="file://$MODULE_DIR$/selenium/bin"/>
+		<excludeFolder url="file://$MODULE_DIR$/selenium/build"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/cpp"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/csharp"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/gecko-1.9.2"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/gecko-2"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/gecko-5"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/gecko-6"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/gecko-7"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/json-cpp"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/mongoose"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/nmock"/>
+		<excludeFolder url="file://$MODULE_DIR$/third_party/webkit"/>
 	</contentEntry>
 	<lib name="junit-dep-4.10.jar" scope="COMPILE">
 		<srcroot url="jar://$MODULE_DIR$/third_party/java/junit/junit-dep-4.10-src.jar!/"/>
@@ -124,10 +144,10 @@
 	<lib name="jetty-servlet-7.2.0.v20101020.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/jetty/jetty-servlet-7.2.0.v20101020.jar!/"/>
 	</lib>
-	<lib name="guava-r09.jar" scope="COMPILE">
-		<srcroot url="jar://$MODULE_DIR$/third_party/java/guava-libraries/guava-r09-src.jar!/"/>
-		<relative-module-src project-related="jar://$PROJECT_DIR$/third_party/java/guava-libraries/guava-r09-src.jar!/"/>
-		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/guava-libraries/guava-r09.jar!/"/>
+	<lib name="guava-10.0.1.jar" scope="COMPILE">
+		<srcroot url="jar://$MODULE_DIR$/third_party/java/guava-libraries/guava-10.0.1-src.jar!/"/>
+		<relative-module-src project-related="jar://$PROJECT_DIR$/third_party/java/guava-libraries/guava-10.0.1-src.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/guava-libraries/guava-10.0.1.jar!/"/>
 	</lib>
 	<lib name="jasper-compiler-jdt-5.5.15.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/jasper/jasper-compiler-jdt-5.5.15.jar!/"/>
@@ -162,10 +182,10 @@
 	<lib name="xalan-2.7.1.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/xml/xalan-2.7.1.jar!/"/>
 	</lib>
-	<lib name="operadriver-v0.7.3.jar" scope="COMPILE">
-		<srcroot url="jar://$MODULE_DIR$/third_party/java/opera-driver/operadriver-v0.7.3-source.jar!/"/>
-		<relative-module-src project-related="jar://$PROJECT_DIR$/third_party/java/opera-driver/operadriver-v0.7.3-source.jar!/"/>
-		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/opera-driver/operadriver-v0.7.3.jar!/"/>
+	<lib name="operadriver-v0.8.1.jar" scope="COMPILE">
+		<srcroot url="jar://$MODULE_DIR$/third_party/java/opera-driver/operadriver-v0.8.1-source.jar!/"/>
+		<relative-module-src project-related="jar://$PROJECT_DIR$/third_party/java/opera-driver/operadriver-v0.8.1-source.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/opera-driver/operadriver-v0.8.1.jar!/"/>
 	</lib>
 	<lib name="jmock-junit4-2.5.1.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/jmock/jmock-junit4-2.5.1.jar!/"/>
@@ -184,5 +204,10 @@
 	</lib>
 	<lib name="jmock-legacy-2.5.1.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/jmock/jmock-legacy-2.5.1.jar!/"/>
+	</lib>
+	<lib name="commons-exec-1.1.jar" scope="COMPILE">
+		<srcroot url="jar://$MODULE_DIR$/third_party/java/commons-exec/commons-exec-1.1-sources.jar!/"/>
+		<relative-module-src project-related="jar://$PROJECT_DIR$/third_party/java/commons-exec/commons-exec-1.1-sources.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/third_party/java/commons-exec/commons-exec-1.1.jar!/"/>
 	</lib>
 </component>

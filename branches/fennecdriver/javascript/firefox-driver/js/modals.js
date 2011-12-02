@@ -28,10 +28,6 @@ goog.require('fxdriver.moz');
 goog.require('fxdriver.utils');
 
 
-var CI = Components.interfaces;
-var CC = Components.classes;
-
-
 fxdriver.modals.isModalPresent = function(callback, timeout) {
   var timer = new fxdriver.Timer();
   timer.runWhenTrue(
@@ -71,14 +67,22 @@ fxdriver.modals.getText = function(driver) {
 fxdriver.modals.setValue = function(driver, value) {
   var modal = fxdriver.modals.find_();
   var textbox = modal.document.getElementById('loginTextbox');
+
   try {
-    var trueIfTextboxExists = textbox.selectionStart > -1;
-    if (trueIfTextboxExists) {
-      textbox.value = value;
+    var isVisible = false;
+    if (bot.userAgent.isVersion(8)) {
+      isVisible = textbox.clientHeight != 0;
+    } else {
+      isVisible = textbox.selectionStart > -1;
     }
-  } catch (e) {
-    throw new WebDriverError(bot.ErrorCode.ELEMENT_NOT_VISIBLE, 'Alert did not have a text box');
-  }
+
+    if (isVisible) {
+      textbox.value = value;
+      return;
+    }
+  } catch (ignored) {}
+
+  throw new WebDriverError(bot.ErrorCode.ELEMENT_NOT_VISIBLE, 'Alert did not have a text box');
 };
 
 
@@ -151,9 +155,7 @@ fxdriver.modals.signalOpenModal = function(parent, text) {
   if (driver && driver.response_) {
     fxdriver.modals.setFlag(driver, text);
     var res = driver.response_;
-    res.value = {
-      text: text
-    };
+    res.value = text;
     res.statusCode = bot.ErrorCode.MODAL_DIALOG_OPENED;
     res.send();
   }

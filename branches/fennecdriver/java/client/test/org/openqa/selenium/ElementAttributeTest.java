@@ -20,10 +20,12 @@ package org.openqa.selenium;
 import com.google.common.base.Throwables;
 
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
+import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
+import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -279,7 +281,7 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
   }
 
   @Ignore(value = {IE, IPHONE, ANDROID}, reason = "IE7 Does not support SVG; " +
-      "SVG elements crash the iWebDriver app (issue 1134)")
+      "SVG elements crash the iWebDriver app (issue 1134)", issues = {1134})
   public void testGetAttributeDoesNotReturnAnObjectForSvgProperties() {
     driver.get(pages.svgPage);
     WebElement svgElement = driver.findElement(By.id("rotate"));
@@ -311,4 +313,27 @@ public class ElementAttributeTest extends AbstractDriverTestCase {
     assertEquals("hello world", element.getAttribute("value"));
   }
 
+  @Ignore({FIREFOX, CHROME, OPERA, IPHONE, ANDROID, REMOTE, SELENESE})
+  public void testShouldReturnNullForNonPresentBooleanAttributes() {
+    driver.get(pages.booleanAttributes);
+    WebElement element1 = driver.findElement(By.id("working"));
+    assertNull(element1.getAttribute("required"));
+    WebElement element2 = driver.findElement(By.id("wallace"));
+    assertNull(element2.getAttribute("nowrap"));
+  }
+
+  @Ignore({IE, IPHONE, ANDROID, REMOTE, SELENESE})
+  public void testShouldReturnTrueForPresentBooleanAttributes() {
+    driver.get(pages.booleanAttributes);
+    WebElement element1 = driver.findElement(By.id("emailRequired"));
+    assertEquals("true", element1.getAttribute("required"));
+    WebElement element2 = driver.findElement(By.id("emptyTextAreaRequired"));
+    assertEquals("true", element2.getAttribute("required"));
+    WebElement element3 = driver.findElement(By.id("inputRequired"));
+    assertEquals("true", element3.getAttribute("required"));
+    WebElement element4 = driver.findElement(By.id("textAreaRequired"));
+    assertEquals("true", element4.getAttribute("required"));
+    WebElement element5 = driver.findElement(By.id("unwrappable"));
+    assertEquals("true", element5.getAttribute("nowrap"));
+  }
 }

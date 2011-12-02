@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -27,8 +28,10 @@ import static org.openqa.selenium.Ignore.Driver.OPERA;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.TestWaiter.waitFor;
 import static org.openqa.selenium.WaitingConditions.elementTextToEqual;
+import static org.openqa.selenium.WaitingConditions.windowHandleCountToBe;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 @Ignore({CHROME, HTMLUNIT, IPHONE, OPERA, SELENESE})
 public class AlertsTest extends AbstractDriverTestCase {
@@ -48,7 +51,7 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore
+  @Ignore(ALL)
   public void testShouldDismissAlertOnException() {
     driver.findElement(By.id("alert")).click();
 
@@ -83,6 +86,22 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @NeedsLocalEnvironment(reason = "Carefully timing based")
+  public void testShouldGetTextOfAlertOpenedInSetTimeout() throws Exception {
+    driver.findElement(By.id("slow-alert")).click();
+    
+    // DO NOT WAIT OR SLEEP HERE.
+    // This is a regression test for a bug where only the first switchTo call would throw,
+    // and only if it happens before the alert actually loads.
+    Alert alert = driver.switchTo().alert();
+    try {
+      assertEquals("Slow", alert.getText());
+    } finally {
+      alert.accept();
+    }
+  }
+
+  @JavascriptEnabled
   public void testShouldAllowUsersToDismissAnAlertManually() {
     driver.findElement(By.id("alert")).click();
 
@@ -95,6 +114,11 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldAllowAUserToAcceptAPrompt() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("prompt")).click();
 
     Alert alert = waitFor(alertToBePresent(driver));
@@ -106,6 +130,11 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldAllowAUserToDismissAPrompt() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("prompt")).click();
 
     Alert alert = waitFor(alertToBePresent(driver));
@@ -117,6 +146,11 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testShouldAllowAUserToSetTheValueOfAPrompt() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("prompt")).click();
 
     Alert alert = waitFor(alertToBePresent(driver));
@@ -205,7 +239,34 @@ public class AlertsTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
+  @Ignore(value = {ALL}, issues = {2764, 2834})
+  public void testSwitchingToMissingAlertInAClosedWindowThrows() throws Exception {
+    String mainWindow = driver.getWindowHandle();
+    try {
+      driver.findElement(By.id("open-new-window")).click();
+      waitFor(windowHandleCountToBe(driver, 2));
+      driver.switchTo().window("newwindow").close();
+
+      try {
+        alertToBePresent(driver).call();
+        fail("Expected exception");
+      } catch (NoSuchWindowException expected) {
+        // Expected
+      }
+  
+    } finally {
+      driver.switchTo().window(mainWindow);
+      waitFor(elementTextToEqual(driver, By.id("open-new-window"), "open new window"));
+    }
+  }
+
+  @JavascriptEnabled
   public void testPromptShouldUseDefaultValueIfNoKeysSent() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("prompt-with-default")).click();
 
     Alert alert = waitFor(alertToBePresent(driver));
@@ -217,6 +278,11 @@ public class AlertsTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore(ANDROID)
   public void testPromptShouldHaveNullValueIfDismissed() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("prompt-with-default")).click();
 
     Alert alert = waitFor(alertToBePresent(driver));
@@ -227,6 +293,11 @@ public class AlertsTest extends AbstractDriverTestCase {
 
   @JavascriptEnabled
   public void testHandlesTwoAlertsFromOneInteraction() {
+    if (cannotTestPrompts()) {
+      System.out.println("Ignoring IE alerts tests on Sauce");
+      return;
+    }
+
     driver.findElement(By.id("double-prompt")).click();
 
     Alert alert1 = waitFor(alertToBePresent(driver));
@@ -241,6 +312,84 @@ public class AlertsTest extends AbstractDriverTestCase {
     waitFor(elementTextToEqual(driver, By.id("text2"), "cheddar"));
   }
 
+  @JavascriptEnabled
+  public void testShouldHandleAlertOnPageLoad() {
+    driver.findElement(By.id("open-page-with-onload-alert")).click();
+
+    Alert alert = waitFor(alertToBePresent(driver));
+    String value = alert.getText();
+    alert.accept();
+
+    assertEquals("onload", value);
+    waitFor(elementTextToEqual(driver, By.tagName("p"), "Page with onload event handler"));
+  }
+
+  @JavascriptEnabled
+  @Ignore(value = {FIREFOX, ANDROID, IE}, reason = "FF waits too long, may be hangs out." +
+      "Android currently does not store the source of the alert. IE8: Not confirmed working.")
+  public void testShouldNotHandleAlertInAnotherWindow() {
+    String mainWindow = driver.getWindowHandle();
+    try {
+      driver.findElement(By.id("open-window-with-onload-alert")).click();
+  
+      try {
+        waitFor(alertToBePresent(driver), 5, TimeUnit.SECONDS);
+        fail("Expected exception");
+      } catch (NoAlertPresentException expected) {
+        // Expected
+      }
+
+    } finally {
+      driver.switchTo().window("onload");
+      waitFor(alertToBePresent(driver)).dismiss();
+      driver.close();
+      driver.switchTo().window(mainWindow);
+      waitFor(elementTextToEqual(driver, By.id("open-window-with-onload-alert"), "open new window"));
+    }
+  }
+
+  @JavascriptEnabled
+  @Ignore(value = {IE}, reason = "IE crashes")
+  public void testShouldHandleAlertOnPageUnload() {
+    driver.findElement(By.id("open-page-with-onunload-alert")).click();
+    driver.navigate().back();
+
+    Alert alert = waitFor(alertToBePresent(driver));
+    String value = alert.getText();
+    alert.accept();
+
+    assertEquals("onunload", value);
+    waitFor(elementTextToEqual(driver, By.id("open-page-with-onunload-alert"), "open new page"));
+  }
+
+  @JavascriptEnabled
+  @Ignore(value = {IE}, reason = "IE crashes")
+  public void testShouldHandleAlertOnWindowClose() {
+    String mainWindow = driver.getWindowHandle();
+    try {
+      driver.findElement(By.id("open-window-with-onclose-alert")).click();
+      waitFor(windowHandleCountToBe(driver, 2));
+      driver.switchTo().window("onclose").close();
+
+      Alert alert = waitFor(alertToBePresent(driver));
+      String value = alert.getText();
+      alert.accept();
+  
+      assertEquals("onunload", value);
+
+    } finally {
+      driver.switchTo().window(mainWindow);
+      waitFor(elementTextToEqual(driver, By.id("open-window-with-onclose-alert"), "open new window"));
+    }
+  }
+
+  private boolean cannotTestPrompts() {
+    return
+        SauceDriver.shouldUseSauce() &&
+        TestUtilities.getEffectivePlatform().equals(Platform.XP) &&
+        TestUtilities.isInternetExplorer(driver);
+  }
+
   private Callable<Alert> alertToBePresent(final WebDriver driver) {
     return new Callable<Alert>() {
       public Alert call() throws Exception {
@@ -248,4 +397,5 @@ public class AlertsTest extends AbstractDriverTestCase {
       }
     };
   }
+
 }

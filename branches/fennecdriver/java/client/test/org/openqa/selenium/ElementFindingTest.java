@@ -20,7 +20,6 @@ package org.openqa.selenium;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
-import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.TestWaiter.waitFor;
 import static org.openqa.selenium.WaitingConditions.pageTitleToBe;
@@ -448,27 +447,31 @@ public class ElementFindingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({REMOTE})
-  @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementByCssSelector() {
     driver.get(pages.xhtmlTestPage);
     driver.findElement(By.cssSelector("div.content"));
   }
 
   @JavascriptEnabled
-  @Ignore({REMOTE})
-  @NeedsFreshDriver
   public void testShouldBeAbleToFindAnElementsByCssSelector() {
     driver.get(pages.xhtmlTestPage);
     driver.findElements(By.cssSelector("p"));
   }
 
-  public void testFindingByXPathShouldNotIncludeParentElementIfSameTagType() {
+  public void testFindingByTagNameShouldNotIncludeParentElementIfSameTagType() {
     driver.get(pages.xhtmlTestPage);
     WebElement parent = driver.findElement(By.id("my_span"));
 
     assertEquals(2, parent.findElements(By.tagName("div")).size());
     assertEquals(2, parent.findElements(By.tagName("span")).size());
+  }
+
+  public void testFindingByCssShouldNotIncludeParentElementIfSameTagType() {
+    driver.get(pages.xhtmlTestPage);
+    WebElement parent = driver.findElement(By.cssSelector("div#parent"));
+    WebElement child = parent.findElement(By.cssSelector("div"));
+
+    assertEquals("child", child.getAttribute("id"));
   }
 
   // TODO(danielwh): Add extensive CSS selector tests

@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,7 +13,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 package org.openqa.grid.internal;
 
@@ -28,13 +29,13 @@ import org.openqa.grid.web.Hub;
 import org.openqa.grid.web.servlet.handler.RequestHandler;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
+import org.openqa.selenium.server.log.LoggingManager;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,29 +48,26 @@ import java.util.logging.Logger;
 public class Registry {
 
   public static final String KEY = Registry.class.getName();
-
-  private Prioritizer prioritizer;
-
   private static final Logger log = Logger.getLogger(Registry.class.getName());
-
-  private final NewSessionRequestQueue newSessionQueue;
-
-  private Hub hub;
 
   // lock for anything modifying the tests session currently running on this
   // registry.
   private final ReentrantLock lock = new ReentrantLock();
   private final Condition testSessionAvailable = lock.newCondition();
-
   private final ProxySet proxies;
   private final ActiveTestSessions activeTestSessions = new ActiveTestSessions();
-  private Matcher matcherThread = new Matcher();
-  private volatile boolean stop = false;
-  private int newSessionWaitTimeout;
-
   private final GridHubConfiguration configuration;
   private final HttpClientFactory httpClientFactory;
+  private final NewSessionRequestQueue newSessionQueue;
+  private final Matcher matcherThread = new Matcher();
+  private final List<RemoteProxy> registeringProxies = new CopyOnWriteArrayList<RemoteProxy>();
 
+
+  private volatile boolean stop = false;
+  // The following three variables need to be volatile because we expose a public setters
+  private volatile int newSessionWaitTimeout;
+  private volatile Prioritizer prioritizer;
+  private volatile Hub hub;
 
   private Registry(Hub hub, GridHubConfiguration config) {
     this.hub = hub;
@@ -79,6 +77,7 @@ public class Registry {
     this.configuration = config;
     this.httpClientFactory = new HttpClientFactory();
     proxies = new ProxySet(config.isThrowOnCapabilityNotPresent());
+    this.matcherThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler());
   }
 
   @SuppressWarnings({"NullableProblems"})
@@ -88,12 +87,6 @@ public class Registry {
 
   public static Registry newInstance(Hub hub, GridHubConfiguration config) {
     Registry registry = new Registry(hub, config);
-    registry.matcherThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-      public void uncaughtException(Thread t, Throwable e) {
-        log.log(Level.SEVERE, "Matcher thread dying due to unhandled exception.", e);
-      }
-    });
-
     registry.matcherThread.start();
 
     // freynaud : TODO
@@ -125,11 +118,88 @@ public class Registry {
   }
 
   /**
+   * Ends this test session for the hub, releasing the resources in the hub / registry. It does not
+   * release anything on the remote. The resources are released in a separate thread, so the call
+   * returns immediatly. It allows release with long duration not to block the test while the hub is
+   * releasing the resource.
+   *
+   * @param session The session to terminate
+   * @param reason  the reason for termination
+   */
+  public void terminate(final TestSession session, final SessionTerminationReason reason) {
+    new Thread(new Runnable() { // Thread safety reviewed
+      public void run() {
+        _release(session.getSlot(), reason);
+      }
+    }).start();
+  }
+
+  /**
+   * Release the test slot. Free the resource on the slot itself and the registry. If also invokes
+   * the {@link org.openqa.grid.internal.listeners.TestSessionListener#afterSession(TestSession)} if
+   * applicable.
+   *
+   * @param testSlot The slot to release
+   */
+  private void _release(TestSlot testSlot, SessionTerminationReason reason) {
+    if (!testSlot.startReleaseProcess()) {
+      return;
+    }
+
+    if (!testSlot.performAfterSessionEvent()) {
+      return;
+    }
+
+    final String internalKey = testSlot.getInternalKey();
+
+    try {
+      lock.lock();
+      testSlot.finishReleaseProcess();
+      release(internalKey, reason);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  void terminateSynchronousFOR_TEST_ONLY(TestSession testSession) {
+    _release(testSession.getSlot(), SessionTerminationReason.CLIENT_STOPPED_SESSION);
+  }
+
+  public void removeIfPresent(RemoteProxy proxy) {
+    // Find the original proxy. While the supplied one is logically equivalent, it may be a fresh object with
+    // an empty TestSlot list, which doesn't figure into the proxy equivalence check.  Since we want to free up
+    // those test sessions, we need to operate on that original object.
+    if (proxies.contains(proxy)) {
+      log.warning(String.format(
+          "Proxy '%s' was previously registered.  Cleaning up any stale test sessions.", proxy));
+
+      final RemoteProxy p = proxies.remove(proxy);
+      for (TestSlot slot : p.getTestSlots()) {
+        forceRelease(slot, SessionTerminationReason.PROXY_REREGISTRATION);
+      }
+      p.teardown();
+    }
+  }
+
+  /**
+   * releasing the testslot, WITHOUT running any listener.
+   */
+  public void forceRelease(TestSlot testSlot, SessionTerminationReason reason) {
+    if (testSlot.getSession() == null) {
+      return;
+    }
+
+    String internalKey = testSlot.getInternalKey();
+    release(internalKey, reason);
+    testSlot.doFinishRelease();
+  }
+
+
+  /**
    * iterates the queue of incoming new session request and assign them to proxy after they've been
    * sorted by priority, with priority defined by the prioritizer.
    */
   class Matcher extends Thread { // Thread safety reviewed
-    private volatile boolean cleanState = true;
 
     Matcher() {
       super("Matcher thread");
@@ -145,32 +215,12 @@ public class Registry {
       }
     }
 
-    public void setCleanState() {
-      this.cleanState = true;
-    }
-
-    /**
-     * let the matcher know that something has been modified in the registry, and that the current
-     * iteration of incoming new session request should be stop to take the change into account. The
-     * change could be either a new Proxy added, or a session requested/released
-     */
-    public void setDirty() {
-      this.cleanState = false;
-    }
-
-    /**
-     * @return true if the registry hasn't been modified since the matcher started the current
-     *         iteration.
-     */
-    public boolean isRegistryClean() {
-      return cleanState;
-    }
-
   }
 
   public void stop() {
     stop = true;
     matcherThread.interrupt();
+    newSessionQueue.stop();
     proxies.teardown();
     httpClientFactory.close();
 
@@ -189,7 +239,7 @@ public class Registry {
     try {
       lock.lock();
 
-      proxies.verifyNewSessionRequest(request);
+      proxies.verifyAbilityToHandleDesiredCapabilities(request.getDesiredCapabilities());
       newSessionQueue.add(request);
       fireMatcherStateChanged();
     } finally {
@@ -205,26 +255,17 @@ public class Registry {
    */
 
   private void assignRequestToProxy() {
-
-    boolean force = false;
     while (!stop) {
       try {
-        matcherThread.setCleanState();
-        if (force) {
-          force = false;
-        } else {
-          testSessionAvailable.await(5, TimeUnit.SECONDS);
-        }
+        testSessionAvailable.await(5, TimeUnit.SECONDS);
 
-        if (matcherThread.isRegistryClean()) {
-          newSessionQueue.processQueue(new Predicate<RequestHandler>() {
-            public boolean apply(RequestHandler input) {
-              return canTakeRequestHandler(input);
-            }
-          }, prioritizer);
-        } else {
-          force = true;
-        }
+        newSessionQueue.processQueue(new Predicate<RequestHandler>() {
+          public boolean apply(RequestHandler input) {
+            return takeRequestHandler(input);
+          }
+        }, prioritizer);
+        // Just make sure we delete anything that is logged on this thread from memory
+        LoggingManager.perSessionLogHandler().clearThreadTempLogs();
       } catch (InterruptedException e) {
         log.info("Shutting down registry.");
       } catch (Throwable t) {
@@ -234,24 +275,14 @@ public class Registry {
 
   }
 
-  private boolean canTakeRequestHandler(RequestHandler request) {
-    // sort the proxies first, by default by total number of
-    // test running, to avoid putting all the load of the first
-    // proxies.
-    List<RemoteProxy> sorted = proxies.getSorted();
-
-    for (RemoteProxy proxy : sorted) {
-      TestSession session = proxy.getNewSession(request.getDesiredCapabilities());
-      if (session != null) {
-        boolean ok = activeTestSessions.add(session);
-        request.bindSession(session);
-        if (!ok) {
-          log.severe("Error adding session : " + session);
-        }
-        return true;
-      }
+  private boolean takeRequestHandler(RequestHandler request) {
+    final TestSession session = proxies.getNewSession(request.getDesiredCapabilities());
+    final boolean sessionCreated = session != null;
+    if (sessionCreated) {
+      activeTestSessions.add(session);
+      request.bindSession(session);
     }
-    return false;
+    return sessionCreated;
   }
 
   /**
@@ -259,12 +290,12 @@ public class Registry {
    * free to be reserved by other tests
    *
    * @param session The session
+   * @param reason  the reason for the release
    */
-  private void release(TestSession session) {
+  private void release(TestSession session, SessionTerminationReason reason) {
     try {
       lock.lock();
-      matcherThread.setDirty();
-      boolean removed = activeTestSessions.remove(session);
+      boolean removed = activeTestSessions.remove(session, reason);
       if (removed) {
         fireMatcherStateChanged();
       }
@@ -273,20 +304,18 @@ public class Registry {
     }
   }
 
-  public void release(String internalKey) {
+  private void release(String internalKey, SessionTerminationReason reason) {
     if (internalKey == null) {
       return;
     }
     final TestSession session1 = activeTestSessions.findSessionByInternalKey(internalKey);
     if (session1 != null) {
-      release(session1);
+      release(session1, reason);
       return;
     }
     log.warning("Tried to release session with internal key " + internalKey +
                 " but couldn't find it.");
   }
-
-  private List<RemoteProxy> registeringProxies = new CopyOnWriteArrayList<RemoteProxy>();
 
   /**
    * Add a proxy to the list of proxy available for the grid to managed and link the proxy to the
@@ -302,7 +331,7 @@ public class Registry {
     try {
       lock.lock();
 
-      proxies.removeIfPresent(proxy);
+      removeIfPresent(proxy);
 
       if (registeringProxies.contains(proxy)) {
         log.warning(String.format("Proxy '%s' is already queued for registration.", proxy));
@@ -311,7 +340,6 @@ public class Registry {
       }
 
       registeringProxies.add(proxy);
-      matcherThread.setDirty();
       fireMatcherStateChanged();
     } finally {
       lock.unlock();
@@ -356,11 +384,7 @@ public class Registry {
     proxies.setThrowOnCapabilityNotPresent(throwOnCapabilityNotPresent);
   }
 
-  public Lock getLock() {
-    return lock;
-  }
-
-  void fireMatcherStateChanged() {
+  private void fireMatcherStateChanged() {
     testSessionAvailable.signalAll();
   }
 
@@ -379,8 +403,21 @@ public class Registry {
    * @param externalKey the external session key
    * @return null if the hub doesn't have a node associated to the provided externalKey
    */
-  public TestSession getSession(String externalKey) {
+  public TestSession getSession(ExternalSessionKey externalKey) {
     return activeTestSessions.findSessionByExternalKey(externalKey);
+  }
+
+  /**
+   * gets the test existing session associated to this external key. The external key is the session
+   * used by webdriver.
+   *
+   * This method will log complaints and reasons if the key cannot be found
+   *
+   * @param externalKey the external session key
+   * @return null if the hub doesn't have a node associated to the provided externalKey
+   */
+  public TestSession getExistingSession(ExternalSessionKey externalKey) {
+    return activeTestSessions.getExistingSession(externalKey);
   }
 
   /*
@@ -421,4 +458,13 @@ public class Registry {
   HttpClientFactory getHttpClientFactory() {
     return httpClientFactory;
   }
+
+  private static class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+    public void uncaughtException(Thread t, Throwable e) {
+      log.log(Level.SEVERE, "Matcher thread dying due to unhandled exception.", e);
+    }
+  }
+
+
 }

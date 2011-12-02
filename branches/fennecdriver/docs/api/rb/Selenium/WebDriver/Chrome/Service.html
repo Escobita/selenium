@@ -6,7 +6,7 @@
 <title>
   Class: Selenium::WebDriver::Chrome::Service
   
-    &mdash; Documentation by YARD 0.7.2
+    &mdash; Documentation by YARD 0.7.3
   
 </title>
 
@@ -104,6 +104,7 @@
 </div>
 <div class="tags">
   
+
 </div>
   <h2>Constant Summary</h2>
   
@@ -122,6 +123,7 @@
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='int'>20</span></pre></dd>
@@ -139,6 +141,7 @@
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='int'>5</span></pre></dd>
@@ -156,6 +159,7 @@
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unable to find the chromedriver executable. Please download the server from http://code.google.com/p/chromium/downloads/list and place it somewhere on your PATH. More info at http://code.google.com/p/selenium/wiki/ChromeDriver.</span><span class='tstring_end'>&quot;</span></span></pre></dd>
@@ -375,24 +379,25 @@ A new instance of Service
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-31
-32
-33
-34
 35
 36
 37
 38
-39</pre>
+39
+40
+41
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='id initialize'>initialize</span><span class='lparen'>(</span><span class='id executable_path'>executable_path</span><span class='comma'>,</span> <span class='id port'>port</span><span class='rparen'>)</span>
   <span class='ivar'>@uri</span>           <span class='op'>=</span> <span class='const'>URI</span><span class='period'>.</span><span class='id parse'>parse</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://</span><span class='embexpr_beg'>#{</span><span class='const'>Platform</span><span class='period'>.</span><span class='id localhost'>localhost</span><span class='rbrace'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id port'>port</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -438,6 +443,7 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -485,18 +491,19 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-27
-28
-29</pre>
+31
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id default_service'>default_service</span>
   <span class='id new'>new</span> <span class='id executable_path'>executable_path</span><span class='comma'>,</span> <span class='const'>PortProber</span><span class='period'>.</span><span class='id random'>random</span>
@@ -525,6 +532,7 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -535,14 +543,22 @@ Returns the value of attribute uri
 17
 18
 19
-20</pre>
+20
+21
+22
+23
+24</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id executable_path'>executable_path</span>
   <span class='ivar'>@executable_path</span> <span class='op'>||=</span> <span class='lparen'>(</span>
-    <span class='const'>Platform</span><span class='period'>.</span><span class='id find_binary'>find_binary</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>chromedriver</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>or</span> <span class='id raise'>raise</span> <span class='const'>Error</span><span class='op'>::</span><span class='const'>WebDriverError</span><span class='comma'>,</span> <span class='const'>MISSING_TEXT</span>
+    <span class='id path'>path</span> <span class='op'>=</span> <span class='const'>Platform</span><span class='period'>.</span><span class='id find_binary'>find_binary</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>chromedriver</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id path'>path</span> <span class='kw'>or</span> <span class='id raise'>raise</span> <span class='const'>Error</span><span class='op'>::</span><span class='const'>WebDriverError</span><span class='comma'>,</span> <span class='const'>MISSING_TEXT</span>
+    <span class='const'>Platform</span><span class='period'>.</span><span class='id assert_executable'>assert_executable</span> <span class='id path'>path</span>
+
+    <span class='id path'>path</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -569,19 +585,20 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-22
-23
-24
-25</pre>
+26
+27
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id executable_path='>executable_path=</span><span class='lparen'>(</span><span class='id path'>path</span><span class='rparen'>)</span>
   <span class='const'>Platform</span><span class='period'>.</span><span class='id assert_executable'>assert_executable</span> <span class='id path'>path</span>
@@ -617,24 +634,25 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-41
-42
-43
-44
 45
 46
 47
 48
-49</pre>
+49
+50
+51
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id start'>start</span>
   <span class='ivar'>@process</span><span class='period'>.</span><span class='id start'>start</span>
@@ -669,29 +687,42 @@ Returns the value of attribute uri
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-51
-52
-53
-54
 55
 56
 57
 58
-59</pre>
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/chrome/service.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id stop'>stop</span>
   <span class='kw'>return</span> <span class='kw'>if</span> <span class='ivar'>@process</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='ivar'>@process</span><span class='period'>.</span><span class='id exited?'>exited?</span>
 
-  <span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTP</span><span class='period'>.</span><span class='id get'>get</span> <span class='id uri'>uri</span><span class='period'>.</span><span class='id host'>host</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/shutdown</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id uri'>uri</span><span class='period'>.</span><span class='id port'>port</span>
+  <span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTP</span><span class='period'>.</span><span class='id start'>start</span><span class='lparen'>(</span><span class='id uri'>uri</span><span class='period'>.</span><span class='id host'>host</span><span class='comma'>,</span> <span class='id uri'>uri</span><span class='period'>.</span><span class='id port'>port</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id http'>http</span><span class='op'>|</span>
+    <span class='id http'>http</span><span class='period'>.</span><span class='id open_timeout'>open_timeout</span> <span class='op'>=</span> <span class='const'>STOP_TIMEOUT</span> <span class='op'>/</span> <span class='int'>2</span>
+    <span class='id http'>http</span><span class='period'>.</span><span class='id read_timeout'>read_timeout</span> <span class='op'>=</span> <span class='const'>STOP_TIMEOUT</span> <span class='op'>/</span> <span class='int'>2</span>
+
+    <span class='id http'>http</span><span class='period'>.</span><span class='id head'>head</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/shutdown</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
   <span class='ivar'>@process</span><span class='period'>.</span><span class='id poll_for_exit'>poll_for_exit</span> <span class='const'>STOP_TIMEOUT</span>
 <span class='kw'>rescue</span> <span class='const'>ChildProcess</span><span class='op'>::</span><span class='const'>TimeoutError</span>
   <span class='comment'># ok, force quit
@@ -707,9 +738,9 @@ Returns the value of attribute uri
 </div>
     
     <div id="footer">
-  Generated on Fri Sep 23 15:53:36 2011 by 
+  Generated on Tue Nov 29 01:07:03 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.2 (ruby-1.9.2).
+  0.7.3 (ruby-1.9.2).
 </div>
 
   </body>

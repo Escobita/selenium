@@ -17,19 +17,16 @@ limitations under the License.
 
 package org.openqa.selenium;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertTrue;
-
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.openqa.selenium.internal.InProject;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.openqa.selenium.Ignore.NativeEventsEnabledState;
+import org.openqa.selenium.internal.IgnoredTestCallback;
+import org.openqa.selenium.internal.InProject;
 
 import java.io.File;
 import java.lang.reflect.AnnotatedElement;
@@ -38,10 +35,13 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
-public class TestSuiteBuilder {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertTrue;
 
+public class TestSuiteBuilder {
   private Set<File> sourceDirs = Sets.newHashSet();
-  private Set<Ignore.Driver> ignored = Sets.newHashSet();
   private Class<? extends WebDriver> driverClass;
   private boolean keepDriver;
   private boolean includeJavascript;
@@ -53,8 +53,10 @@ public class TestSuiteBuilder {
   private Set<String> testMethodNames = Sets.newHashSet();
   private Set<String> decorators = Sets.newLinkedHashSet();
   private Set<Package> packages = Sets.newLinkedHashSet();
+  private Set<IgnoredTestCallback> ignoredTestCallbacks = Sets.newHashSet();
   private boolean outputTestNames = false;
   private File baseDir;
+  private IgnoreComparator ignoreComparator = new IgnoreComparator();
 
   public TestSuiteBuilder() {
     baseDir = InProject.locate("Rakefile").getParentFile();
@@ -84,7 +86,7 @@ public class TestSuiteBuilder {
   }
 
   public TestSuiteBuilder exclude(Ignore.Driver tagToIgnore) {
-    ignored.add(tagToIgnore);
+    ignoreComparator.addDriver(tagToIgnore);
     return this;
   }
 
@@ -119,6 +121,10 @@ public class TestSuiteBuilder {
   public Test create() throws Exception {
     applySystemProperties();
 
+    if (ignoredTestCallbacks.isEmpty()) {
+      ignoredTestCallbacks.add(new LoggingIgnoreCallback());
+    }
+
     if (withDriver) {
       assertThat("No driver class set", driverClass, is(notNullValue()));
     }
@@ -138,7 +144,7 @@ public class TestSuiteBuilder {
     if (suite.countTestCases() == 0) {
       System.err.println("No test cases found");
 
-      if (!onlyRun.isEmpty()) {      
+      if (!onlyRun.isEmpty()) {
         System.err.println("The following class names are enabled but may not exist: ");
         for(String className : onlyRun) {
           System.err.println("*** " + className);
@@ -206,8 +212,16 @@ public class TestSuiteBuilder {
     }
 
     if (isIgnored(clazz)) {
-      System.err.println("Ignoring test class: " + clazz + ": "
-          + clazz.getAnnotation(Ignore.class).reason());
+      invokeIgnoreCallbacks(clazz, "", clazz.getAnnotation(Ignore.class));
+      return;
+    }
+
+    if (clazz.isAnnotationPresent(NeedsLocalEnvironment.class) && !isUsingLocalTestEnvironment()) {
+      String reason = clazz.getAnnotation(NeedsLocalEnvironment.class).reason();
+      System.err.printf(
+        "Ignoring %s (Needs local environment%s)%n",
+        clazz.getName(),
+        reason == null ? "" : ": " + reason);
       return;
     }
 
@@ -247,8 +261,9 @@ public class TestSuiteBuilder {
             restartDriver = true;
           }
 
-          if (withDriver) {
-            test = new DriverTestDecorator(test, driverClass,
+          if (withDriver && driverClass != null) {
+            Supplier<WebDriver> supplier = new DefaultDriverSupplierSupplier(driverClass).get();
+            test = new DriverTestDecorator(test, supplier,
                 keepDriver, freshDriver, restartDriver);
           }
         }
@@ -266,10 +281,17 @@ public class TestSuiteBuilder {
     }
 
     if (isIgnored(method)) {
-      System.err.println("Ignoring: "
-          + method.getDeclaringClass() + "."
-          + method.getName() + ": "
-          + method.getAnnotation(Ignore.class).reason());
+      invokeIgnoreCallbacks(method.getDeclaringClass(), method.getName(), method.getAnnotation(Ignore.class));
+      return false;
+    }
+    
+    if (method.isAnnotationPresent(NeedsLocalEnvironment.class) && !isUsingLocalTestEnvironment()) {
+      String reason = method.getAnnotation(NeedsLocalEnvironment.class).reason();
+      System.err.printf(
+        "Ignoring %s.%s (Needs local environment%s)%n",
+        method.getDeclaringClass().getName(),
+        method.getName(),
+        reason == null ? "" : ": " + reason);
       return false;
     }
 
@@ -282,25 +304,18 @@ public class TestSuiteBuilder {
         || method.getAnnotation(org.junit.Test.class) != null;
   }
 
+  private static boolean isUsingLocalTestEnvironment() {
+    return !SauceDriver.shouldUseSauce();
+  }
+
+  private void invokeIgnoreCallbacks(Class clazz, String methodName, Ignore ignore) {
+    for (IgnoredTestCallback ignoredTestCallback : ignoredTestCallbacks) {
+      ignoredTestCallback.callback(clazz, methodName, ignore);
+    }
+  }
+
   private boolean isIgnored(AnnotatedElement annotatedElement) {
-    Ignore ignore = annotatedElement.getAnnotation(Ignore.class);
-    if (ignore == null) {
-      return false;
-    }
-
-    if (ignore.value().length == 0) {
-      return true;
-    }
-
-    for (Ignore.Driver value : ignore.value()) {
-      for (Ignore.Driver name : ignored) {
-        if (value == name || value == Ignore.Driver.ALL) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return ignoreComparator.shouldIgnore(annotatedElement.getAnnotation(Ignore.class));
   }
 
   private Class<?> getClassFrom(File file) {
@@ -400,4 +415,31 @@ public class TestSuiteBuilder {
     return this;
   }
 
+  public static Platform getEffectivePlatform() {
+    return (isUsingLocalTestEnvironment()) ?
+        Platform.getCurrent() : SauceDriver.getEffectivePlatform();
+  }
+
+  public TestSuiteBuilder withIgnoredTestCallback(IgnoredTestCallback ignoredTestCallback) {
+    ignoredTestCallbacks.add(ignoredTestCallback);
+    return this;
+  }
+
+  public class LoggingIgnoreCallback implements IgnoredTestCallback {
+    public void callback(Class clazz, String testName, Ignore ignore) {
+      String message;
+
+      if(testName.isEmpty()) {
+        message = "Ignoring test class: " + clazz.getName();
+      } else {
+        message = "Ignoring: " + clazz.getName() + "." + testName;
+      }
+      System.err.println(message + ": " + ignore.reason());
+    }
+  }
+
+  public TestSuiteBuilder exclude(NativeEventsEnabledState value) {
+    ignoreComparator.setNativeEventsIgnoreState(value);
+    return this;
+  }
 }

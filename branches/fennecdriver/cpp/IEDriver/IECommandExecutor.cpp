@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -43,6 +43,8 @@
 #include "CommandHandlers/GetSessionCapabilitiesCommandHandler.h"
 #include "CommandHandlers/GetPageSourceCommandHandler.h"
 #include "CommandHandlers/GetTitleCommandHandler.h"
+#include "CommandHandlers/GetWindowPositionCommandHandler.h"
+#include "CommandHandlers/GetWindowSizeCommandHandler.h"
 #include "CommandHandlers/GoBackCommandHandler.h"
 #include "CommandHandlers/GoForwardCommandHandler.h"
 #include "CommandHandlers/GoToUrlCommandHandler.h"
@@ -59,10 +61,12 @@
 #include "CommandHandlers/RefreshCommandHandler.h"
 #include "CommandHandlers/ScreenshotCommandHandler.h"
 #include "CommandHandlers/SendKeysCommandHandler.h"
+#include "CommandHandlers/SendKeysToActiveElementCommandHandler.h"
 #include "CommandHandlers/SendKeysToAlertCommandHandler.h"
-#include "CommandHandlers/SendModifierKeyCommandHandler.h"
 #include "CommandHandlers/SetAsyncScriptTimeoutCommandHandler.h"
 #include "CommandHandlers/SetImplicitWaitTimeoutCommandHandler.h"
+#include "CommandHandlers/SetWindowPositionCommandHandler.h"
+#include "CommandHandlers/SetWindowSizeCommandHandler.h"
 #include "CommandHandlers/SubmitElementCommandHandler.h"
 #include "CommandHandlers/SwitchToFrameCommandHandler.h"
 #include "CommandHandlers/SwitchToWindowCommandHandler.h"
@@ -353,11 +357,12 @@ int IECommandExecutor::GetManagedBrowser(const std::string& browser_id,
 }
 
 void IECommandExecutor::GetManagedBrowserHandles(std::vector<std::string>* managed_browser_handles) const {
-  // TODO: Enumerate windows looking for browser windows
-  // created by showModalDialog().
   BrowserMap::const_iterator it = this->managed_browsers_.begin();
   for (; it != this->managed_browsers_.end(); ++it) {
     managed_browser_handles->push_back(it->first);
+
+    // Look for browser windows created by showModalDialog().
+    it->second->GetActiveDialogWindowHandle();
   }
 }
 
@@ -552,17 +557,19 @@ void IECommandExecutor::PopulateCommandHandlers() {
   this->command_handlers_[GetAlertText] = CommandHandlerHandle(new GetAlertTextCommandHandler);
   this->command_handlers_[SendKeysToAlert] = CommandHandlerHandle(new SendKeysToAlertCommandHandler);
 
-  this->command_handlers_[SendModifierKey] = CommandHandlerHandle(new SendModifierKeyCommandHandler);
   this->command_handlers_[MouseMoveTo] = CommandHandlerHandle(new MouseMoveToCommandHandler);
   this->command_handlers_[MouseClick] = CommandHandlerHandle(new MouseClickCommandHandler);
   this->command_handlers_[MouseDoubleClick] = CommandHandlerHandle(new MouseDoubleClickCommandHandler);
   this->command_handlers_[MouseButtonDown] = CommandHandlerHandle(new MouseButtonDownCommandHandler);
   this->command_handlers_[MouseButtonUp] = CommandHandlerHandle(new MouseButtonUpCommandHandler);
+  this->command_handlers_[SendKeysToActiveElement] = CommandHandlerHandle(new SendKeysToActiveElementCommandHandler);
+
+  this->command_handlers_[GetWindowSize] = CommandHandlerHandle(new GetWindowSizeCommandHandler);
+  this->command_handlers_[SetWindowSize] = CommandHandlerHandle(new SetWindowSizeCommandHandler);
+  this->command_handlers_[GetWindowPosition] = CommandHandlerHandle(new GetWindowPositionCommandHandler);
+  this->command_handlers_[SetWindowPosition] = CommandHandlerHandle(new SetWindowPositionCommandHandler);
 
   // As-yet unimplemented commands
-  // TODO(JimEvans): Update this and remove SendModifierKey handler
-  // when all platforms support SendKeysToActiveElement.
-  this->command_handlers_[SendKeysToActiveElement] = CommandHandlerHandle(new IECommandHandler);
   this->command_handlers_[Status] = CommandHandlerHandle(new IECommandHandler);
   this->command_handlers_[GetOrientation] = CommandHandlerHandle(new IECommandHandler);
   this->command_handlers_[SetOrientation] = CommandHandlerHandle(new IECommandHandler);

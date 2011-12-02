@@ -18,8 +18,8 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import static org.openqa.selenium.OutputType.FILE;
 import static org.openqa.selenium.remote.CapabilityType.ACCEPT_SSL_CERTS;
+import static org.openqa.selenium.remote.CapabilityType.LOGGING_PREFS;
 import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
 import org.openqa.selenium.Capabilities;
@@ -33,7 +33,7 @@ import org.openqa.selenium.firefox.internal.NewProfileExtensionConnection;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.internal.Lock;
 import org.openqa.selenium.internal.SocketLock;
-import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -88,7 +88,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
   }
 
   private static FirefoxProfile extractProfile(Capabilities capabilities) {
-    FirefoxProfile profile = new FirefoxProfile();
+    FirefoxProfile profile = null;
 
     if (capabilities.getCapability(PROFILE) != null) {
       Object raw = capabilities.getCapability(PROFILE);
@@ -103,6 +103,8 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
       }
     }
 
+    profile = getProfile(profile);
+
     if (capabilities.getCapability(PROXY) != null) {
       Proxy proxy = Proxies.extractProxy(capabilities);
       profile.setProxyPreferences(proxy);
@@ -111,6 +113,13 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
     if (capabilities.getCapability(ACCEPT_SSL_CERTS) != null) {
       Boolean acceptCerts = (Boolean) capabilities.getCapability(ACCEPT_SSL_CERTS);
       profile.setAcceptUntrustedCertificates(acceptCerts);
+    }
+
+    if (capabilities.getCapability(LOGGING_PREFS) != null) {
+      LoggingPreferences logsPrefs = (LoggingPreferences) capabilities.getCapability(LOGGING_PREFS);
+      for (String logtype : logsPrefs.getEnabledLogTypes()) {
+        profile.setPreference("webdriver.log." + logtype, logsPrefs.getLevel(logtype).intValue());
+      }
     }
 
     return profile;
@@ -152,7 +161,7 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
     }
   }
 
-  private FirefoxProfile getProfile(FirefoxProfile profile) {
+  private static FirefoxProfile getProfile(FirefoxProfile profile) {
     FirefoxProfile profileToUse = profile;
     String suggestedProfile = System.getProperty("webdriver.firefox.profile");
     if (profileToUse == null && suggestedProfile != null) {
@@ -190,41 +199,11 @@ public class FirefoxDriver extends RemoteWebDriver implements TakesScreenshot {
     ((LazyCommandExecutor) this.getCommandExecutor()).quit();
   }
 
-  @Override
-  protected FirefoxWebElement newRemoteWebElement() {
-    return new FirefoxWebElement(this);
-  }
-
   public <X> X getScreenshotAs(OutputType<X> target) {
     // Get the screenshot as base64.
     String base64 = execute(DriverCommand.SCREENSHOT).getValue().toString();
     // ... and convert it.
     return target.convertFromBase64Png(base64);
-  }
-
-  /**
-   * Saves a screenshot of the current page into the given file.
-   * 
-   * @deprecated Use getScreenshotAs(file), which returns a temporary file.
-   */
-  @Deprecated
-  public void saveScreenshot(File pngFile) {
-    if (pngFile == null) {
-      throw new IllegalArgumentException("Method parameter pngFile must not be null");
-    }
-
-    File tmpfile = getScreenshotAs(FILE);
-
-    File dir = pngFile.getParentFile();
-    if (dir != null && !dir.exists() && !dir.mkdirs()) {
-      throw new WebDriverException("Could not create directory " + dir.getAbsolutePath());
-    }
-
-    try {
-      FileHandler.copy(tmpfile, pngFile);
-    } catch (IOException e) {
-      throw new WebDriverException(e);
-    }
   }
 
   private static class LazyCommandExecutor implements CommandExecutor {

@@ -5,8 +5,6 @@ import org.openqa.selenium.server.RemoteControlConfiguration;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class FirefoxCustomProfileLauncherUnitTest extends TestCase {
 
@@ -24,7 +22,7 @@ public class FirefoxCustomProfileLauncherUnitTest extends TestCase {
         new FirefoxCustomProfileLauncherStubbedForShutdown();
     launcher.haveProcessKillThrowException(false);
     launcher.setCustomProfileDir(new File("testdir"));
-    launcher.setProcess(new TestProcess());
+    launcher.setCommandLine(new TestProcess());
     launcher.close();
     assertTrue(launcher.wasKillFirefoxProcessCalled());
     assertTrue(launcher.wasRemoveCustomProfileCalled());
@@ -34,7 +32,7 @@ public class FirefoxCustomProfileLauncherUnitTest extends TestCase {
     FirefoxCustomProfileLauncherStubbedForShutdown launcher =
         new FirefoxCustomProfileLauncherStubbedForShutdown();
     launcher.setCustomProfileDir(new File("testdir"));
-    launcher.setProcess(new TestProcess());
+    launcher.setCommandLine(new TestProcess());
     launcher.close();
     assertTrue(launcher.wasKillFirefoxProcessCalled());
     assertTrue(launcher.wasRemoveCustomProfileCalled());
@@ -101,40 +99,5 @@ public class FirefoxCustomProfileLauncherUnitTest extends TestCase {
     protected void removeCustomProfileDir() throws RuntimeException {
       removeCustomProfileDirCalled = true;
     }
-  }
-
-  public static class TestProcess extends Process {
-
-    @Override
-    public void destroy() {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int exitValue() {
-      return 0;
-    }
-
-    @Override
-    public InputStream getErrorStream() {
-      return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-      return null;
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
-      return null;
-    }
-
-    @Override
-    public int waitFor() throws InterruptedException {
-      return 0;
-    }
-
   }
 }

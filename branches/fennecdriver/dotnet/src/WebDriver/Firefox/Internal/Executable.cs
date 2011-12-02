@@ -1,7 +1,7 @@
 ﻿// <copyright file="Executable.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ namespace OpenQA.Selenium.Firefox.Internal
                     "/Applications/Firefox.app/Contents/MacOS/firefox-bin",
                     string.Concat("/Users/", Environment.UserName, "/Applications/Firefox.app/Contents/MacOS/firefox-bin")
                 };
-                
+
                 foreach (string path in paths)
                 {
                     FileInfo firefoxBinary = new FileInfo(path);
@@ -181,21 +181,21 @@ namespace OpenQA.Selenium.Firefox.Internal
                         break;
                     }
                 }
-            }
-            
-            if (string.IsNullOrEmpty(binary))
-            {
-                // Use "which firefox" for non-Windows OS.
-                using (Process proc = new Process())
+
+                if (string.IsNullOrEmpty(binary))
                 {
-                    proc.StartInfo.FileName = "which";
-                    proc.StartInfo.Arguments = "firefox";
-                    proc.StartInfo.CreateNoWindow = true;
-                    proc.StartInfo.RedirectStandardOutput = true;
-                    proc.StartInfo.UseShellExecute = false;
-                    proc.Start();
-                    proc.WaitForExit();
-                    binary = proc.StandardOutput.ReadToEnd().Trim();
+                    // Use "which firefox" for non-Windows OS.
+                    using (Process proc = new Process())
+                    {
+                        proc.StartInfo.FileName = "which";
+                        proc.StartInfo.Arguments = "firefox";
+                        proc.StartInfo.CreateNoWindow = true;
+                        proc.StartInfo.RedirectStandardOutput = true;
+                        proc.StartInfo.UseShellExecute = false;
+                        proc.Start();
+                        proc.WaitForExit();
+                        binary = proc.StandardOutput.ReadToEnd().Trim();
+                    }
                 }
             }
 

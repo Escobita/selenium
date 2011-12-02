@@ -1,5 +1,5 @@
 rubygem(
-  version = "2.8.1.dev",
+  version = "2.14.1.dev",
   name = "selenium-webdriver",
   dir = "build/rb",
   deps = [
@@ -15,10 +15,10 @@ rubygem(
     "//rb:rc-client"
   ],
   gemdeps = [
-    { "json_pure"    : ">= 0"     },
+    { "multi_json"   : "~> 1.0.4" },
     { "rubyzip"      : ">= 0"     },
     { "childprocess" : ">= 0.2.1" },
-    { "ffi"          : ">= 1.0.7" }
+    { "ffi"          : "~> 1.0.9" }
   ],
   devdeps = [
     { "rspec"       : "~> 2.0"   },

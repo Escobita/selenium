@@ -1,11 +1,29 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.grid.web.servlet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.grid.internal.GridException;
+import org.openqa.grid.internal.ExternalSessionKey;
 import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.RemoteProxy;
 import org.openqa.grid.internal.TestSession;
+import org.openqa.grid.common.exception.GridException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -88,7 +106,7 @@ public class TestSessionStatusServlet extends RegistryBasedServlet {
       session = requestJSON.getString("session");
     }
 
-    TestSession testSession = getRegistry().getSession(session);
+    TestSession testSession = getRegistry().getSession(ExternalSessionKey.fromString(session));
 
     if (testSession == null) {
       res.put("msg", "Cannot find test slot running session " + session + " in the registry.");
@@ -96,7 +114,7 @@ public class TestSessionStatusServlet extends RegistryBasedServlet {
     } else {
       res.put("msg", "slot found !");
       res.put("success", true);
-      res.put("session", testSession.getExternalKey());
+      res.put("session", testSession.getExternalKey().getKey());
       res.put("internalKey", testSession.getInternalKey());
       res.put("inactivityTime", testSession.getInactivityTime());
       RemoteProxy p = testSession.getSlot().getProxy();

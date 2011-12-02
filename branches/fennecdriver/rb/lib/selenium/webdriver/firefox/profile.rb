@@ -77,6 +77,8 @@ module Selenium
 
         #
         # Set a preference for this particular profile.
+        #
+        # @see http://kb.mozillazine.org/About:config_entries
         # @see http://preferential.mozdev.org/preferences.html
         #
 
@@ -87,7 +89,7 @@ module Selenium
               raise ArgumentError, "preference values must be plain strings: #{key.inspect} => #{value.inspect}"
             end
 
-            value = value.to_json
+            value = MultiJson.encode(value)
           when TrueClass, FalseClass, Integer, Float
             value = value.to_s
           else
@@ -278,6 +280,7 @@ module Selenium
           "browser.tabs.warnOnOpen"                   => 'false',
           "devtools.errorconsole.enabled"             => 'true',
           "dom.disable_open_during_load"              => 'false',
+          "extensions.autoDisableScopes"              => '10',
           "extensions.logging.enabled"                => 'true',
           "extensions.update.enabled"                 => 'false',
           "extensions.update.notifyUser"              => 'false',

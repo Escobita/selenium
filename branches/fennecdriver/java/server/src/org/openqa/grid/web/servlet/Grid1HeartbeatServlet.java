@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,7 +13,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 package org.openqa.grid.web.servlet;
 
@@ -51,13 +52,13 @@ public class Grid1HeartbeatServlet extends RegistryBasedServlet {
     // Build up the proxy URL based upon the params the Grid 1.0 node will pass as query params.
     Map<String, String[]> queryParams = request.getParameterMap();
     String nodeUrl =
-        String.format("http://%s:%s/selenium-server/driver", queryParams.get("host")[0],
+        String.format("http://%s:%s", queryParams.get("host")[0],
             queryParams.get("port")[0]);
 
     // Check each registered node and see if the pinging node is in the list.
     boolean alreadyRegistered = false;
     for (RemoteProxy proxy : getRegistry().getAllProxies()) {
-      if (proxy.getRemoteURL().toString().equals(nodeUrl)) {
+      if (proxy.getRemoteHost().toString().equals(nodeUrl)) {
         alreadyRegistered = true;
       }
     }

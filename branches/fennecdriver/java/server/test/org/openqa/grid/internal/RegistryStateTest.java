@@ -1,9 +1,26 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.grid.internal;
 
 import static org.openqa.grid.common.RegistrationRequest.APP;
 import static org.openqa.grid.common.RegistrationRequest.MAX_INSTANCES;
 import static org.openqa.grid.common.RegistrationRequest.MAX_SESSION;
-import static org.openqa.grid.common.RegistrationRequest.REMOTE_URL;
+import static org.openqa.grid.common.RegistrationRequest.REMOTE_HOST;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,7 +54,7 @@ public class RegistryStateTest {
     app2.put(APP, "app2");
     app2.put(MAX_INSTANCES, 1);
 
-    config.put(REMOTE_URL, "http://machine1:4444");
+    config.put(REMOTE_HOST, "http://machine1:4444");
     config.put(MAX_SESSION, 5);
 
     req = new RegistrationRequest();
@@ -61,7 +78,7 @@ public class RegistryStateTest {
       newSessionRequest.process();
       TestSession session = newSessionRequest.getTestSession();
 
-      session.terminateSynchronousFOR_TEST_ONLY();
+      registry.terminateSynchronousFOR_TEST_ONLY(session);
       Assert.assertEquals(0, registry.getActiveSessions().size());
     } finally {
       registry.stop();
@@ -88,7 +105,7 @@ public class RegistryStateTest {
       Assert.assertEquals(1, registry.getAllProxies().size());
       Assert.assertEquals(1, registry.getUsedProxies().size());
 
-      session.terminateSynchronousFOR_TEST_ONLY();
+      registry.terminateSynchronousFOR_TEST_ONLY(session);
       Assert.assertEquals(0, registry.getActiveSessions().size());
       Assert.assertEquals(1, registry.getAllProxies().size());
       Assert.assertEquals(0, registry.getUsedProxies().size());
@@ -108,7 +125,7 @@ public class RegistryStateTest {
       MockedRequestHandler newSessionRequest = new MockedNewSessionRequestHandler(registry, app1);
       newSessionRequest.process();
       TestSession session = newSessionRequest.getTestSession();
-      session.terminateSynchronousFOR_TEST_ONLY();
+      registry.terminateSynchronousFOR_TEST_ONLY(session);
       Assert.assertEquals(0, registry.getActiveSessions().size());
 
     } finally {
@@ -127,15 +144,16 @@ public class RegistryStateTest {
       MockedRequestHandler newSessionRequest = new MockedNewSessionRequestHandler(registry, app1);
       newSessionRequest.process();
       TestSession session = newSessionRequest.getTestSession();
-      session.setExternalKey("1234");
+      final ExternalSessionKey externalKey = ExternalSessionKey.fromString("1234");
+      session.setExternalKey(externalKey);
 
-      TestSession s = registry.getSession("1234");
+      TestSession s = registry.getSession(externalKey);
       Assert.assertNotNull(s);
       Assert.assertEquals(s, session);
-      session.terminateSynchronousFOR_TEST_ONLY();
+      registry.terminateSynchronousFOR_TEST_ONLY(session);
       Assert.assertEquals(0, registry.getActiveSessions().size());
 
-      TestSession s2 = registry.getSession("1234");
+      TestSession s2 = registry.getSession(externalKey);
       Assert.assertNull(s2);
 
       Assert.assertEquals(0, registry.getActiveSessions().size());
@@ -152,10 +170,10 @@ public class RegistryStateTest {
     try {
       registry.add(p1);
 
-      TestSession s = registry.getSession("1234");
+      TestSession s = registry.getSession(ExternalSessionKey.fromString("1234"));
       Assert.assertNull(s);
 
-      s = registry.getSession("");
+      s = registry.getSession(ExternalSessionKey.fromString(""));
       Assert.assertNull(s);
 
       s = registry.getSession(null);

@@ -248,9 +248,13 @@ public class ExpectedConditions {
 
       public WebElement apply(WebDriver driver) {
         WebElement element = visibilityOfElementLocated.apply(driver);
-        if (element != null && element.isEnabled()) {
-          return element;
-        } else {
+        try {
+          if (element != null && element.isEnabled()) {
+            return element;
+          } else {
+            return null;
+          }
+        } catch (StaleElementReferenceException e) {
           return null;
         }
       }
@@ -279,6 +283,42 @@ public class ExpectedConditions {
     };
   }
 
+  /**
+   * An expectation for checking if the given element is selected.
+   */
+  public static ExpectedCondition<Boolean> elementToBeSelected(final WebElement element) {
+    return elementSelectionStateToBe(element, true);
+  }
+
+  /**
+   * An expectation for checking if the given element is selected.
+   */
+  public static ExpectedCondition<Boolean> elementSelectionStateToBe(final WebElement element,
+                                                                     final boolean selected) {
+    return new ExpectedCondition<Boolean>() {
+      public Boolean apply(WebDriver from) {
+        return element.isSelected() == selected;
+      }
+    };
+  }
+
+  public static ExpectedCondition<Boolean> elementToBeSelected(final By locator) {
+    return elementSelectionStateToBe(locator, true);
+  }
+
+  public static ExpectedCondition<Boolean> elementSelectionStateToBe(final By locator,
+                                                                     final boolean selected) {
+    return new ExpectedCondition<Boolean>() {
+      public Boolean apply(WebDriver from) {
+        try {
+          WebElement element = from.findElement(locator);
+          return element.isSelected() == selected;
+        } catch (StaleElementReferenceException e) {
+          return null;
+        }
+      }
+    };
+  }
 
   /**
    * Looks up an element. Logs and re-throws WebDriverException if thrown. <p/>

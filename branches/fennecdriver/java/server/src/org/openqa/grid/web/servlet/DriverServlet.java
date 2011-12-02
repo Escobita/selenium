@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,11 +13,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
+
 package org.openqa.grid.web.servlet;
 
 import com.google.common.io.ByteStreams;
 
+import org.openqa.grid.internal.ExternalSessionKey;
 import org.openqa.selenium.remote.ErrorCodes;
 
 import org.json.JSONArray;
@@ -43,6 +46,7 @@ public class DriverServlet extends RegistryBasedServlet {
 
   private static final long serialVersionUID = -1693540182205547227L;
 
+  @SuppressWarnings("UnusedDeclaration")
   public DriverServlet() {
     this(null);
   }
@@ -85,10 +89,8 @@ public class DriverServlet extends RegistryBasedServlet {
 
         JSONObject resp = new JSONObject();
         try {
-          resp.put("sessionId", JSONObject.NULL);
-          if (req != null) {
-            resp.put("sessionId", req.getServerSession());
-          }
+          final ExternalSessionKey serverSession = req.getServerSession();
+          resp.put("sessionId", serverSession != null ? serverSession.getKey() : null);
           resp.put("status", ErrorCodes.UNHANDLED_ERROR);
           JSONObject value = new JSONObject();
           value.put("message", e.getMessage());

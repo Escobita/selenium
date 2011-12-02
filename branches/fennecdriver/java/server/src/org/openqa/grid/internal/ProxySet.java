@@ -1,7 +1,6 @@
-package org.openqa.grid.internal;
-
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,12 +13,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
+
+package org.openqa.grid.internal;
 
 import net.jcip.annotations.ThreadSafe;
 
 import org.openqa.grid.common.exception.CapabilityNotPresentOnTheGridException;
-import org.openqa.grid.web.servlet.handler.RequestHandler;
+import org.openqa.grid.common.exception.GridException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,28 +66,22 @@ public class ProxySet implements Iterable<RemoteProxy> {
     return false;
   }
 
-  private void forceRelease(RemoteProxy proxy) {
+  /**
+   * Removes the specified instance from the proxySet
+   * @param proxy The proxy to remove, must be present in this set
+   * @return The instance that was removed. Not null.
+   */
+  public RemoteProxy remove(RemoteProxy proxy) {
     // Find the original proxy. While the supplied one is logically equivalent, it may be a fresh object with
     // an empty TestSlot list, which doesn't figure into the proxy equivalence check.  Since we want to free up
     // those test sessions, we need to operate on that original object.
     for (RemoteProxy p : proxies) {
       if (p.equals(proxy)) {
         proxies.remove(p);
-
-        for (TestSlot slot : p.getTestSlots()) {
-          slot.forceRelease();
-        }
+        return p;
       }
     }
-  }
-
-  public void removeIfPresent(RemoteProxy proxy) {
-    if (proxies.contains(proxy)) {
-      log.warning(String.format(
-          "Proxy '%s' was previously registered.  Cleaning up any stale test sessions.", proxy));
-
-      forceRelease(proxy);
-    }
+    throw new IllegalStateException("Did not contain proxy" + proxy);
   }
 
   public void add(RemoteProxy proxy) {
@@ -124,10 +119,25 @@ public class ProxySet implements Iterable<RemoteProxy> {
     return proxies.isEmpty();
   }
 
-  public List<RemoteProxy> getSorted() {
+  private List<RemoteProxy> getSorted() {
     List<RemoteProxy> sorted = new ArrayList<RemoteProxy>(proxies);
     Collections.sort(sorted);
     return sorted;
+  }
+
+  public TestSession getNewSession(Map<String, Object> desiredCapabilities) {
+    // sort the proxies first, by default by total number of
+    // test running, to avoid putting all the load of the first
+    // proxies.
+    List<RemoteProxy> sorted = getSorted();
+
+    for (RemoteProxy proxy : sorted) {
+      TestSession session = proxy.getNewSession(desiredCapabilities);
+      if (session != null) {
+        return session;
+      }
+    }
+    return null;
   }
 
   public Iterator<RemoteProxy> iterator() {
@@ -138,20 +148,20 @@ public class ProxySet implements Iterable<RemoteProxy> {
     return proxies.size();
   }
 
-  public void verifyNewSessionRequest(RequestHandler request) {
+  public void verifyAbilityToHandleDesiredCapabilities(Map<String, Object> desiredCapabilities) {
     if (proxies.isEmpty()) {
       if (throwOnCapabilityNotPresent) {
-        throw new GridException("Empty pool of VM for setup " + request.getDesiredCapabilities());
+        throw new GridException("Empty pool of VM for setup " + desiredCapabilities);
       } else {
         log.warning("Empty pool of nodes.");
       }
 
     }
-    if (!hasCapability(request.getDesiredCapabilities())) {
+    if (!hasCapability(desiredCapabilities)) {
       if (throwOnCapabilityNotPresent) {
-        throw new CapabilityNotPresentOnTheGridException(request.getDesiredCapabilities());
+        throw new CapabilityNotPresentOnTheGridException(desiredCapabilities);
       } else {
-        log.warning("grid doesn't contain " + request.getDesiredCapabilities() +
+        log.warning("grid doesn't contain " + desiredCapabilities +
                     " at the moment.");
       }
 

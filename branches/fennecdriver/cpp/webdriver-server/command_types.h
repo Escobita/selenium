@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -70,15 +70,16 @@ enum CommandType {
   GetOrientation,
   SetOrientation,
 
+  GetWindowSize,
+  SetWindowSize,
+  GetWindowPosition,
+  SetWindowPosition,
+
   AcceptAlert,
   DismissAlert,
   GetAlertText,
   SendKeysToAlert,
 
-
-  // TODO(JimEvans): Remove the SendModifierKey type when all platforms support
-  // the SendKeysToActiveElement command.
-  SendModifierKey,
   SendKeysToActiveElement,
   MouseMoveTo,
   MouseClick,

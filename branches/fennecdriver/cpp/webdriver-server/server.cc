@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -492,14 +492,16 @@ void Server::PopulateCommandRepository() {
   this->commands_["/session/:sessionid/orientation"]["GET"] = GetOrientation;
   this->commands_["/session/:sessionid/orientation"]["POST"] = SetOrientation;
 
+  this->commands_["/session/:sessionid/window/:windowHandle/size"]["GET"] = GetWindowSize;
+  this->commands_["/session/:sessionid/window/:windowHandle/size"]["POST"] = SetWindowSize;
+  this->commands_["/session/:sessionid/window/:windowHandle/position"]["GET"] = GetWindowPosition;
+  this->commands_["/session/:sessionid/window/:windowHandle/position"]["POST"] = SetWindowPosition;
+
   this->commands_["/session/:sessionid/accept_alert"]["POST"] = AcceptAlert;
   this->commands_["/session/:sessionid/dismiss_alert"]["POST"] = DismissAlert;
   this->commands_["/session/:sessionid/alert_text"]["GET"] = GetAlertText;
   this->commands_["/session/:sessionid/alert_text"]["POST"] = SendKeysToAlert;
 
-  // TODO(JimEvans): Remove the SendModifierKey URI when all platforms support
-  // the SendKeysToActiveElement command.
-  this->commands_["/session/:sessionid/modifier"]["POST"] = SendModifierKey;
   this->commands_["/session/:sessionid/keys"]["POST"] = SendKeysToActiveElement;
   this->commands_["/session/:sessionid/moveto"]["POST"] = MouseMoveTo;
   this->commands_["/session/:sessionid/click"]["POST"] = MouseClick;

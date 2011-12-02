@@ -1,7 +1,7 @@
 ﻿// <copyright file="IWait.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,28 @@ namespace OpenQA.Selenium.Support.UI
     /// <typeparam name="TSource">The type of object used to detect the condition.</typeparam>
     public interface IWait<TSource>
     {
+        /// <summary>
+        /// Gets or sets how long to wait for the evaluated condition to be true.
+        /// </summary>
+        TimeSpan Timeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets how often the condition should be evaluated.
+        /// </summary>
+        TimeSpan PollingInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message to be displayed when time expires.
+        /// </summary>
+        string Message { get; set; }
+
+        /// <summary>
+        /// Configures this instance to ignore specific types of exceptions while waiting for a condition.
+        /// Any exceptions not whitelisted will be allowed to propagate, terminating the wait.
+        /// </summary>
+        /// <param name="exceptionTypes">The types of exceptions to ignore.</param>
+        void IgnoreExceptionTypes(params Type[] exceptionTypes);
+
         /// <summary>
         /// Waits until a condition is true or times out.
         /// </summary>

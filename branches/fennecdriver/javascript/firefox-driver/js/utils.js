@@ -273,7 +273,7 @@ Utils.getElementAt = function(index, rawDoc) {
         'Element not found in the cache');
   }
 
-  return fxdriver.moz.unwrapFor4(e);
+  return e;
 };
 
 
@@ -352,10 +352,15 @@ Utils.useNativeEvents = function() {
   }
 
   return false;
-}
+};
 
 Utils.type = function(doc, element, text, opt_useNativeEvents, jsTimer, releaseModifiers,
     opt_keysState) {
+
+  var obj = Utils.getNativeEvents();
+  var node = Utils.getNodeForNativeEvents(element);
+  var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
+  var isUsingNativeEvents = opt_useNativeEvents && obj && node && thmgr_cls;
 
   // For consistency between native and synthesized events, convert common
   // escape sequences to their Key enum aliases.
@@ -363,22 +368,7 @@ Utils.type = function(doc, element, text, opt_useNativeEvents, jsTimer, releaseM
       replace(/\t/g, '\uE004').                           // DOM_VK_TAB
       replace(/(\r\n|\n|\r)/g, '\uE006');                 // DOM_VK_RETURN
 
-  // Special-case file input elements. This is ugly, but should be okay
-  if (element.tagName == "INPUT") {
-    var inputtype = element.getAttribute("type");
-    if (inputtype && inputtype.toLowerCase() == "file") {
-      element.value = text;
-      Utils.fireHtmlEvent(element, "change");
-      return;
-    }
-  }
-
-  var obj = Utils.getNativeEvents();
-  var node = Utils.getNodeForNativeEvents(element);
-  var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
-
-  if (opt_useNativeEvents && obj && node && thmgr_cls) {
-
+  if (isUsingNativeEvents) {
     var pageUnloadedIndicator = Utils.getPageUnloadedIndicator(element);
 
     // Now do the native thing.
@@ -734,7 +724,14 @@ Utils.keyEvent = function(doc, element, type, keyCode, charCode,
     keyboardEvent.preventDefault();
   }
 
-  return element.dispatchEvent(keyboardEvent);
+  if (bot.userAgent.isFirefox4()) {
+    var win = doc.defaultView;
+    var domUtil = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+        .getInterface(Components.interfaces.nsIDOMWindowUtils);
+    return domUtil.dispatchDOMEventViaPresShell(element, keyboardEvent, true);
+  } else {
+    return element.dispatchEvent(keyboardEvent);
+  }
 };
 
 
@@ -1103,7 +1100,7 @@ Utils.wrapResult = function(result, doc) {
 Utils.getXPathOfElement = function(element) {
   var path = "";
   for (; element && element.nodeType == 1; element = element.parentNode) {
-    index = Utils.getElementIndexForXPath_(element);
+    var index = Utils.getElementIndexForXPath_(element);
     path = "/" + element.tagName + "[" + index + "]" + path;
   }
   return path;	

@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -248,7 +248,7 @@ bool Element::IsHiddenByOverflow() {
   script_source += L"var s = window.getComputedStyle ? window.getComputedStyle(p, null) : p.currentStyle;\n";
   //Note: In the case that the parent has overflow=hidden, and the element is out of sight,
   //this will force the IEDriver to scroll the element in to view.  This is a bug.
-  script_source += L"while (p != null && s.overflow != 'auto' && s.overflow != 'scroll' && s.overflow != 'hidden') {\n";
+  script_source += L"while (p != null && s != null && s.overflow && s.overflow != 'auto' && s.overflow != 'scroll' && s.overflow != 'hidden') {\n";
   script_source += L"  p = p.parentNode;\n";
   script_source += L"  s = window.getComputedStyle ? window.getComputedStyle(p, null) : p.currentStyle;\n";
   script_source += L"}";

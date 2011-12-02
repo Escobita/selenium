@@ -338,7 +338,6 @@ DelayedCommand.prototype.executeInternal_ = function() {
  */
 var nsCommandProcessor = function() {
   Components.utils.import('resource://fxdriver/modules/atoms.js');
-  Components.utils.import('resource://fxdriver/modules/utils.js');
 
   this.wrappedJSObject = this;
   this.wm = Components.classes['@mozilla.org/appshell/window-mediator;1'].
@@ -399,7 +398,8 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   if (command.name == 'newSession' ||
       command.name == 'quit' ||
       command.name == 'getStatus' ||
-      command.name == 'getWindowHandles') {
+      command.name == 'getWindowHandles' ||
+      command.name == 'getLogs') {
     try {
       this[command.name](response, command.parameters);
     } catch (ex) {
@@ -439,7 +439,8 @@ nsCommandProcessor.prototype.execute = function(jsonCommandString,
   var driver = sessionWindow.fxdriver;  // TODO(jmleyba): We only need to store an ID on the window!
   if (!driver) {
     response.sendError(new WebDriverError(bot.ErrorCode.UNKNOWN_ERROR,
-        'Session has no driver: ' + response.session.getId()));
+        'Session [' + response.session.getId() + '] has no driver.' +
+        ' The browser window may have been closed.'));
     return;
   }
 
@@ -532,6 +533,38 @@ nsCommandProcessor.prototype.getWindowHandles = function(response) {
   response.value = res;
   response.send();
 };
+
+
+/**
+ * Retreives the driver's logs. At the moment this retreives at most the first 10MB
+ * contained in the log file.
+ *
+ * @private
+ * @param {!Response} response The response object to send the command response
+ *     in.
+ * @param {!}
+ */
+nsCommandProcessor.prototype.getLogs = function(response, parameters) {
+  fxdriver.Logger.dumpn("parameters: " + parameters.type);
+  Components.utils['import']("resource://gre/modules/NetUtil.jsm");
+  NetUtil.asyncFetch(fxdriver.debug.driver_logs_file, function(inputStream, status) {
+    if (!Components.isSuccessCode(status)) {
+      fxdriver.debug.dumpn("Failed to read driver logs file!");
+      return;
+    }
+
+    var scriptableStream = Components.classes["@mozilla.org/scriptableinputstream;1"]
+            .createInstance(Components.interfaces.nsIScriptableInputStream);
+    scriptableStream.init(inputStream);
+
+    // We read at most 10MB at a time. For now 10MB is enough. If this becomes
+    // a limitation, we should add a HTTP Range header to allow downloading the file
+    // in multiple parts.
+    var bytesToRead = Math.min(inputStream.available(), 10485760);
+    response.value = scriptableStream.readBytes(bytesToRead);
+    response.send();
+  });
+}
 
 
 /**

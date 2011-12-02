@@ -402,7 +402,23 @@ bot.dom.isTextual = function(element) {
     return goog.array.contains(bot.dom.TEXTUAL_INPUT_TYPES_, type);
   }
 
+  if (bot.dom.isContentEditable(element)) {
+    return true;
+  }
+
   return false;
+};
+
+
+/**
+ * Whether the element is contentEditable.
+ *
+ * @param {!Element} element The element to check.
+ * @return {boolean} Whether the element is contentEditable.
+ */
+bot.dom.isContentEditable = function(element) {
+  return bot.dom.getProperty(element, 'contentEditable') == 'true' ||
+      bot.dom.getAttribute(element, 'contentEditable') != null;
 };
 
 
@@ -486,7 +502,11 @@ bot.dom.getEffectiveStyle = function(elem, styleName) {
  * @private
  */
 bot.dom.getCascadedStyle_ = function(elem, styleName) {
-  var value = (elem.currentStyle || elem.style)[styleName];
+  var style = elem.currentStyle || elem.style;
+  var value = style[styleName];
+  if (!goog.isDef(value) && style['getPropertyValue']) {
+    value = style.getPropertyValue(styleName);
+  }
   if (value != 'inherit') {
     return goog.isDef(value) ? value : null;
   }
@@ -531,13 +551,14 @@ bot.dom.isShown = function(elem, opt_ignoreOpacity) {
     return titleWindow == bot.getWindow();
   }
 
-  // Option or optgroup is shown iff enclosing select is shown.
+  // Option or optgroup is shown iff enclosing select is shown (ignoring the
+  // select's opacity).
   if (bot.dom.isElement(elem, goog.dom.TagName.OPTION) ||
       bot.dom.isElement(elem, goog.dom.TagName.OPTGROUP)) {
     var select = /**@type {Element}*/ (goog.dom.getAncestor(elem, function(e) {
       return bot.dom.isElement(e, goog.dom.TagName.SELECT);
     }));
-    return !!select && bot.dom.isShown(select, opt_ignoreOpacity);
+    return !!select && bot.dom.isShown(select, true);
   }
 
   // Map is shown iff image that uses it is shown.
@@ -840,6 +861,32 @@ bot.dom.getOpacity = function(elem) {
 
 
 /**
+ * Implementation of getOpacity for browsers that do support
+ * the "opacity" style.
+ *
+ * @param {!Element} elem Element whose opacity has to be found.
+ * @return {number} Opacity between 0 and 1.
+ * @private
+ */
+bot.dom.getOpacityNonIE_ = function(elem) {
+  // By default the element is opaque.
+  var elemOpacity = 1;
+
+  var opacityStyle = bot.dom.getEffectiveStyle(elem, 'opacity');
+  if (opacityStyle) {
+    elemOpacity = Number(opacityStyle);
+  }
+
+  // Let's apply the parent opacity to the element.
+  var parentElement = bot.dom.getParentElement(elem);
+  if (parentElement) {
+    elemOpacity = elemOpacity * bot.dom.getOpacityNonIE_(parentElement);
+  }
+  return elemOpacity;
+};
+
+
+/**
  * This function calculates the amount of scrolling necessary to bring the
  * target location into view.
  *
@@ -940,32 +987,6 @@ bot.dom.getInViewLocation =
   }
 
   return inViewLocation;
-};
-
-
-/**
- * Implementation of getOpacity for browsers that do support
- * the "opacity" style.
- *
- * @param {!Element} elem Element whose opacity has to be found.
- * @return {number} Opacity between 0 and 1.
- * @private
- */
-bot.dom.getOpacityNonIE_ = function(elem) {
-  // By default the element is opaque.
-  var elemOpacity = 1;
-
-  var opacityStyle = bot.dom.getEffectiveStyle(elem, 'opacity');
-  if (opacityStyle) {
-    elemOpacity = Number(opacityStyle);
-  }
-
-  // Let's apply the parent opacity to the element.
-  var parentElement = bot.dom.getParentElement(elem);
-  if (parentElement) {
-    elemOpacity = elemOpacity * bot.dom.getOpacityNonIE_(parentElement);
-  }
-  return elemOpacity;
 };
 
 
@@ -1090,4 +1111,23 @@ bot.dom.getLocationInView = function(elem, opt_elemRegion) {
       goog.style.getClientPosition(elem);
   return new goog.math.Coordinate(elemClientPos.x + elemRegion.left,
                                   elemClientPos.y + elemRegion.top);
+};
+
+
+/**
+ * Checks whether the element is currently scrolled in to view, such that the
+ * offset given, relative to the top-left corner of the element, is displayed.
+ *
+ * @param {!Element} element The element to check.
+ * @param {!goog.math.Coordinate} offset Coordinate in the element, relative to
+ *     the top-left corner of the element, to check.
+ * @return {boolean} Whether the coordinates specified, relative to the element,
+ *     are scrolled in to view.
+ */
+bot.dom.isCurrentlyScrolledIntoView = function(element, offset) {
+  var coords = goog.style.getClientPosition(element);
+  coords.x += offset.x;
+  coords.y += offset.y;
+  var visibleRect = goog.style.getVisibleRectForElement(element);
+  return !!visibleRect && (visibleRect.contains(coords));
 };

@@ -6,7 +6,7 @@
 <title>
   Class: Selenium::WebDriver::Remote::Http::Common
   
-    &mdash; Documentation by YARD 0.7.2
+    &mdash; Documentation by YARD 0.7.3
   
 </title>
 
@@ -104,6 +104,7 @@
 </div>
 <div class="tags">
   
+
 </div><div id="subclasses">
   <h2>Direct Known Subclasses</h2>
   <p class="children"><span class='object_link'><a href="Curb.html" title="Selenium::WebDriver::Remote::Http::Curb (class)">Curb</a></span>, <span class='object_link'><a href="Default.html" title="Selenium::WebDriver::Remote::Http::Default (class)">Default</a></span></p>
@@ -129,6 +130,7 @@ same as chromium/gecko
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='int'>20</span></pre></dd>
@@ -146,6 +148,7 @@ same as chromium/gecko
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application/json</span><span class='tstring_end'>&quot;</span></span></pre></dd>
@@ -163,6 +166,7 @@ same as chromium/gecko
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Accept</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='const'>CONTENT_TYPE</span> <span class='rbrace'>}</span></pre></dd>
@@ -238,6 +242,27 @@ Returns the value of attribute timeout.
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#close-instance_method" title="#close (instance method)">- (Object) <strong>close</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  <span class="private note title">Private</span>
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#initialize-instance_method" title="#initialize (instance method)">- (Common) <strong>initialize</strong> </a>
     
 
@@ -289,6 +314,7 @@ A new instance of Common
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -340,6 +366,7 @@ Returns the value of attribute timeout
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -387,16 +414,13 @@ Returns the value of attribute timeout
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-17
-18
-19
-20
 21
 22
 23
@@ -412,17 +436,21 @@ Returns the value of attribute timeout
 33
 34
 35
-36</pre>
+36
+37
+38
+39
+40</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/remote/http/common.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/remote/http/common.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id call'>call</span><span class='lparen'>(</span><span class='id verb'>verb</span><span class='comma'>,</span> <span class='id url'>url</span><span class='comma'>,</span> <span class='id command_hash'>command_hash</span><span class='rparen'>)</span>
   <span class='id url'>url</span>      <span class='op'>=</span> <span class='id server_url'>server_url</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='id url'>url</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id url'>url</span><span class='period'>.</span><span class='id kind_of?'>kind_of?</span><span class='lparen'>(</span><span class='const'>URI</span><span class='rparen'>)</span>
   <span class='id headers'>headers</span>  <span class='op'>=</span> <span class='const'>DEFAULT_HEADERS</span><span class='period'>.</span><span class='id dup'>dup</span>
 
   <span class='kw'>if</span> <span class='id command_hash'>command_hash</span>
-    <span class='id payload'>payload</span>                   <span class='op'>=</span> <span class='id command_hash'>command_hash</span><span class='period'>.</span><span class='id to_json'>to_json</span>
+    <span class='id payload'>payload</span>                   <span class='op'>=</span> <span class='const'>MultiJson</span><span class='period'>.</span><span class='id encode'>encode</span><span class='lparen'>(</span><span class='id command_hash'>command_hash</span><span class='rparen'>)</span>
     <span class='id headers'>headers</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Type</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>   <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='const'>CONTENT_TYPE</span><span class='rbrace'>}</span><span class='tstring_content'>; charset=utf-8</span><span class='tstring_end'>&quot;</span></span>
     <span class='id headers'>headers</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Content-Length</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id payload'>payload</span><span class='period'>.</span><span class='id bytesize'>bytesize</span><span class='period'>.</span><span class='id to_s'>to_s</span> <span class='kw'>if</span> <span class='lbracket'>[</span><span class='symbol'>:post</span><span class='comma'>,</span> <span class='symbol'>:put</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id include?'>include?</span><span class='lparen'>(</span><span class='id verb'>verb</span><span class='rparen'>)</span>
 
@@ -442,14 +470,55 @@ Returns the value of attribute timeout
 </table>
 </div>
     
+      <div class="method_details ">
+  <p class="signature " id="close-instance_method">
+  
+    - (<tt>Object</tt>) <strong>close</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong> 
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/remote/http/common.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id close'>close</span>
+  <span class='comment'># hook for subclasses - will be called on Driver#quit
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
     
     <div id="footer">
-  Generated on Fri Sep 23 15:53:37 2011 by 
+  Generated on Tue Nov 29 01:07:04 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.2 (ruby-1.9.2).
+  0.7.3 (ruby-1.9.2).
 </div>
 
   </body>

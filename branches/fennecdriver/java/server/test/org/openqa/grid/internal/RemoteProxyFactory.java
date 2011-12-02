@@ -1,3 +1,19 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.openqa.grid.internal;
 
 import java.util.HashMap;
@@ -29,7 +45,7 @@ public class RemoteProxyFactory {
     req.addDesiredCapabilitiy(capability);
 
     Map<String, Object> config = new HashMap<String, Object>();
-    config.put("url", url);
+    config.put(RegistrationRequest.REMOTE_HOST, url);
     req.setConfiguration(config);
     return createProxy(registry, req);
 
@@ -49,7 +65,7 @@ public class RemoteProxyFactory {
     RegistrationRequest req = RegistrationRequest.build("-role", "webdriver");
     req.getCapabilities().clear();
     req.addDesiredCapabilitiy(cap);
-    req.getConfiguration().put(RegistrationRequest.REMOTE_URL, url);
+    req.getConfiguration().put(RegistrationRequest.REMOTE_HOST, url);
     return createProxy(registry, req);
 
   }
@@ -72,7 +88,7 @@ public class RemoteProxyFactory {
       req.addDesiredCapabilitiy(c);
     }
 
-    req.getConfiguration().put(RegistrationRequest.REMOTE_URL, url);
+    req.getConfiguration().put(RegistrationRequest.REMOTE_HOST, url);
     return createProxy(registry, req);
 
   }

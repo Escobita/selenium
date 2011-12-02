@@ -15,6 +15,8 @@ import java.util.List;
 /**
  * @author jmleyba@gmail.com (Jason Leyba)
  */
+@NeedsLocalEnvironment(reason =
+    "Executing these tests over the wire doesn't work, because they relies on 100ms-specific timing")
 public class ImplicitWaitTest extends AbstractDriverTestCase {
 
   @Override

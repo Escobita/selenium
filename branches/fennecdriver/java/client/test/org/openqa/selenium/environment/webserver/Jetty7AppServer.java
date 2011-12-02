@@ -38,6 +38,10 @@ import javax.servlet.Servlet;
 
 public class Jetty7AppServer implements AppServer {
 
+  private static final String HOSTNAME_FOR_TEST_ENV_NAME = "HOSTNAME";
+  private static final String ALTERNATIVE_HOSTNAME_FOR_TEST_ENV_NAME = "ALTERNATIVE_HOSTNAME";
+  private static final String FIXED_HTTP_PORT_ENV_NAME = "TEST_HTTP_PORT";
+  private static final String FIXED_HTTPS_PORT_ENV_NAME = "TEST_HTTPS_PORT";
   private static final String DEFAULT_CONTEXT_PATH = "/common";
   private static final String JS_SRC_CONTEXT_PATH = "/javascript";
   private static final String THIRD_PARTY_JS_CONTEXT_PATH =
@@ -59,7 +63,12 @@ public class Jetty7AppServer implements AppServer {
   private final String hostName;
 
   public Jetty7AppServer() {
-    this("localhost");
+    this(getHostname());
+  }
+
+  private static String getHostname() {
+    String hostnameFromProperty = System.getenv(HOSTNAME_FOR_TEST_ENV_NAME);
+    return hostnameFromProperty == null ? "localhost" : hostnameFromProperty;
   }
 
   public Jetty7AppServer(String hostName) {
@@ -98,8 +107,18 @@ public class Jetty7AppServer implements AppServer {
     addServlet("Basic Authentication", "/basicAuth", BasicAuth.class);
     addFilter(MultiPartFilter.class, "/upload", 0 /* DEFAULT dispatches */);
 
-    listenOn(findFreePort());
-    listenSecurelyOn(findFreePort());
+    listenOn(getHttpPort());
+    listenSecurelyOn(getHttpsPort());
+  }
+
+  private int getHttpPort() {
+    String port = System.getenv(FIXED_HTTP_PORT_ENV_NAME);
+    return port == null ? findFreePort() : Integer.parseInt(port);
+  }
+
+  private int getHttpsPort() {
+    String port = System.getenv(FIXED_HTTPS_PORT_ENV_NAME);
+    return port == null ? findFreePort() : Integer.parseInt(port);
   }
 
   protected File findRootOfWebApp() {
@@ -119,7 +138,9 @@ public class Jetty7AppServer implements AppServer {
   }
 
   public String getAlternateHostName() {
-    return networkUtils.getPrivateLocalAddress();
+    String alternativeHostnameFromProperty = System.getenv(ALTERNATIVE_HOSTNAME_FOR_TEST_ENV_NAME);
+    return alternativeHostnameFromProperty == null ?
+        networkUtils.getPrivateLocalAddress() : alternativeHostnameFromProperty;
   }
 
   public String whereIs(String relativeUrl) {
@@ -214,6 +235,10 @@ public class Jetty7AppServer implements AppServer {
     }
   }
 
+  public void addServlet(String url, Servlet servlet) {
+    defaultContext.addServlet(new ServletHolder(servlet), url);
+  }
+
   public void addFilter(Class<? extends Filter> filter, String path,
       int dispatches) {
     defaultContext.addFilter(filter, path, dispatches);
@@ -237,7 +262,7 @@ public class Jetty7AppServer implements AppServer {
   }
 
   public static void main(String[] args) {
-    Jetty7AppServer server = new Jetty7AppServer("localhost");
+    Jetty7AppServer server = new Jetty7AppServer(getHostname());
     server.listenOn(2310);
     System.out.println("Starting server on port 2310");
     server.listenSecurelyOn(2410);

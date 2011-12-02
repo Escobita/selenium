@@ -21,7 +21,7 @@
  * @constructor
  */
 function Dispatcher() {
-  Components.utils.import('resource://fxdriver/modules/utils.js');
+  Components.utils.import('resource://fxdriver/modules/atoms.js');
 
   this.resources_ = [];
   this.init_();
@@ -258,6 +258,14 @@ Dispatcher.prototype.init_ = function() {
       on(Request.Method.POST, Dispatcher.executeAs('switchToWindow')).
       on(Request.Method.DELETE, Dispatcher.executeAs('close'));
 
+  this.bind_('/session/:sessionId/window/:windowHandle/size').
+      on(Request.Method.POST, Dispatcher.executeAs('setWindowSize')).
+      on(Request.Method.GET, Dispatcher.executeAs('getWindowSize'));
+
+  this.bind_('/session/:sessionId/window/:windowHandle/position').
+      on(Request.Method.POST, Dispatcher.executeAs('setWindowPosition')).
+      on(Request.Method.GET, Dispatcher.executeAs('getWindowPosition'));
+
   this.bind_('/session/:sessionId/screenshot').
       on(Request.Method.GET, Dispatcher.executeAs('screenshot'));
 
@@ -289,6 +297,8 @@ Dispatcher.prototype.init_ = function() {
   this.bind_('/session/:sessionId/keys').
       on(Request.Method.POST, Dispatcher.executeAs('sendKeysToActiveElement'));
 
+  this.bind_('/session/:sessionId/log').
+      on(Request.Method.POST, Dispatcher.executeAs('getLogs'));
 
 
   // --------------------------------------------------------------------------

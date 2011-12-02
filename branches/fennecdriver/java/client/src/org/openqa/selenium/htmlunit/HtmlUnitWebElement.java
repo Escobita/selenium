@@ -44,7 +44,6 @@ import org.openqa.selenium.internal.WrapsElement;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.SgmlPage;
-import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
@@ -87,7 +86,49 @@ public class HtmlUnitWebElement implements WrapsDriver,
   private static final String[] blockLevelsTagNames =
   {"p", "h1", "h2", "h3", "h4", "h5", "h6", "dl", "div", "noscript",
       "blockquote", "form", "hr", "table", "fieldset", "address", "ul", "ol", "pre", "br"};
-  private static final String[] booleanAttributes = {"checked", "selected", "multiple"};
+  private static final String[] booleanAttributes = {
+    "async",
+    "autofocus",
+    "autoplay",
+    "checked",
+    "compact",
+    "complete",
+    "controls",
+    "declare",
+    "defaultchecked",
+    "defaultselected",
+    "defer",
+    "disabled",
+    "draggable",
+    "ended",
+    "formnovalidate",
+    "hidden",
+    "indeterminate",
+    "iscontenteditable",
+    "ismap",
+    "itemscope",
+    "loop",
+    "multiple",
+    "muted",
+    "nohref",
+    "noresize",
+    "noshade",
+    "novalidate",
+    "nowrap",
+    "open",
+    "paused",
+    "pubdate",
+    "readonly",
+    "required",
+    "reversed",
+    "scoped",
+    "seamless",
+    "seeking",
+    "selected",
+    "spellcheck",
+    "truespeed",
+    "willvalidate"
+    };
 
   private String toString;
 
@@ -359,11 +400,7 @@ public class HtmlUnitWebElement implements WrapsDriver,
 
     for (String booleanAttribute : booleanAttributes) {
       if (booleanAttribute.equals(lowerName)) {
-        if (value.equals(DomElement.ATTRIBUTE_NOT_DEFINED)) {
-          return null;
-        }
-
-        return "true";
+        return element.hasAttribute(lowerName) ? "true" : null;
       }
     }
     if ("index".equals(lowerName) && element instanceof HtmlOption) {
@@ -634,7 +671,8 @@ public class HtmlUnitWebElement implements WrapsDriver,
     List<WebElement> toReturn = new LinkedList<WebElement>();
 
     for (WebElement current : allElements) {
-      if (element.isAncestorOf(((HtmlUnitWebElement) current).element)) {
+      HtmlElement candidate = ((HtmlUnitWebElement) current).element;
+      if (element.isAncestorOf(candidate) && element != candidate) {
         toReturn.add(current);
       }
     }

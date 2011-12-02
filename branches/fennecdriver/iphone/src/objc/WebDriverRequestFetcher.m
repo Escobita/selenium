@@ -11,7 +11,6 @@
 #import "HTTPRedirectResponse.h"
 #import "HTTPResponse+Utility.h"
 #import "NSObject+SBJSON.h"
-#import "NSString+SBJSON.h"
 #import "RESTServiceMapping.h"
 #import "WebDriverPreferences.h"
 
@@ -43,7 +42,7 @@ static WebDriverRequestFetcher *singleton = nil;
   connectorAddr = [preferences connectorAddr];
   requesterId = [preferences requesterId];
   
-  serviceMapping_ = [[RESTServiceMapping alloc] init]; 	
+  serviceMapping_ = [[RESTServiceMapping alloc] initWithIpAddress:connectorAddr port:3001 ]; 	
   status_ = [[NSString alloc] initWithFormat:@"Driven by requests from %@ routed by %@",
                   requesterId, connectorAddr]; 
   

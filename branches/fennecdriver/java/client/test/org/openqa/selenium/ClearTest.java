@@ -2,13 +2,13 @@ package org.openqa.selenium;
 
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
+import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
-import static org.openqa.selenium.Ignore.Driver.FIREFOX;
-import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 
-@Ignore({CHROME, OPERA, FIREFOX, IE, SELENESE, ANDROID})
+@Ignore({CHROME, OPERA, SELENESE, ANDROID})
 public class ClearTest extends AbstractDriverTestCase {
 
   public void testWritableTextInputShouldClear() {
@@ -71,5 +71,12 @@ public class ClearTest extends AbstractDriverTestCase {
     }
   }
 
+  @Ignore({HTMLUNIT, IPHONE})
+  public void testContentEditableAreaShouldClear() {
+    driver.get(pages.readOnlyPage);
+    WebElement element = driver.findElement(By.id("content-editable"));
+    element.clear();
+    assertEquals("", element.getText());
+  }
 
 }

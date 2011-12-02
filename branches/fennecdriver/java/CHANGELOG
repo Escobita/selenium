@@ -1,3 +1,165 @@
+v2.14.0
+=======
+WebDriver:
+  * Deleted all deprecated methods in the Java API.
+  * Client code cleaned to work with Java 5. Server code needs Java 6.
+  * Added a front-end for executing WebDriverJS scripts. Point a
+    browser at http://localhost:4444/wd/hub.
+  * Can now query an Android driver for supported capabilities.
+  * Updated JSON framework used in the iOS driver.
+  * Fixed issue with scrolling on small viewports with native events
+    in Firefox.
+  * FIXED: 2889: FluentWait supports adding a custom message to
+    timeout exception.
+  * FIXED 2798: When implicit waits are enabled in the FirefoxDriver,
+    stale element reference errors when searching for child elements
+    are now handled properly
+  * FIXED 2917: Preventing endless recursion in hashCode.
+
+Server:
+  * Memory leak fixed
+
+Grid:
+  * New beta console added.  
+  * Grid nodes were leaking even more memory that regular server
+    nodes.  
+  * Fixed a scenario that used to lead to "session = null" errors.
+  * Now support iOS nodes.
+
+Known issues:
+  * Continuing problems with element out of bounds exception being
+    thrown.
+
+
+v2.13.0
+=======
+Dependency change:
+  * Selenium/webdriver java dependencies now use apache commons-exec
+    (http://commons.apache.org/exec/) version 1.1. If you are using manual
+    dependency management you will need to add this to your project.
+    If you resolve via maven central (maven, ivy, gradle), this will
+    be handled automatically.
+WebDriver:
+  * Recovering from null window references in the Firefox driver (#1438)
+  * Make native events work correctly on Linux with the Python bindings (#2633)
+  * Improved finding Firefox on Windows in the C# bindings (2818)
+  * Screenshots in Python are now working (2829)
+  * Exporting webdriver.promise from the Javascript API (2839)
+  * Permission denied accessing some elements using the Firefox driver (2863)
+  * Fixed typing into content editable elements with Firefox (2.12 regression)
+  * Firefox is started in the forgeground on OS X. Focus / blur events now have
+    higher chance of firing correctly on OS X.
+  * Deprecated methods were removed from the FirefoxDriver and FirefoxProfile
+    classes (saveScreenshot, enableNativeEvents, alwaysLoadNoFocusLib).
+  * The amount of time a test can remain hanging is now capped (to 3 hours).
+
+Grid:
+  * Gracefully handle registration of old nodes in a new grid hub (#2738).
+  * Releasing all the resources when a proxy is removed from the hub (#2768).
+
+Known issues:
+  * Synthesized mouse events are inaccurate (Affects Firefox driver users
+    on OS X) (2281)
+  * Invalid move target out of bounds exception thrown.2700
+  * Dragged elements end up in the wrong location, with the Firefox driver,
+    when scrolling is required (typically with small viewport) (2877)
+
+v2.12.0
+=======
+
+RC
+  * Disabled web security checks for Chrome by default. 
+  * Actually reenabling *safariproxy.
+
+WebDriver
+  * Firefox 8 support enabled
+  * Added @Beta annotation. Any method marked with this may be deleted
+    or changed without notification.
+  * Added @Beta Window control for Firefox in Ruby and Java. This
+    allows resizing and moving.
+  * Renamed FirefoxProfile.enableNativeEvents() to
+    FirefoxProfile.areNativeEventsEnabled(). Deprecated original
+    method. Will be removed in 2.13.
+  * Renamed FirefoxProfile.alwaysLoadNoFocusLib() to
+    FirefoxProfile.shouldLoadNoFocusLib(). Deprecated original
+    method. Will be removed in 2.13.
+  * Better reporting of page size when attempting to move out of bounds.
+  * More informative error message when a remote webdriver client
+    fails to connect to the browser.
+  * PageFactory now only decorates WebElement lists.
+  * Calling WebElement.clear on a disabled or readOnly element will
+    throw an InvalidElementStateException.
+  * WebDriver.getWindowHandle will throw a NoSuchWindowException if
+    the window is closed.
+  * FIXED: 1498: HtmlUnit no longer finds containing element when
+    searching by CSS.
+
+Grid
+  * Made Grid orphan check only apply to Se1 clients.
+
+Atoms
+  * Implemented clear action for contentEditable elements.
+
+
+v2.11.0
+=======
+
+RC:
+  * Safari proxy added back to the supported browser.
+
+
+v2.10.0
+======
+
+Grid:
+  * Stability and reliability fixes.
+  * A single node can now process both selenium 1.0 and selenium webdriver requests.  Old proxies deprecated.
+  * FIXED: 2617: Removing unnecessary logging.
+  * FIXED: 2650, 2400: Unregister dead nodes.
+
+WebDriver:
+  * FIXED: 2700: Don't throw MoveTargetOutOfBoundsError where we shouldn't.
+  * FIXED: 2301: Allow commas in CSS selectors.
+  * FIXED: 2099: Occasional XPath lookup errors.
+  * FIXED: 1771: Don't scroll unnecessarily.
+  * FIXED: 2674: Don't incorrectly decorate List<WebElement>s which don't have @FindBy annotations.
+
+Javascript:
+  * Added jsapi, including node integration.  More details to come.
+
+General:
+  * Updated version of guava used to 10.0.1.
+
+v2.9.0
+======
+
+Project:
+  * ThoughtWorks code grant to the Software Freedom Conservancy complete.
+
+WebDriver:
+  * Support for Ice Cream Sandwich in the AndroidDriver
+  * CSS Selector support enabled for Android
+  * Remote webdriver server log now contains '[HTML source]' instead of full
+    source.
+  * Better respect for preformatted text in WebElement.getText()
+  * Adding better error message when failing to connect to the FirefoxDriver.
+  * Reduced scrolling during tests for IE and Firefox.
+  * Preserve the state of modified keys when using native events on Linux.
+  * Support for experimental page load detection in firefox. Set the
+    "webdriver.load.strategy" to "fast" in the FirefoxProfile to enable less
+    conservative page loading detection at the risk of greater test
+    instability.
+  * FIXED: 2031: Shielding backslashes when writing preferences to a file.
+    There is an issue with Firefox: it drops \n and \r when it moves user
+    preferences to prefs.js. This patch is a workaround.
+  * FIXED: 2223: Clicks on labels are now propagated to the referenced element.
+  * FIXED: 2646: PortProber no longer attempts to divide by zero.
+  * FIXED: 2675: Better detection of where to click on links.
+
+RC:
+  * FIXED: 569: Making assert and verify methods NPE-safe.
+
+
 v2.8.0
 ======
 
@@ -147,7 +309,6 @@ Grid:
   * Additional logging
 
 
-
 v2.1.0
 ======
 
@@ -162,3 +323,9 @@ Grid:
   * Track when a session has become orphaned.  I.e., when the client sends no
     commands after the initial session creation.  This almost always indicates
     the client is no longer connected and the session is unusable immediately.
+
+
+
+
+
+

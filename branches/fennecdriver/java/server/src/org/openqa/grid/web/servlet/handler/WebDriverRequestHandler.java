@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,7 +13,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
+
 package org.openqa.grid.web.servlet.handler;
 
 import java.io.IOException;
@@ -26,7 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.grid.internal.GridException;
+import org.openqa.grid.internal.ExternalSessionKey;
+import org.openqa.grid.common.SeleniumProtocol;
+import org.openqa.grid.common.exception.GridException;
+import org.openqa.grid.internal.exception.NewSessionException;
+import org.openqa.grid.internal.utils.ForwardConfiguration;
 import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.TestSession;
 import org.openqa.jetty.jetty.servlet.ServletHttpResponse;
@@ -50,8 +56,9 @@ public class WebDriverRequestHandler extends RequestHandler {
     if ("/session".equals(getRequest().getPathInfo())) {
       return RequestType.START_SESSION;
     } else if (getRequest().getMethod().equalsIgnoreCase("DELETE")) {
-      String externalKey = extractSession(getRequest().getPathInfo());
-      if (getRequest().getPathInfo().endsWith("/session/" + externalKey)) {
+      ExternalSessionKey
+          externalKey =  ExternalSessionKey.fromWebDriverRequest(getRequest().getPathInfo());
+      if (getRequest().getPathInfo().endsWith("/session/" + externalKey.getKey())) {
         return RequestType.STOP_SESSION;
       }
     }
@@ -59,39 +66,12 @@ public class WebDriverRequestHandler extends RequestHandler {
   }
 
   @Override
-  public String extractSession() {
+  public ExternalSessionKey extractSession() {
     if (getRequestType() == RequestType.START_SESSION) {
       throw new IllegalAccessError("Cannot call that method of a new session request.");
     }
     String path = getRequest().getPathInfo();
-    return extractSession(path);
-  }
-
-  /**
-   * extract the session xxx from http://host:port/a/b/c/session/xxx/...
-   * 
-   * @param path The path to the session
-   * @return the session key provided by the remote., or null if the url didn't contain a session id
-   */
-  private String extractSession(String path) {
-    int sessionIndex = path.indexOf("/session/");
-    if (sessionIndex != -1) {
-      sessionIndex += "/session/".length();
-      int nextSlash = path.indexOf("/", sessionIndex);
-      String session;
-      if (nextSlash != -1) {
-        session = path.substring(sessionIndex, nextSlash);
-      } else {
-        session = path.substring(sessionIndex, path.length());
-      }
-      // log.debug("session found : " + session);
-      if ("".equals(session)) {
-        return null;
-      }
-      return session;
-    }
-    // log.debug("session not found in location " + loc);
-    return null;
+    return ExternalSessionKey.fromWebDriverRequest(path);
   }
 
   // TODO freynaud parsing is so so.
@@ -119,7 +99,7 @@ public class WebDriverRequestHandler extends RequestHandler {
   }
 
   @Override
-  public String forwardNewSessionRequest(TestSession session) {
+  public ExternalSessionKey forwardNewSessionRequestAndUpdateRegistry(TestSession session) throws NewSessionException{
     try {
       // here, don't forward the requestBody directly, but read the
       // desiredCapabilities from the session instead.
@@ -128,22 +108,31 @@ public class WebDriverRequestHandler extends RequestHandler {
       JSONObject c = new JSONObject();
       c.put("desiredCapabilities", session.getRequestedCapabilities());
       String content = c.toString();
-      session.forward(getRequest(), getResponse(), content, false);
+      ForwardConfiguration config = new ForwardConfiguration();
+      config.setProtocol(SeleniumProtocol.WebDriver);
+      config.setNewSessionRequest(true);
+      config.setContentOverWrite(content);
+      session.forward(getRequest(), getResponse(), config);
     } catch (IOException e) {
-      log.warning("Error forwarding the request " + e.getMessage());
-      return null;
+      //log.warning("Error forwarding the request " + e.getMessage());
+      throw new NewSessionException("Error forwarding the request " + e.getMessage(),e);
     } catch (JSONException e) {
-      log.warning("Error with the request " + e.getMessage());
-      return null;
+      //log.warning("Error with the request " + e.getMessage());
+      throw new NewSessionException("Error with the request " + e.getMessage(),e);
     }
 
     if (getResponse().containsHeader("Location")) {
       String location =
           ((ServletHttpResponse) getResponse()).getHttpResponse().getField("Location");
-      return extractSession(location);
+      ExternalSessionKey res =  ExternalSessionKey.fromWebDriverRequest( location);
+      if ( res!=null){
+        return res;
+      }else {
+        throw new NewSessionException("couldn't extract the new session from the response header.");
+      }
     } else {
-      log.warning("Error, header should contain Location");
-      return null;
+      //log.warning("Error, header should contain Location");
+      throw new NewSessionException("Error, header should contain Location ");
     }
 
   }

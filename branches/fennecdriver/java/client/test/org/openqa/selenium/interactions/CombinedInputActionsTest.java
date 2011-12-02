@@ -35,6 +35,7 @@ import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+import static org.openqa.selenium.TestUtilities.getEffectivePlatform;
 import static org.openqa.selenium.TestUtilities.isFirefox;
 import static org.openqa.selenium.TestUtilities.isInternetExplorer;
 import static org.openqa.selenium.TestUtilities.isNativeEventsEnabled;
@@ -50,7 +51,7 @@ public class CombinedInputActionsTest extends AbstractDriverTestCase {
   // TODO: Check if this could work in any browser without native events.
   @JavascriptEnabled
   public void testClickingOnFormElements() {
-    if (!isNativeEventsEnabled(driver) || (!Platform.getCurrent().is(Platform.LINUX))) {
+    if (!isNativeEventsEnabled(driver) || (!getEffectivePlatform().is(Platform.LINUX))) {
       System.out.println("Skipping testClickingOnFormElements: Only works with native events" +
           " on Linux.");
       return;
@@ -80,7 +81,7 @@ public class CombinedInputActionsTest extends AbstractDriverTestCase {
   @JavascriptEnabled
   @Ignore({ANDROID, IE, REMOTE, IPHONE, SELENESE, OPERA})
   public void testSelectingMultipleItems() {
-    if (!isNativeEventsEnabled(driver) || (!Platform.getCurrent().is(Platform.LINUX))) {
+    if (!isNativeEventsEnabled(driver) || (!getEffectivePlatform().is(Platform.LINUX))) {
       System.out.println("Skipping testClickingOnFormElements: Only works with native events" +
           " on Linux.");
       return;
@@ -165,14 +166,14 @@ public class CombinedInputActionsTest extends AbstractDriverTestCase {
     waitFor(WaitingConditions.pageTitleToBe(driver, "We Arrive Here"));
   }
 
-  @Ignore({SELENESE, HTMLUNIT})
+  @Ignore({SELENESE, HTMLUNIT, OPERA})
   public void testChordControlCutAndPaste() {
     // FIXME: macs don't have CONRTROL key
-    if (Platform.getCurrent().is(Platform.MAC)) {
+    if (getEffectivePlatform().is(Platform.MAC)) {
       return;
     }
 
-    if (Platform.getCurrent().is(Platform.WINDOWS) &&
+    if (getEffectivePlatform().is(Platform.WINDOWS) &&
         (isInternetExplorer(driver) || isFirefox(driver))) {
       System.out.println("Skipping testChordControlCutAndPaste on Windows: native events library" +
           " does not support storing modifiers state yet.");

@@ -1,3 +1,90 @@
+2.14.0 (2011-11-29)
+===================
+
+* Add Selenium::WebDriver::Support::Select class to ease working with select lists.
+* Add Capabilities.ipad and Capabilities.iphone (#2895)
+* Replace json_pure dependency with multi_json. (#2901)
+* Don't leave sockets hanging in SYN_SENT state while polling.
+* Allow selecting option elements even if the enclosing select has zero opacity.
+* Exception renames (old names aliased and will still work in rescues):
+  * ObsoleteElementError      -> StaleElementReferenceError
+  * UnhandledError            -> UnknownError
+  * UnexpectedJavascriptError -> JavascriptError
+  * NoAlertOpenError          -> NoAlertPresentError
+  * ElementNotDisplayedError  -> ElementNotVisibleError
+* Firefox:
+  * Fixed issue with scrolling on small viewports with native events.
+  * Fix CSS selector support in Firefox 3.0
+* IE:
+  * Implement the window control API
+
+2.13.0 (2011-11-18)
+===================
+
+* Firefox:
+  * Recovering from null window references in the Firefox driver (#1438)
+
+2.12.2 (2011-11-13)
+===================
+
+* Firefox
+  * Fix issue where Firefox 8 would throw permission errors after document.domain was modified (#2863).
+  * Force window to the foreground on launch (see https://bugzilla.mozilla.org/show_bug.cgi?id=566671)
+
+2.12.1 (2011-11-11)
+===================
+
+* Fix regression when typing into contenteditable elements.
+
+2.12.0 (2011-11-10)
+===================
+
+* Loosened the ffi dependency now that Windows support is back (#2755).
+* Fix shutdown issues when using net-http-persistent against remote servers.
+* Added beta window control API (see Selenium::WebDriver::Options#window).
+* Firefox
+  * Support for Firefox 8.
+  * Better reporting of page size when attempting to move out of bounds.
+  * Beta implementation of window control.
+
+2.11.0
+======
+
+(release skipped since it included only server-side changes)
+
+2.10.0 (2011-10-27)
+===================
+
+* Improve native keyboard emulation on Windows.
+* Allow commas in CSS selectors (#2301)
+* Firefox:
+  * Fix intermittent error when finding elements by XPath (#2099)
+  * Fix detection of maximum page size (#2700)
+  * Avoid extension selection dialog (extensions.autoDisableScopes)
+  * Fix invalid wire responses from the synthetic mouse (#2695)
+  * Don't scroll unnecessarily (#1771).
+* IE:
+  * Improve handling of #clear on disabled or readonly elements.
+
+2.9.1 (2011-10-24)
+==================
+
+* Workaround for invalid error responses (#2695).
+
+2.9.0 (2011-10-21)
+==================
+
+* Support file uploads to the remote server (see Selenium::WebDriver::DriverExtensions::UploadsFiles)
+* New exception: Selenium::WebDriver::Error::MoveTargetOutOfBoundsError
+* Implemented Chrome::Profile#add_extension
+* Better respect for preformatted text in Element#text
+* Reduced scrolling during tests for IE and Firefox.
+* Firefox:
+  * Support for experimental page load detection.
+* IE:
+  * Better detection of where to click on links (#2675).
+  * Improve handling of modal dialogs (showModalDialog).
+
 2.8.0 (2011-10-06)
 ==================
 

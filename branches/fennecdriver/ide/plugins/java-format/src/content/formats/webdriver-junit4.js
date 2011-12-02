@@ -203,11 +203,12 @@ options.header =
         "\n" +
         "public class ${className} {\n" +
         "\tprivate WebDriver driver;\n" +
-        "\tprivate String baseUrl=\"\";\n" +
+        "\tprivate String baseUrl;\n" +
         "\tprivate StringBuffer verificationErrors = new StringBuffer();\n" +
         "\t@Before\n" +
         "\tpublic void setUp() throws Exception {\n" +
         "\t\tdriver = new FirefoxDriver();\n" +
+        "\t\tbaseUrl = \"${baseURL}\";\n" +
         "\t\tdriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);\n" +
         "\t}\n" +
         "\n" +
@@ -294,7 +295,11 @@ WDAPI.Driver.prototype.getCurrentUrl = function() {
 };
 
 WDAPI.Driver.prototype.get = function(url) {
-  return this.ref + ".get(" + url + ")";
+  if (url.length > 1 && (url.substring(1,8) == "http://" || url.substring(1,9) == "https://")) { // url is quoted
+    return this.ref + ".get(" + url + ")";
+  } else {
+    return this.ref + ".get(baseUrl + " + url + ")";
+  }
 };
 
 WDAPI.Driver.prototype.getTitle = function() {
@@ -339,6 +344,10 @@ WDAPI.Element.prototype.sendKeys = function(text) {
 
 WDAPI.Element.prototype.submit = function() {
   return this.ref + ".submit()";
+};
+
+WDAPI.Element.prototype.select = function(label) {
+  return "new Select(" + this.ref + ").selectByVisibleText(" + xlateArgument(label) + ")";
 };
 
 WDAPI.ElementList = function(ref) {

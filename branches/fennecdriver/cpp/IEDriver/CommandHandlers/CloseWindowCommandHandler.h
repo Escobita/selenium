@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -49,8 +49,10 @@ class CloseWindowCommandHandler : public IECommandHandler {
     }
     browser_wrapper->Close();
 
+    IECommandExecutor& mutable_executor = const_cast<IECommandExecutor&>(executor);
+    mutable_executor.set_current_browser_id("");
+
     if (current_window_count == 1) {
-      IECommandExecutor& mutable_executor = const_cast<IECommandExecutor&>(executor);
       mutable_executor.set_is_valid(false);
     }
     response->SetSuccessResponse(Json::Value::null);

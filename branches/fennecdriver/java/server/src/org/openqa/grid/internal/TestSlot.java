@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,14 +13,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
-
+*/
 package org.openqa.grid.internal;
 
+import org.openqa.grid.common.SeleniumProtocol;
+import org.openqa.grid.common.exception.GridException;
 import org.openqa.grid.internal.listeners.TestSessionListener;
 import org.openqa.grid.internal.utils.CapabilityMatcher;
-import org.openqa.selenium.remote.internal.HttpClientFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.Map;
@@ -35,12 +38,11 @@ import java.util.logging.Logger;
  * The listener ({@link TestSessionListener} attached to the test session of this test slot is
  * thread safe. If 2 threads are trying to execute the before / after session, only 1 will be
  * executed.The other one will be discarded.
- *
- * This class sees multiple threads but is currently sort-of protected by the lock in
- * Registry. Unfortunately the CleanUpThread also messes around in here, so it should
- * be thread safe on its own. Which probably means the lock in the registry is just
- * nonsense.
- *
+ * 
+ * This class sees multiple threads but is currently sort-of protected by the lock in Registry.
+ * Unfortunately the CleanUpThread also messes around in here, so it should be thread safe on its
+ * own.
+ * 
  */
 public class TestSlot {
 
@@ -48,14 +50,22 @@ public class TestSlot {
 
   private final Map<String, Object> capabilities;
   private final RemoteProxy proxy;
+  private final SeleniumProtocol protocol;
+  private final String path;
   private final CapabilityMatcher matcher;
-  private volatile TestSession currentSession;
-
   private final Lock lock = new ReentrantLock();
-  volatile boolean beingReleased = false;
 
-  public TestSlot(RemoteProxy proxy, Map<String, Object> capabilities) {
+  private volatile TestSession currentSession;
+  volatile boolean beingReleased = false;
+  private boolean showWarning = false;
+
+
+  public TestSlot(RemoteProxy proxy, SeleniumProtocol protocol, String path,
+                  Map<String, Object> capabilities) {
     this.proxy = proxy;
+    this.protocol = protocol;
+    this.path = path;
+
     CapabilityMatcher c = proxy.getCapabilityHelper();
     if (c == null) {
       throw new InvalidParameterException("the proxy needs to have a valid "
@@ -63,7 +73,6 @@ public class TestSlot {
     }
     matcher = proxy.getCapabilityHelper();
     this.capabilities = capabilities;
-
   }
 
   public Map<String, Object> getCapabilities() {
@@ -85,7 +94,7 @@ public class TestSlot {
    * Use {@link RemoteProxy#setCapabilityHelper(CapabilityMatcher)} on the proxy histing the test
    * slot to modify the definition of match
    * 
-   * @param desiredCapabilities
+   * @param desiredCapabilities capabilities for the new session
    * @return a new session linked to that testSlot if possible, null otherwise.
    */
   public TestSession getNewSession(Map<String, Object> desiredCapabilities) {
@@ -95,7 +104,7 @@ public class TestSlot {
         return null;
       } else {
         if (matches(desiredCapabilities)) {
-          TestSession session = new TestSession(this, desiredCapabilities);
+          TestSession session = new TestSession(this, desiredCapabilities, new DefaultTimeSource());
           currentSession = session;
           return session;
         } else {
@@ -105,11 +114,32 @@ public class TestSlot {
     } finally {
       lock.unlock();
     }
+  }
 
+
+
+  /**
+   * the type of protocol for the TestSlot.Ideally should always be webdriver, but can also be
+   * selenium1 protocol for backward compatibility purposes.
+   * 
+   * @return the protocol for this TestSlot
+   */
+  public SeleniumProtocol getProtocol() {
+    return protocol;
   }
 
   /**
-   * @param desiredCapabilities
+   * the path the server is using to handle the request. Typically /wd/hub for a webdriver based
+   * protocol and /selenium-server/driver/ for a selenium1 based protocol
+   * 
+   * @return the path the server is using for the requests of this slot.
+   */
+  public String getPath() {
+    return path;
+  }
+
+  /**
+   * @param desiredCapabilities capabilities for the new session
    * @return true if the desired capabilties matches for the
    *         {@link RemoteProxy#getCapabilityHelper()}
    */
@@ -137,7 +167,11 @@ public class TestSlot {
    * @return true if that's the first thread trying to release this test slot, false otherwise.
    * @see TestSlot#finishReleaseProcess()
    */
-  private boolean startReleaseProcess() {
+  boolean startReleaseProcess() {
+    if (currentSession == null) {
+      return false;
+    }
+
     try {
       lock.lock();
       if (beingReleased) {
@@ -154,31 +188,25 @@ public class TestSlot {
   /**
    * releasing all the resources. The slot can now be reused.
    */
-  private void finishReleaseProcess() {
+  void finishReleaseProcess() {
     try {
       lock.lock();
-      currentSession = null;
-      beingReleased = false;
+      doFinishRelease();
     } finally {
       lock.unlock();
     }
   }
 
-  private boolean showWarning = false;
+  public void doFinishRelease() {
+    currentSession = null;
+    beingReleased = false;
+  }
 
-  /**
-   * Release the test slot. Free the resource on the slot itself and the registry. If also invokes
-   * the {@link TestSessionListener#afterSession(TestSession)} if applicable.
-   */
-  void _release() {
-    if (currentSession == null) {
-      return;
-    }
+  String getInternalKey() {
+    return currentSession == null ? null : currentSession.getInternalKey();
+  }
 
-    boolean okToContinue = startReleaseProcess();
-    if (!okToContinue) {
-      return;
-    }
+  boolean performAfterSessionEvent() {
     // run the pre-release listener
     try {
       if (proxy instanceof TestSessionListener) {
@@ -191,49 +219,9 @@ public class TestSlot {
     } catch (Throwable t) {
       log.severe("Error running afterSession for " + currentSession + " the test slot is now dead.");
       t.printStackTrace();
-      return;
+      return false;
     }
-
-    // forceRelease doesn't check anything and wll set currentSession to
-    // null.
-    String internalKey = currentSession == null ? null : currentSession.getInternalKey();
-
-    try {
-      proxy.getRegistry().getLock().lock();
-      // release resources on the test slot.
-      finishReleaseProcess();
-      // update the registry.
-      proxy.getRegistry().release(internalKey);
-    } finally {
-      proxy.getRegistry().getLock().unlock();
-    }
-
-  }
-
-  /**
-   * releasing the testslot, WITHOUT running any listener.
-   */
-  public void forceRelease() {
-    if (currentSession == null) {
-      return;
-    }
-
-    String internalKey = currentSession.getInternalKey();
-    currentSession = null;
-    proxy.getRegistry().release(internalKey);
-    beingReleased = false;
-
-  }
-
-  /**
-   * releasing the test slot, running the afterSession listener if specified.
-   */
-  public void release() {
-    new Thread(new Runnable() { // Thread safety reviewed
-      public void run() {
-        _release();
-      }
-    }).start();
+    return true;
   }
 
   @Override
@@ -241,7 +229,17 @@ public class TestSlot {
     return currentSession == null ? "no session" : currentSession.toString();
   }
 
-  public HttpClientFactory getHttpClientFactory() {
-    return getProxy().getHttpClientFactory();
+  /**
+   * get the full URL the underlying server is listening on for selenium / webdriver commands.
+   * 
+   * @return the url
+   */
+  public URL getRemoteURL() {
+    String u = getProxy().getRemoteHost() + getPath();
+    try {
+      return new URL(u);
+    } catch (MalformedURLException e) {
+      throw new GridException("Configuration error for the node." + u + " isn't a valid URL");
+    }
   }
 }

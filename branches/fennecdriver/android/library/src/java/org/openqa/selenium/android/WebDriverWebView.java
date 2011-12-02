@@ -17,7 +17,8 @@ limitations under the License.
 
 package org.openqa.selenium.android;
 
-import android.view.MotionEvent;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -40,10 +41,7 @@ class WebDriverWebView {
     view.setWebChromeClient(chromeClient);
     view.setWebViewClient(viewClient);
 
-    final float zoom = view.getScale();
-
     view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
       public void onFocusChange(View view, boolean focused) {
         // When a text area is focused, webview's focus is false
         if (!focused) {
@@ -51,7 +49,7 @@ class WebDriverWebView {
         }
       }
     });
-
+    
     view.addJavascriptInterface(jsInterface, "webdriver");
 
     initWebViewSettings(view);

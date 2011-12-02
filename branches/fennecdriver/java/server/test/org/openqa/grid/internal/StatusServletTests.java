@@ -1,3 +1,20 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.grid.internal;
 
 import junit.framework.Assert;
@@ -56,13 +73,13 @@ public class StatusServletTests {
 
     hub.start();
 
-    p1 = RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine1:4444/", registry);
+    p1 = RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine1:4444", registry);
     RemoteProxy p2 =
-        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine2:4444/", registry);
+        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine2:4444", registry);
     RemoteProxy p3 =
-        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine3:4444/", registry);
+        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine3:4444", registry);
     RemoteProxy p4 =
-        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine4:4444/", registry);
+        RemoteProxyFactory.getNewBasicRemoteProxy("app1", "http://machine4:4444", registry);
 
     RegistrationRequest req = new RegistrationRequest();
     Map<String, Object> capability = new HashMap<String, Object>();
@@ -70,7 +87,7 @@ public class StatusServletTests {
     req.addDesiredCapabilitiy(capability);
 
     Map<String, Object> config = new HashMap<String, Object>();
-    config.put("url", "http://machine5:4444/");
+    config.put(RegistrationRequest.REMOTE_HOST, "http://machine5:4444");
     req.setConfiguration(config);
     RemoteProxy customProxy = new MyCustomProxy(req, registry);
 
@@ -88,13 +105,13 @@ public class StatusServletTests {
     newSessionRequest.setDesiredCapabilities(cap);
     newSessionRequest.process();
     session = newSessionRequest.getTestSession();
-    session.setExternalKey("ext. key");
+    session.setExternalKey(ExternalSessionKey.fromString("ext. key"));
 
   }
 
   @Test
   public void testget() throws IOException, JSONException {
-    String id = "http://machine1:4444/";
+    String id = "http://machine1:4444";
     HttpClient client = httpClientFactory.getHttpClient();
 
     BasicHttpRequest r = new BasicHttpRequest("GET", proxyApi.toExternalForm() + "?id=" + id);
@@ -108,7 +125,7 @@ public class StatusServletTests {
 
   @Test
   public void testGetNegative() throws IOException, JSONException {
-    String id = "http://wrongOne:4444/";
+    String id = "http://wrongOne:4444";
     HttpClient client = httpClientFactory.getHttpClient();
 
     BasicHttpRequest r = new BasicHttpRequest("GET", proxyApi.toExternalForm() + "?id=" + id);
@@ -124,7 +141,7 @@ public class StatusServletTests {
 
   @Test
   public void testpost() throws IOException, JSONException {
-    String id = "http://machine1:4444/";
+    String id = "http://machine1:4444";
     HttpClient client =  httpClientFactory.getHttpClient();
 
     JSONObject o = new JSONObject();
@@ -143,7 +160,7 @@ public class StatusServletTests {
 
   @Test
   public void testpostReflection() throws IOException, JSONException {
-    String id = "http://machine5:4444/";
+    String id = "http://machine5:4444";
     HttpClient client =  httpClientFactory.getHttpClient();
 
     JSONObject o = new JSONObject();
@@ -169,7 +186,7 @@ public class StatusServletTests {
 
   @Test
   public void testSessionApi() throws IOException, JSONException {
-    String s = session.getExternalKey();
+    ExternalSessionKey s = session.getExternalKey();
     HttpClient client =  httpClientFactory.getHttpClient();
 
     JSONObject o = new JSONObject();
@@ -185,18 +202,18 @@ public class StatusServletTests {
     Assert.assertTrue(res.getBoolean("success"));
 
     Assert.assertNotNull(res.get("internalKey"));
-    Assert.assertEquals(s, res.get("session"));
+    Assert.assertEquals(s, ExternalSessionKey.fromJSON((String) res.get("session")));
     Assert.assertNotNull(res.get("inactivityTime"));
     Assert.assertEquals(p1.getId(), res.get("proxyId"));
   }
 
   @Test
   public void testSessionget() throws IOException, JSONException {
-    String s = session.getExternalKey();
+    ExternalSessionKey s = session.getExternalKey();
 
     HttpClient client =  httpClientFactory.getHttpClient();
 
-    String url = testSessionApi.toExternalForm() + "?session=" + URLEncoder.encode(s, "UTF-8");
+    String url = testSessionApi.toExternalForm() + "?session=" + URLEncoder.encode(s.getKey(), "UTF-8");
     BasicHttpRequest r = new BasicHttpRequest("GET", url);
 
     HttpResponse response = client.execute(host, r);
@@ -206,7 +223,7 @@ public class StatusServletTests {
     Assert.assertTrue(o.getBoolean("success"));
 
     Assert.assertNotNull(o.get("internalKey"));
-    Assert.assertEquals(s, o.get("session"));
+    Assert.assertEquals(s, ExternalSessionKey.fromJSON((String) o.get("session")));
     Assert.assertNotNull(o.get("inactivityTime"));
     Assert.assertEquals(p1.getId(), o.get("proxyId"));
 

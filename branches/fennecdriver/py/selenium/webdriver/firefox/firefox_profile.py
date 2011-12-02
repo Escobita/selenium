@@ -16,7 +16,6 @@
 import copy
 import tempfile
 import os
-import logging
 import zipfile
 import shutil
 import re
@@ -50,6 +49,7 @@ class FirefoxProfile(object):
         "startup.homepage_welcome_url": "\"about:blank\"",
         "devtools.errorconsole.enabled": "true",
         "dom.disable_open_during_load": "false",
+        "extensions.autoDisableScopes" : 10,
         "extensions.logging.enabled": "true",
         "extensions.update.enabled": "false",
         "extensions.update.notifyUser": "false",
@@ -88,12 +88,14 @@ class FirefoxProfile(object):
            This defaults to None and will create a new
            directory when object is created.
         """
-        self.default_preferences = copy.deepcopy(FirefoxProfile.DEFAULT_PREFERENCES)
+        self.default_preferences = copy.deepcopy(
+            FirefoxProfile.DEFAULT_PREFERENCES)
         self.profile_dir = profile_directory
         if self.profile_dir is None:
             self.profile_dir = self._create_tempfolder()
         else:
-            newprof = os.path.join(tempfile.mkdtemp(), "webdriver-py-profilecopy")
+            newprof = os.path.join(tempfile.mkdtemp(),
+                "webdriver-py-profilecopy")
             shutil.copytree(self.profile_dir, newprof)
             self.profile_dir = newprof
             self._read_existing_userjs()
@@ -110,8 +112,10 @@ class FirefoxProfile(object):
             clean_value = 'true'
         elif value is False:
             clean_value = 'false'
+        elif isinstance(value, str):
+            clean_value = '"%s"' % value
         else:
-            clean_value = repr(value)
+            clean_value = str(int(value))
 
         self.default_preferences[key] = clean_value
 
@@ -147,7 +151,8 @@ class FirefoxProfile(object):
 
     @property
     def accept_untrusted_certs(self):
-        return bool(self.default_preferences["webdriver_accept_untrusted_certs"])
+        return bool(
+            self.default_preferences["webdriver_accept_untrusted_certs"])
 
     @accept_untrusted_certs.setter
     def accept_untrusted_certs(self, value):
@@ -220,14 +225,16 @@ class FirefoxProfile(object):
 
         #Get directories ready
         for file_in_xpi in xpi.namelist():
-            name = file_in_xpi.replace("\\", os.path.sep).replace("/", os.path.sep)
+            name = file_in_xpi.replace("\\", os.path.sep).replace(
+                "/", os.path.sep)
             dest = os.path.join(tempdir, name)
             if (name.endswith(os.path.sep) and not os.path.exists(dest)):
                 os.makedirs(dest)
 
         #Copy files
         for file_in_xpi in xpi.namelist():
-            name = file_in_xpi.replace("\\", os.path.sep).replace("/", os.path.sep)
+            name = file_in_xpi.replace("\\", os.path.sep).replace(
+                "/", os.path.sep)
             dest = os.path.join(tempdir, name)
             if not (name.endswith(os.path.sep)):
                 outfile = open(dest, 'wb')
@@ -237,7 +244,8 @@ class FirefoxProfile(object):
         if ext_dir == "":
             installrdfpath = os.path.join(tempdir,"install.rdf")
             ext_dir = os.path.join(
-                self.extensionsDir, self._read_id_from_install_rdf(installrdfpath))
+                self.extensionsDir, self._read_id_from_install_rdf(
+                  installrdfpath))
         if os.path.exists(ext_dir):
             shutil.rmtree(ext_dir)
         shutil.copytree(tempdir, ext_dir)

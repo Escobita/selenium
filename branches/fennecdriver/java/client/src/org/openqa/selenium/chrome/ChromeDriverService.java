@@ -1,11 +1,10 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
 package org.openqa.selenium.chrome;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.openqa.selenium.os.CommandLine.findExecutable;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.net.PortProber;
+import org.openqa.selenium.net.UrlChecker;
+import org.openqa.selenium.os.CommandLine;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +14,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.browserlaunchers.AsyncExecute;
-import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.net.UrlChecker;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.openqa.selenium.os.CommandLine.findExecutable;
 
 /**
  * Manages the life and death of a chromedriver server.
@@ -30,11 +30,6 @@ public class ChromeDriverService {
    * the {@link #createDefaultService() default service}.
    */
   public static final String CHROME_DRIVER_EXE_PROPERTY = "webdriver.chrome.driver";
-
-  /**
-   * Used to spawn a new child process when this service is {@link #start() started}.
-   */
-  private final ProcessBuilder processBuilder;
 
   /**
    * The base URL for the managed server.
@@ -50,7 +45,9 @@ public class ChromeDriverService {
    * A reference to the current child process. Will be {@code null} whenever this service is not
    * running. Protected by {@link #lock}.
    */
-  private Process process = null;
+  private CommandLine process = null;
+  private final String executable;
+  private final String args;
 
   /**
    * @param executable The chromedriver executable.
@@ -58,9 +55,8 @@ public class ChromeDriverService {
    * @throws IOException If an I/O error occurs.
    */
   private ChromeDriverService(File executable, int port) throws IOException {
-    this.processBuilder =
-        new ProcessBuilder(executable.getCanonicalPath(), String.format("--port=%d", port));
-
+    this.executable = executable.getCanonicalPath();
+    args = String.format("--port=%d", port);
     url = new URL(String.format("http://localhost:%d", port));
   }
 
@@ -114,7 +110,7 @@ public class ChromeDriverService {
       if (process == null) {
         return false;
       }
-      process.exitValue();
+      process.destroy();
       return false;
     } catch (IllegalThreadStateException e) {
       return true;
@@ -136,9 +132,9 @@ public class ChromeDriverService {
       if (process != null) {
         return;
       }
-      process = processBuilder.start();
-      pipe(process.getErrorStream(), System.err);
-      pipe(process.getInputStream(), System.out);
+      process = new CommandLine(this.executable, args);
+      process.copyOutputTo(System.err);
+      process.executeAsync();
 
       URL status = new URL(url.toString() + "/status");
       URL healthz = new URL(url.toString() + "/healthz");
@@ -180,7 +176,7 @@ public class ChromeDriverService {
       }
       URL killUrl = new URL(url.toString() + "/shutdown");
       new UrlChecker().waitUntilUnavailable(3, SECONDS, killUrl);
-      AsyncExecute.killProcess(process);
+      process.destroy();
     } catch (MalformedURLException e) {
       throw new WebDriverException(e);
     } catch (UrlChecker.TimeoutException e) {

@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -32,7 +33,7 @@ import static org.openqa.selenium.WaitingConditions.elementValueToEqual;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.openqa.selenium.WaitingConditions.trimmedElementTextToEqual;
+import static org.hamcrest.Matchers.not;
 
 import java.io.File;
 import java.io.IOException;
@@ -155,7 +156,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(SELENESE)
+  @Ignore(value = {ANDROID, SELENESE}, reason = "Android: triggers mouse click instead.")
   public void testShouldIssueMouseUpEvents() {
     driver.get(pages.javascriptPage);
     driver.findElement(By.id("mouseup")).click();
@@ -227,7 +228,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     driver.findElement(By.id("labelForCheckbox")).click();
 
     WebElement result = driver.findElement(By.id("result"));
-    assertNotNull(waitFor(trimmedElementTextToEqual(result, "labelclick chboxclick")));
+    assertNotNull(waitFor(elementTextToContain(result, "labelclick chboxclick")));
   }
 
   @Ignore(ANDROID)
@@ -367,7 +368,7 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
   @Ignore(value = {SELENESE, ANDROID},
       reason = "Not implemented")
   public void testShouldReportTheXAndYCoordinatesWhenClicking() {
-    driver.get(pages.javascriptPage);
+    driver.get(pages.clickEventPage);
 
     WebElement element = driver.findElement(By.id("eventish"));
     element.click();
@@ -375,8 +376,17 @@ public class CorrectEventFiringTest extends AbstractDriverTestCase {
     String clientX = getTextFromElementOnceAvailable("clientX");
     String clientY = getTextFromElementOnceAvailable("clientY");
 
-    assertFalse("0".equals(clientX));
-    assertFalse("0".equals(clientY));
+    assertThat(clientX, not(equalTo("0")));
+    assertThat(clientY, not(equalTo("0")));
+  }
+  
+  @JavascriptEnabled
+  @Ignore(ALL)
+  public void testClickEventsShouldBubble() {
+    driver.get(pages.clicksPage);
+    driver.findElement(By.id("bubblesFrom")).click();
+    boolean eventBubbled = (Boolean)((JavascriptExecutor)driver).executeScript("return !!window.bubbledClick;");
+    assertTrue("Event didn't bubble up", eventBubbled);
   }
 
   private void clickOnElementWhichRecordsEvents() {

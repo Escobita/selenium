@@ -241,9 +241,6 @@
     <ClInclude Include="CommandHandlers\SendKeysToAlertCommandHandler.h">
       <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="CommandHandlers\SendModifierKeyCommandHandler.h">
-      <Filter>Header Files\CommandHandlers</Filter>
-    </ClInclude>
     <ClInclude Include="CommandHandlers\SetAsyncScriptTimeoutCommandHandler.h">
       <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
@@ -281,6 +278,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IECommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlers\SendKeysToActiveElementCommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlers\GetWindowSizeCommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlers\GetWindowPositionCommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlers\SetWindowPositionCommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlers\SetWindowSizeCommandHandler.h">
       <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
   </ItemGroup>

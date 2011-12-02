@@ -63,8 +63,8 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\..\third_party\csharp\dotnetzip-1.9\Ionic.Zip.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.Net35">
-      <HintPath>..\..\..\third_party\csharp\json-net-4.0r2\Newtonsoft.Json.Net35.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\third_party\csharp\json-net-4.0r4\Net35\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -156,12 +156,14 @@
     <Compile Include="InvalidCookieDomainException.cs" />
     <Compile Include="InvalidElementStateException.cs" />
     <Compile Include="IOptions.cs" />
+    <Compile Include="IRotatable.cs" />
     <Compile Include="ISearchContext.cs" />
     <Compile Include="ITakesScreenshot.cs" />
     <Compile Include="ITargetLocator.cs" />
     <Compile Include="ITimeouts.cs" />
     <Compile Include="IWebDriver.cs" />
     <Compile Include="IWebElement.cs" />
+    <Compile Include="IWindow.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="NoAlertPresentException.cs" />
     <Compile Include="NoSuchElementException.cs" />
@@ -197,9 +199,11 @@
     <Compile Include="Remote\RemoteTimeouts.cs" />
     <Compile Include="Remote\RemoteWebDriver.cs" />
     <Compile Include="Remote\RemoteWebElement.cs" />
+    <Compile Include="Remote\RemoteWindow.cs" />
     <Compile Include="Remote\Response.cs" />
     <Compile Include="Remote\SessionId.cs" />
     <Compile Include="Remote\StackTraceElement.cs" />
+    <Compile Include="ScreenOrientation.cs" />
     <Compile Include="Screenshot.cs" />
     <Compile Include="StaleElementReferenceException.cs" />
     <Compile Include="UnableToSetCookieException.cs" />

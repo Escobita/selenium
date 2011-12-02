@@ -44,6 +44,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+
 public class FirefoxProfile {
   public static final String PORT_PREFERENCE = "webdriver_firefox_port";
 
@@ -70,6 +71,7 @@ public class FirefoxProfile {
           .put("browser.tabs.warnOnOpen", false)
           .put("devtools.errorconsole.enabled", true)
           .put("dom.disable_open_during_load", false)
+          .put("extensions.autoDisableScopes", 10)
           .put("extensions.logging.enabled", true)
           .put("extensions.update.enabled", false)
           .put("extensions.update.notifyUser", false)
@@ -406,7 +408,7 @@ public class FirefoxProfile {
     }
   }
 
-  public boolean enableNativeEvents() {
+  public boolean areNativeEventsEnabled() {
     return enableNativeEvents;
   }
 
@@ -420,7 +422,7 @@ public class FirefoxProfile {
    * 
    * @return Whether the no focus library should always be loaded for Firefox on Linux.
    */
-  public boolean alwaysLoadNoFocusLib() {
+  public boolean shouldLoadNoFocusLib() {
     return loadNoFocusLib;
   }
 

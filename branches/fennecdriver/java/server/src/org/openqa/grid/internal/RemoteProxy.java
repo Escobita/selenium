@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,11 +13,20 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 package org.openqa.grid.internal;
 
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.grid.common.RegistrationRequest;
+import org.openqa.grid.common.SeleniumProtocol;
+import org.openqa.grid.common.exception.GridException;
 import org.openqa.grid.internal.listeners.TimeoutListener;
 import org.openqa.grid.internal.utils.CapabilityMatcher;
 import org.openqa.grid.internal.utils.DefaultCapabilityMatcher;
@@ -25,6 +35,9 @@ import org.openqa.grid.internal.utils.HtmlRenderer;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,16 +50,17 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.openqa.grid.common.RegistrationRequest.MAX_INSTANCES;
-import static org.openqa.grid.common.RegistrationRequest.REMOTE_URL;
+import static org.openqa.grid.common.RegistrationRequest.PATH;
+import static org.openqa.grid.common.RegistrationRequest.REMOTE_HOST;
+import static org.openqa.grid.common.RegistrationRequest.SELENIUM_PROTOCOL;
 
 /**
- * Proxy to a remote server executing the tests.
- * <p/>
- * The proxy keeps a state of what is happening on the remote server and knows if a new test can be
- * run on the remote server. There are several reasons why a test could not be run on the specified
- * remote server, for instance: if the RemoteProxy decides the remote server has reached the maximum
- * number of concurrent sessions, or if the client has requested DesiredCapabilities we don't
- * support e.g. asking for Chrome when we only support Firefox.
+ * Proxy to a remote server executing the tests. <p/> The proxy keeps a state of what is happening
+ * on the remote server and knows if a new test can be run on the remote server. There are several
+ * reasons why a test could not be run on the specified remote server, for instance: if the
+ * RemoteProxy decides the remote server has reached the maximum number of concurrent sessions, or
+ * if the client has requested DesiredCapabilities we don't support e.g. asking for Chrome when we
+ * only support Firefox.
  */
 public class RemoteProxy implements Comparable<RemoteProxy> {
 
@@ -59,13 +73,13 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   private static final Logger log = Logger.getLogger(RemoteProxy.class.getName());
 
-  // the URL the remote listen on.
-  protected volatile URL remoteURL;
+  // the host the remote listen on.The final URL will be proxy.host + slot.path
+  protected volatile URL remoteHost;
 
   private final Map<String, Object> config;
 
   // list of the type of test the remote can run.
-  private final List<TestSlot> testSlots = Collections.synchronizedList(new ArrayList<TestSlot>());
+  private final List<TestSlot> testSlots;
 
   // maximum number of tests that can run at a given time on the remote.
   private final int maxConcurrentSession;
@@ -74,6 +88,9 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   private volatile CapabilityMatcher capabilityHelper = new DefaultCapabilityMatcher();
 
   private String id;
+
+  private volatile boolean stop = false;
+
 
   public List<TestSlot> getTestSlots() {
     return testSlots;
@@ -92,16 +109,12 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   }
 
   /**
-   * Create the proxy from the info sent by the remote.
-   * <p/>
-   * If maxSession is not specified, default to 1 = max number of tests running at a given time will
-   * be 1.
-   * <p/>
-   * For each capability, maxInstances is defaulted to 1 if not specified = max number of test of
-   * each capability running at a time will be 1. maxInstances for firefox can be > 1. IE won't
-   * support it.
-   * 
-   * @param request The request
+   * Create the proxy from the info sent by the remote. <p/> If maxSession is not specified, default
+   * to 1 = max number of tests running at a given time will be 1. <p/> For each capability,
+   * maxInstances is defaulted to 1 if not specified = max number of test of each capability running
+   * at a time will be 1. maxInstances for firefox can be > 1. IE won't support it.
+   *
+   * @param request  The request
    * @param registry The registry to use
    */
   public RemoteProxy(RegistrationRequest request, Registry registry) {
@@ -109,19 +122,19 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
     this.registry = registry;
     this.config =
         mergeConfig(registry.getConfiguration().getAllParams(), request.getConfiguration());
-    String url = (String) config.get(REMOTE_URL);
+    String url = (String) config.get(REMOTE_HOST);
     if (url == null) {
       // no URL isn't always a problem.
       // The remote proxy only knows where the remote is if the remote
       // itself initiate the registration process. In a virtual
       // environment for instance, the IP of the host where the remote is
       // will only be available after the host has been started.
-      this.remoteURL = null;
+      this.remoteHost = null;
       log.warning("URL was null. Not a problem if you set a meaningful ID.");
     } else {
       try {
-        this.remoteURL = new URL(url);
-        this.id = remoteURL.toExternalForm();
+        this.remoteHost = new URL(url);
+        this.id = remoteHost.toExternalForm();
       } catch (MalformedURLException e) {
         // should only happen when a bad config is sent.
         throw new GridException("Not a correct url to register a remote : " + url);
@@ -134,8 +147,13 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
     List<DesiredCapabilities> capabilities = request.getCapabilities();
 
+    List<TestSlot> slots = new ArrayList<TestSlot>();
     for (DesiredCapabilities capability : capabilities) {
       Object maxInstance = capability.getCapability(MAX_INSTANCES);
+
+      SeleniumProtocol protocol = getProtocol(capability);
+      String path = getPath(capability);
+
       if (maxInstance == null) {
         log.warning("Max instance not specified. Using default = 1 instance");
         maxInstance = "1";
@@ -146,8 +164,42 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
         for (String k : capability.asMap().keySet()) {
           c.put(k, capability.getCapability(k));
         }
-        testSlots.add(new TestSlot(this, c));
+        slots.add(new TestSlot(this, protocol, path, c));
       }
+    }
+    this.testSlots = Collections.unmodifiableList(slots);
+  }
+
+  private SeleniumProtocol getProtocol(DesiredCapabilities capability) {
+    String type = (String) capability.getCapability(SELENIUM_PROTOCOL);
+
+    SeleniumProtocol protocol;
+    if (type == null) {
+      protocol = SeleniumProtocol.WebDriver;
+    } else {
+      try {
+        protocol = SeleniumProtocol.valueOf(type);
+      } catch (IllegalArgumentException e) {
+        throw new GridException(type
+            + " isn't a valid protocol type for grid. See SeleniumProtocol enim.", e);
+      }
+    }
+    return protocol;
+  }
+
+  private String getPath(DesiredCapabilities capability) {
+    String type = (String) capability.getCapability(PATH);
+    if (type == null) {
+      switch (getProtocol(capability)) {
+        case Selenium:
+          return "/selenium-server/driver";
+        case WebDriver:
+          return "/wd/hub";
+        default:
+          throw new GridException("Protocol not supported.");
+      }
+    } else {
+      return type;
     }
   }
 
@@ -155,14 +207,14 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
     if (this instanceof TimeoutListener) {
       if (cleanUpCycle > 0 && timeOut > 0) {
         log.fine("starting cleanup thread");
-        new Thread(new CleanUpThread(this)).start();  // Thread safety reviewed (hopefully ;)
+        new Thread(new CleanUpThread(this), "RemoteProxy CleanUpThread").start(); // Thread safety reviewed (hopefully ;)
       }
     }
   }
 
   /**
    * merge the param from config 1 and 2. If a param is present in both, config2 value is used.
-   * 
+   *
    * @param configuration1 The first configuration to merge (recessive)
    * @param configuration2 The second configuration to merge (dominant)
    * @return The merged collection
@@ -180,8 +232,8 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   /**
    * get the unique id for the node. Usually the url it listen on is a good id. If the network keeps
    * changing and the IP of the node is updated, you need to define nodes with a different id.
-   * 
-   * @return  the id
+   *
+   * @return the id
    */
   public String getId() {
     if (id == null) {
@@ -190,17 +242,13 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
     return id;
   }
 
-  protected void setId(String id) {
-    this.id = id;
-  }
-
-  private boolean stop = false;
 
   public void teardown() {
     stop = true;
   }
 
   private class CleanUpThread implements Runnable {
+
     private RemoteProxy proxy;
 
     public CleanUpThread(RemoteProxy proxy) {
@@ -226,18 +274,18 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
               if (hasTimedOut) {
                 log.warning("session " + session + " has TIMED OUT and will be released");
                 ((TimeoutListener) proxy).beforeRelease(session);
-                session.terminate();
+                registry.terminate(session, SessionTerminationReason.TIMEOUT);
               }
 
               if (session.isOrphaned()) {
                 log.warning("session " + session + " has been ORPHANED and will be released");
                 ((TimeoutListener) proxy).beforeRelease(session);
-                session.terminate();
+                registry.terminate(session, SessionTerminationReason.ORPHAN);
               }
             }
           } catch (Throwable t) {
-            log.warning("Error executing the timeout when cleaning up slot " + slot +
-                t.getMessage());
+            log.warning("Error executing the timeout when cleaning up slot " + slot
+                + t.getMessage());
           }
         }
       }
@@ -250,8 +298,8 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   /**
    * return the registration request that created the proxy in the first place.
-   * 
-   * @return  a  RegistrationRequest, doh!
+   *
+   * @return a RegistrationRequest, doh!
    */
   public RegistrationRequest getOriginalRegistrationRequest() {
     return request;
@@ -259,6 +307,7 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   /**
    * return the max number of tests that can run on this remote at a given time.
+   *
    * @return an int, doh!
    */
   public int getMaxNumberOfConcurrentTestSessions() {
@@ -266,15 +315,22 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   }
 
   /**
-   * @return the URL the remote listens on.
+   * Get the host the node is on. This is different from the URL used to communicate with the
+   * driver. For a local node that support both selenium1 and webdriver protocol,
+   * remoteHost=http://localhost:5555 , but the underlying server with respond on urls
+   * http://localhost:5555/wd/hub ( proxy.host + slot.path where slot is a webdriver slot ) and
+   * http://localhost:5555/selenium-server/driver ( proxy.host + slot.path where slot is a selenium1
+   * slot )
+   *
+   * @return the host the remote listens on.
    */
-  public URL getRemoteURL() {
-    return remoteURL;
+  public URL getRemoteHost() {
+    return remoteHost;
   }
 
   /**
    * return a new test session if the current proxy has the resources and is ready to run the test.
-   * 
+   *
    * @param requestedCapability .
    * @return a new TestSession if possible, null otherwise
    */
@@ -299,7 +355,7 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   /**
    * returns the total number of test slots used on this proxy
-   * 
+   *
    * @return an int
    */
   public int getTotalUsed() {
@@ -313,13 +369,11 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   }
 
   /**
-   * Return true if the remote control has the capability requested.
-   * <p/>
-   * the definition of "has" is defined by {@link CapabilityMatcher#matches(Map, Map)}
-   * <p/>
-   * hasCapability = true doesn't mean the test cast start just now, only that the proxy will be
-   * able to run a test requireing that capability at some point.
-   * 
+   * Return true if the remote control has the capability requested. <p/> the definition of "has" is
+   * defined by {@link CapabilityMatcher#matches(Map, Map)} <p/> hasCapability = true doesn't mean
+   * the test cast start just now, only that the proxy will be able to run a test requireing that
+   * capability at some point.
+   *
    * @param requestedCapability The requestedCapability
    * @return true if present
    */
@@ -343,8 +397,8 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   /**
    * Takes a registration request and return the RemoteProxy associated to it. It can be any class
    * extending RemoteProxy.
-   * 
-   * @param request The request
+   *
+   * @param request  The request
    * @param registry The registry to use
    * @return a new instance built from the request.
    */
@@ -364,7 +418,7 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
       Constructor<?> c = clazz.getConstructor(argsClass);
       Object proxy = c.newInstance(args);
       if (proxy instanceof RemoteProxy) {
-        ((RemoteProxy)proxy).setupTimeoutListener();
+        ((RemoteProxy) proxy).setupTimeoutListener();
         return (T) proxy;
       } else {
         throw new InvalidParameterException("Error:" + proxy.getClass() + " isn't a remote proxy");
@@ -385,18 +439,23 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     RemoteProxy other = (RemoteProxy) obj;
     if (getId() == null) {
-      if (other.getId() != null)
+      if (other.getId() != null) {
         return false;
-    } else if (!getId().equals(other.getId()))
+      }
+    } else if (!getId().equals(other.getId())) {
       return false;
+    }
     return true;
   }
 
@@ -410,7 +469,7 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   @Override
   public String toString() {
-    return "URL :" + getRemoteURL() + (timeOut != -1 ? " time out : " + timeOut : "");
+    return "host :" + getRemoteHost() + (timeOut != -1 ? " time out : " + timeOut : "");
   }
 
   private final HtmlRenderer renderer = new DefaultHtmlRenderer(this);
@@ -421,8 +480,8 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
 
   /**
    * im millis
-   * 
-   * @return  an int
+   *
+   * @return an int
    */
   public int getTimeOut() {
     return timeOut;
@@ -432,4 +491,43 @@ public class RemoteProxy implements Comparable<RemoteProxy> {
   public HttpClientFactory getHttpClientFactory() {
     return getRegistry().getHttpClientFactory();
   }
+
+  /**
+   * the status of the node.
+   * @return
+   * @throws GridException. If the node if down or doesn't recognize the /wd/hub/status request. 
+   */
+  public JSONObject getStatus() throws GridException {
+    String url = getRemoteHost().toExternalForm() + "/wd/hub/status";
+    BasicHttpRequest r = new BasicHttpRequest("GET", url);
+    HttpClient client = getHttpClientFactory().getHttpClient();
+    HttpHost host = new HttpHost(getRemoteHost().getHost(), getRemoteHost().getPort());
+    HttpResponse response;
+    try {
+      response = client.execute(host, r);
+      int code = response.getStatusLine().getStatusCode();
+      if (code == 200) {
+        JSONObject status = extractObject(response);
+        EntityUtils.consume(response.getEntity());
+        return status;
+      } else {
+        EntityUtils.consume(response.getEntity());
+        throw new GridException("server response code : " + code);
+      }
+    } catch (Exception e) {
+      throw new GridException(e.getMessage(), e);
+    }
+  }
+
+  private JSONObject extractObject(HttpResponse resp) throws IOException, JSONException {
+    BufferedReader rd = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
+    StringBuilder s = new StringBuilder();
+    String line;
+    while ((line = rd.readLine()) != null) {
+      s.append(line);
+    }
+    rd.close();
+    return new JSONObject(s.toString());
+  }
+
 }

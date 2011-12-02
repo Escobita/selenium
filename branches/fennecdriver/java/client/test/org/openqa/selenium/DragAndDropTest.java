@@ -20,10 +20,12 @@ package org.openqa.selenium;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.HTMLUNIT;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
+
 import static org.openqa.selenium.TestWaiter.waitFor;
 import static org.openqa.selenium.WaitingConditions.elementLocationToBe;
 
@@ -44,7 +46,6 @@ public class DragAndDropTest extends AbstractDriverTestCase {
       System.out.println("Skipping testDragAndDrop on Mac: See issue 2281.");
       return;
     }
-
     driver.get(pages.dragAndDropPage);
     WebElement img = driver.findElement(By.id("test1"));
     Point expectedLocation = img.getLocation();
@@ -94,6 +95,8 @@ public class DragAndDropTest extends AbstractDriverTestCase {
       actions.dragAndDropBy(img, Integer.MAX_VALUE, Integer.MAX_VALUE).perform();
       fail("These coordinates are outside the page - expected to fail.");
     } catch (MoveTargetOutOfBoundsException expected) {
+      // Release mouse button - move was interrupted in the middle.
+      new Actions(driver).release().perform();
     }
   }
 

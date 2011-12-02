@@ -32,14 +32,28 @@ public @interface Ignore {
     CHROME,
     HTMLUNIT,
     FIREFOX,
+    FIREFOX_NATIVE,
+    FIREFOX_SYNTHESIZED,
     IE,
     IPHONE,
     OPERA,
     REMOTE,
     SELENESE,
   }
+  
+  public static enum NativeEventsEnabledState {
+    ALL,
+    ENABLED,
+    DISABLED
+  }
 
   Driver[] value() default {Driver.ALL};
+  
+  Platform[] platforms() default {Platform.ANY};
 
   String reason() default ("Not implemented in driver yet");
+  
+  NativeEventsEnabledState nativeEvents() default NativeEventsEnabledState.ALL;
+
+  int[] issues() default {};
 }

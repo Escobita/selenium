@@ -486,18 +486,20 @@ class WebDriver(object):
         """
         self.execute(Command.SWITCH_TO_WINDOW, {'name': window_name})
 
-    def switch_to_frame(self, index_or_name):
+    def switch_to_frame(self, frame_reference):
         """
-        Switches focus to the specified frame, by index or name.
+        Switches focus to the specified frame, by index, name, or webelement.
         
         :Args:
-         - index_or_name: The name of the window to switch to, or an integer representing the index to switch to.
+         - frame_reference: The name of the window to switch to, an integer representing the index,
+                            or a webelement that is an (i)frame to switch to.
 
         :Usage:
             driver.switch_to_frame('frame_name')
             driver.switch_to_frame(1)
+            driver.switch_to_frame(driver.find_elements_by_tag_name("iframe")[0])
         """
-        self.execute(Command.SWITCH_TO_FRAME, {'id': index_or_name})
+        self.execute(Command.SWITCH_TO_FRAME, {'id': frame_reference})
 
     def switch_to_default_content(self):
         """
@@ -591,11 +593,14 @@ class WebDriver(object):
         Adds a cookie to your current session.
         
         :Args:
-         - cookie_dict: A dictionary object, with the desired cookie name as the key, and
-            the value being the desired contents.
+         - cookie_dict: A dictionary object, with required keys - "name" and "value";
+            optional keys - "path", "domain", "secure", "expiry"
 
-        :Usage:
-            driver.add_cookie({'foo': 'bar',})
+        Usage: 
+            driver.add_cookie({'name' : 'foo', 'value' : 'bar'})
+            driver.add_cookie({'name' : 'foo', 'value' : 'bar', 'path' : '/'})
+            driver.add_cookie({'name' : 'foo', 'value' : 'bar', 'path' : '/', 'secure':True})
+
         """
         self.execute(Command.ADD_COOKIE, {'cookie': cookie_dict})
 
@@ -606,7 +611,7 @@ class WebDriver(object):
            or a command to complete. This method only needs to be called one time per session.
         
         :Args:
-         - time_to_wait: Amount of time to wait
+         - time_to_wait: Amount of time to wait (in seconds)
 
         :Usage:
             driver.implicitly_wait(30)
@@ -624,7 +629,8 @@ class WebDriver(object):
         :Usage:
             driver.set_script_timeout(30)
         """
-        self.execute(Command.SET_SCRIPT_TIMEOUT, {'ms': float(time_to_wait) * 1000})
+        self.execute(Command.SET_SCRIPT_TIMEOUT,
+            {'ms': float(time_to_wait) * 1000})
 
     def find_element(self, by=By.ID, value=None):
         """
@@ -681,3 +687,80 @@ class WebDriver(object):
             driver.get_screenshot_as_base64()
         """
         return self.execute(Command.SCREENSHOT)['value']
+
+    def set_window_size(self, width, height, windowHandle='current'):
+        """
+        Sets the width and height of the current window. (window.resizeTo)
+        
+        :Args:
+         - width: the width in pixels to set the window to
+         - height: the height in pixels to set the window to
+        
+        :Usage:
+            driver.set_window_size(800,600)
+        """
+        self.execute(Command.SET_WINDOW_SIZE, {'width': width, 'height': height,
+          'windowHandle': windowHandle})
+
+    def get_window_size(self, windowHandle='current'):
+        """
+        Gets the width and height of the current window.
+        
+        :Usage:
+            driver.get_window_size()
+        """
+        return self.execute(Command.GET_WINDOW_SIZE,
+            {'windowHandle': windowHandle})['value']
+
+    def set_window_position(self, x, y, windowHandle='current'):
+        """
+        Sets the x,y position of the current window. (window.moveTo)
+        
+        :Args:
+         - x: the x-coordinate in pixels to set the window position
+         - y: the y-coordinate in pixels to set the window position
+        
+        :Usage:
+            driver.set_window_position(0,0)
+        """
+        self.execute(Command.SET_WINDOW_POSITION, {'x': x, 'y': y,
+          'windowHandle': windowHandle})
+
+    def get_window_position(self, windowHandle='current'):
+        """
+        Gets the x,y position of the current window.
+        
+        :Usage:
+            driver.get_window_position()
+        """
+        return self.execute(Command.GET_WINDOW_POSITION,
+            {'windowHandle': windowHandle})['value']
+
+    @property
+    def orientation(self):
+        """
+        Gets the current orientation of the device
+
+        :Usage:
+            orientation = driver.orientation
+        """
+        return self.execute(Command.GET_SCREEN_ORIENTATION)['value']
+
+    @orientation.setter
+    def orientation(self, value):
+        """
+        Sets the current orientation of the device
+
+        :Args:
+         - value: orientation to set it to.
+
+        :Usage:
+            driver.orientation = 'landscape'
+        """
+        allowed_values = ['LANDSCAPE', 'PORTRAIT']
+        if value.upper() in allowed_values:
+            self.execute(Command.SET_SCREEN_ORIENTATION, {'orientation': value})['value']
+        else:
+            raise WebDriverException("You can only set the orientation to 'LANDSCAPE' and 'PORTRAIT'")
+
+

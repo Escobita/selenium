@@ -109,10 +109,10 @@ public class FirefoxDriverTestSuite extends TestCase {
 
     private static FirefoxProfile copyExtensionTo(FirefoxProfile profile) throws Exception {
       File topDir = InProject.locate("Rakefile").getParentFile();
-      File ext = new File(topDir, "build/javascript/firefox-driver/webdriver.xpi");
+      File ext = new File(topDir, "build/javascript/firefox-driver/fennec.xpi");
       if (!ext.exists() || runBuild) {
         ext.delete();
-        new Build().of("//javascript/firefox-driver:webdriver").go();
+        new Build().of("//javascript/firefox-driver:fennec").go();
         runBuild = false;
       }
       profile.addExtension(ext);

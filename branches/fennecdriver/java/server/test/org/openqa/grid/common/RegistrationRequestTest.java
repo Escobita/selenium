@@ -1,17 +1,33 @@
+/*
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package org.openqa.grid.common;
 
 import static org.openqa.grid.common.RegistrationRequest.CLEAN_UP_CYCLE;
-import static org.openqa.grid.common.RegistrationRequest.REMOTE_URL;
-
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import org.junit.Assert;
-import org.junit.Test;
+import static org.openqa.grid.common.RegistrationRequest.REMOTE_HOST;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 public class RegistrationRequestTest {
 
@@ -22,7 +38,7 @@ public class RegistrationRequestTest {
 
     Map<String, Object> config = new HashMap<String, Object>();
     config.put(CLEAN_UP_CYCLE, 1);
-    config.put(REMOTE_URL, url);
+    config.put(REMOTE_HOST, url);
 
     req.setConfiguration(config);
 
@@ -32,7 +48,7 @@ public class RegistrationRequestTest {
     int e = req.getConfigAsInt("doesn't exist", 20);
     Assert.assertTrue(e == 20);
 
-    String url2 = req.getConfigAsString(REMOTE_URL);
+    String url2 = req.getConfigAsString(REMOTE_HOST);
     Assert.assertEquals(url2, url);
   }
 
@@ -88,10 +104,11 @@ public class RegistrationRequestTest {
         caps.getCapability(CapabilityType.BROWSER_NAME));
 
     // Verify the configuration was set up properly.
-    Assert.assertEquals("org.openqa.grid.selenium.proxy.SeleniumRemoteProxy", request
-        .getConfiguration().get(CapabilityType.PROXY));
-    Assert.assertEquals("http://localhost:5000/selenium-server/driver", request.getConfiguration()
-        .get("url"));
+   Assert.assertEquals("http://localhost:5000", request.getConfiguration()
+        .get(RegistrationRequest.REMOTE_HOST));
+    Assert.assertEquals(SeleniumProtocol.Selenium.toString(), request.getConfiguration()
+      .get(RegistrationRequest.SELENIUM_PROTOCOL));
+   
   }
 
 
@@ -102,7 +119,7 @@ public class RegistrationRequestTest {
     RegistrationRequest req =
         RegistrationRequest.build("-role", "rc", hubHost, "ABC", hubPort, "1234");
 
-    Assert.assertEquals(GridRole.REMOTE_CONTROL, req.getRole());
+    Assert.assertEquals(GridRole.NODE, req.getRole());
     Assert.assertEquals("ABC", req.getConfiguration().get(RegistrationRequest.HUB_HOST));
     Assert.assertEquals(1234, req.getConfiguration().get(RegistrationRequest.HUB_PORT));
 

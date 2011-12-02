@@ -4,7 +4,7 @@ module Selenium
   module WebDriver
     describe Keyboard do
 
-      compliant_on :browser => :ie do
+      not_compliant_on :browser => [:chrome, :android, :iphone] do
         it "sends keys to the active element" do
           driver.navigate.to url_for("bodyTypingTest.html")
 
@@ -16,7 +16,6 @@ module Selenium
           driver.find_element(:id => "result").text.strip.should be_empty
         end
 
-        # this spec needs focus with firefox.
         it "can send keys with shift pressed" do
           driver.navigate.to url_for("javascriptPage.html")
 
@@ -30,7 +29,7 @@ module Selenium
           driver.keyboard.release :shift
 
           event_input.attribute(:value).should == "AB"
-          keylogger.text.strip.should == "focus keydown keydown keypress keyup keydown keypress keyup keyup"
+          keylogger.text.strip.should =~ /^(focus )?keydown keydown keypress keyup keydown keypress keyup keyup$/
         end
 
         it "raises an UnsupportedOperationError if the pressed key is not a modifier key" do

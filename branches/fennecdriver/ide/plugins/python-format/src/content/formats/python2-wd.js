@@ -201,6 +201,7 @@ this.options = {
   header:
       'from selenium import webdriver\n' +
           'from selenium.webdriver.common.by import By\n' +
+          'from selenium.webdriver.support.ui import Select\n' +
           'from selenium.common.exceptions import NoSuchElementException\n' +
           'import unittest, time, re\n' +
           '\n' +
@@ -325,7 +326,11 @@ WDAPI.Driver.prototype.getCurrentUrl = function() {
 };
 
 WDAPI.Driver.prototype.get = function(url) {
-  return this.ref + '.get(' + url + ')';
+  if (url.length > 1 && (url.substring(1,8) == "http://" || url.substring(1,9) == "https://")) { // url is quoted
+    return this.ref + ".get(" + url + ")";
+  } else {
+    return this.ref + ".get(self.base_url + " + url + ")";
+  }
 };
 
 WDAPI.Driver.prototype.getTitle = function() {
@@ -370,6 +375,10 @@ WDAPI.Element.prototype.sendKeys = function(text) {
 
 WDAPI.Element.prototype.submit = function() {
   return this.ref + ".submit()";
+};
+
+WDAPI.Element.prototype.select = function(label) {
+  return "Select(" + this.ref + ").select_by_visible_text(" + xlateArgument(label) + ")";
 };
 
 WDAPI.ElementList = function(ref) {

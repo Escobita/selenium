@@ -1,7 +1,7 @@
 // <copyright file="GlobalSuppressions.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,3 +70,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Scope = "member", Target = "OpenQA.Selenium.Support.Events.EventFiringWebDriver+EventFiringWebElement.#Text", Justification = "Firing event on all execptions, so catching generic Exception is appropriate.")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "OpenQA.Selenium.Support.UI.SelectElement.#.ctor(OpenQA.Selenium.IWebElement)", Justification = "WebDriver normalizes strings to lowercase.")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Scope = "member", Target = "OpenQA.Selenium.Support.UI.SelectElement.#SelectedOption", Justification = "Exception should be thrown in this property.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Scope = "member", Target = "OpenQA.Selenium.Support.UI.FluentWait`1.#Until`1(System.Func`2<!0,!!0>)", Justification = "Analyzing and handling all exceptions that occur, so catching generic Exception is appropriate.")]

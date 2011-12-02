@@ -17,6 +17,7 @@
 
 
 import os
+import pytest
 import re
 import tempfile
 import time
@@ -38,6 +39,8 @@ def not_available_on_remote(func):
 class FrameSwitchingTest(unittest.TestCase):
 
     def testShouldBeAbleToSwitchToAFrameByItsIndex(self):
+      if self.driver.capabilities['browserName'] == 'firefox' and self.driver.capabilities['version'].startswith('3'):
+        pytest.skip()
       self._loadPage("frameset")
       self.driver.switch_to_frame(2)
       element = self.driver.find_element_by_id("email")
@@ -74,6 +77,8 @@ class FrameSwitchingTest(unittest.TestCase):
       self.assertEquals("name", element.get_attribute("value"))
 
     def testShouldBeAbleToSwitchToAFrameUsingAPreviouslyLocatedWebElement(self):
+      if self.driver.capabilities['browserName'] == 'firefox' and self.driver.capabilities['version'].startswith('3'):
+        pytest.skip()
       self._loadPage("frameset")
       frame = self.driver.find_element_by_name("third")
       self.driver.switch_to_frame(frame)

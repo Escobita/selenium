@@ -21,6 +21,7 @@ import static org.openqa.selenium.Ignore.Driver.FIREFOX;
 import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
+import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.REMOTE;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
 import static org.openqa.selenium.TestWaiter.waitFor;
@@ -74,6 +75,27 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     driver.switchTo().window(current);
   }
 
+  @Ignore({FIREFOX, OPERA, CHROME, REMOTE, SELENESE})
+  public void testShouldThrowNoSuchWindowExceptionIfAWindowIsClosed() {
+    driver.get(pages.xhtmlTestPage);
+    String current = driver.getWindowHandle();
+
+    driver.findElement(By.linkText("Open new window")).click();
+
+    sleepBecauseWindowsTakeTimeToOpen();
+
+    driver.switchTo().window("result");
+    driver.close();
+
+    try {
+      driver.getWindowHandle();
+      fail("NoSuchWindowException expected");
+    } catch (NoSuchWindowException e) {
+      // Expected.
+    }
+
+    driver.switchTo().window(current);
+  }
 
   @NeedsFreshDriver
   @NoDriverAfterTest
@@ -96,7 +118,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     assertEquals(3, allWindowHandles.size());
   }
 
-  @Ignore(value = {IE, SELENESE},
+  @Ignore(value = {IE, SELENESE, OPERA},
       reason = "IE: can show a dialog 'The web page you are viewing is trying to close the window'")
   public void testClickingOnAButtonThatClosesAnOpenWindowDoesNotCauseTheBrowserToHang() {
     driver.get(pages.xhtmlTestPage);
@@ -117,7 +139,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore({IE, SELENESE})
+  @Ignore({IE, SELENESE, OPERA})
   @JavascriptEnabled
   public void testCanCallGetWindowHandlesAfterClosingAWindow() {
     driver.get(pages.xhtmlTestPage);
@@ -130,7 +152,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
     int currentWindowHandles = driver.getWindowHandles().size();
 
     try {
-      driver.findElement(By.id("close")).click();
+      waitFor(elementToExist(driver, "close")).click();
       Set<String> allHandles = waitFor(windowHandleCountToBe(driver, currentWindowHandles - 1));
 
       assertEquals(1, allHandles.size());
@@ -218,7 +240,7 @@ public class WindowSwitchingTest extends AbstractDriverTestCase {
 
   @NeedsFreshDriver
   @NoDriverAfterTest
-  @Ignore({SELENESE})
+  @Ignore({SELENESE, OPERA})
   public void testClosingOnlyWindowShouldNotCauseTheBrowserToHang() {
     driver.get(pages.xhtmlTestPage);
     driver.close();

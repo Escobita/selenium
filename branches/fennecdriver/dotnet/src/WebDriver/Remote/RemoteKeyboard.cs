@@ -1,7 +1,7 @@
 ﻿// <copyright file="RemoteKeyboard.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,14 @@ namespace OpenQA.Selenium.Remote
         /// <param name="keySequence">A string representing the keystrokes to send.</param>
         public void SendKeys(string keySequence)
         {
-            this.driver.SwitchTo().ActiveElement().SendKeys(keySequence);
+            if (keySequence == null)
+            {
+                throw new ArgumentException("key sequence to send must not be null", "keySequence");
+            }
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("value", keySequence.ToCharArray());
+            this.driver.InternalExecute(DriverCommand.SendKeysToActiveElement, parameters);
         }
 
         /// <summary>
@@ -55,10 +62,14 @@ namespace OpenQA.Selenium.Remote
         /// <remarks>The key value must be one of the values from the <see cref="Keys"/> class.</remarks>
         public void PressKey(string keyToPress)
         {
+            if (keyToPress == null)
+            {
+                throw new ArgumentException("key to press must not be null", "keyToPress");
+            }
+
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("value", keyToPress);
-            parameters.Add("isdown", true);
-            this.driver.InternalExecute(DriverCommand.SendModifierKey, parameters);
+            parameters.Add("value", keyToPress.ToCharArray());
+            this.driver.InternalExecute(DriverCommand.SendKeysToActiveElement, parameters);
         }
 
         /// <summary>
@@ -68,10 +79,14 @@ namespace OpenQA.Selenium.Remote
         /// <remarks>The key value must be one of the values from the <see cref="Keys"/> class.</remarks>
         public void ReleaseKey(string keyToRelease)
         {
+            if (keyToRelease == null)
+            {
+                throw new ArgumentException("key to release must not be null", "keyToRelease");
+            }
+
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("value", keyToRelease);
-            parameters.Add("isdown", false);
-            this.driver.InternalExecute(DriverCommand.SendModifierKey, parameters);
+            parameters.Add("value", keyToRelease.ToCharArray());
+            this.driver.InternalExecute(DriverCommand.SendKeysToActiveElement, parameters);
         }
         #endregion
     }

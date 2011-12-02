@@ -95,7 +95,18 @@ public class FormHandlingTest extends AbstractDriverTestCase {
     driver.get(pages.javascriptPage);
     WebElement textarea = driver.findElement(By
         .id("keyUpArea"));
-    String cheesey = "Brie and cheddar";
+    String cheesey = "brie and cheddar";
+    textarea.sendKeys(cheesey);
+    assertThat(textarea.getAttribute("value"), equalTo(cheesey));
+  }
+
+  @Ignore(value = {ANDROID}, reason = "Android: capitalizatin bug in ICS keeps"
+      + "caps on after a capital letter is sent.")
+  public void testSendKeysKeepsCapitalization() {
+    driver.get(pages.javascriptPage);
+    WebElement textarea = driver.findElement(By
+        .id("keyUpArea"));
+    String cheesey = "BrIe And CheDdar";
     textarea.sendKeys(cheesey);
     assertThat(textarea.getAttribute("value"), equalTo(cheesey));
   }
@@ -179,13 +190,13 @@ public class FormHandlingTest extends AbstractDriverTestCase {
   public void testSendingKeyboardEventsShouldAppendTextInInputs() {
     driver.get(pages.formPage);
     WebElement element = driver.findElement(By.id("working"));
-    element.sendKeys("Some");
+    element.sendKeys("some");
     String value = element.getAttribute("value");
-    assertThat(value, is("Some"));
+    assertThat(value, is("some"));
 
     element.sendKeys(" text");
     value = element.getAttribute("value");
-    assertThat(value, is("Some text"));
+    assertThat(value, is("some text"));
   }
 
   @Ignore(value = {ANDROID, IPHONE, OPERA, SELENESE},

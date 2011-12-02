@@ -81,6 +81,19 @@ bot.locators.xpath.evaluate_ = function(node, path, resultType) {
   return doc.evaluate(path, node, resolver, resultType, null);
 };
 
+/**
+ * @param {!Error} ex The error that needs to be checked.
+ * @return {boolean} Whether the error was caused by an invalid xpath.
+ * @private
+ */
+bot.locators.xpath.isCausedByInvalidXPath_ = function(ex) {
+  // One common cause is that we're attempting to query the document at the
+  // point where it reloads. In a Firefox extension, this will detect that
+  // particular problem. In all other cases, we assume an invalid xpath has
+  // caused the exception.
+  return 'NS_ERROR_ILLEGAL_VALUE' != ex.name;
+};
+
 
 /**
  * Find an element by using an xpath expression
@@ -110,11 +123,12 @@ bot.locators.xpath.single = function(target, root) {
           bot.locators.XPathResult_.FIRST_ORDERED_NODE_TYPE);
       return result ? result.singleNodeValue : null;
     } catch (ex) {
-      // The error is caused most likely by an invalid xpath expression
-      // TODO: catch the exception more precise
-      throw new bot.Error(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-          'Unable to locate an element with the xpath expression ' + target +
-          ' because of the following error:\n' + ex);
+      if (bot.locators.xpath.isCausedByInvalidXPath_(ex)) {
+        throw new bot.Error(bot.ErrorCode.INVALID_SELECTOR_ERROR,
+            'Unable to locate an element with the xpath expression ' + target +
+            ' because of the following error:\n' + ex);
+      }
+      return null;
     }
   }
 
@@ -163,11 +177,12 @@ bot.locators.xpath.many = function(target, root) {
       nodes = bot.locators.xpath.evaluate_(node, path,
           bot.locators.XPathResult_.ORDERED_NODE_SNAPSHOT_TYPE);
     } catch (ex) {
-      // The error is caused most likely by an invalid xpath expression
-      // TODO: catch the exception more precise
-      throw new bot.Error(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-          'Unable to locate elements with the xpath expression ' + path +
-          ' because of the following error:\n' + ex);
+      if (bot.locators.xpath.isCausedByInvalidXPath_(ex)) {
+        throw new bot.Error(bot.ErrorCode.INVALID_SELECTOR_ERROR,
+            'Unable to locate elements with the xpath expression ' + path +
+            ' because of the following error:\n' + ex);
+      }
+      // Fall through.
     }
     var results = [];
     if (nodes) {

@@ -17,39 +17,33 @@ limitations under the License.
 
 package org.openqa.selenium.firefox;
 
-import static org.openqa.selenium.Ignore.Driver.FIREFOX;
-
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.TestSuiteBuilder;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.openqa.selenium.Ignore;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.TestSuiteBuilder;
+
+import static org.openqa.selenium.Ignore.Driver.FIREFOX;
+import static org.openqa.selenium.Ignore.Driver.FIREFOX_NATIVE;
+
 public class NativeEventsFirefoxDriverTestSuite extends TestCase {
+
   public static Test suite() throws Exception {
-    if (Platform.getCurrent().is(Platform.LINUX)) {
-      return new TestSuiteBuilder()
-          .addSourceDir("java/client/test")
-          .usingDriver(TestFirefoxDriverWithNativeEvents.class)
-          .exclude(FIREFOX)
-          .keepDriverInstance()
-          .includeJavascriptTests()
-          .create();
+    if (Platform.getCurrent().is(Platform.MAC)) {
+      return new TestSuite();
     }
 
-    return new TestSuite();
+    return new TestSuiteBuilder()
+        .addSourceDir("java/client/test")
+        .usingDriver(NativeEventsFirefoxDriver.class)
+        .exclude(FIREFOX)
+        .exclude(FIREFOX_NATIVE)
+        .exclude(Ignore.NativeEventsEnabledState.ENABLED)
+        .keepDriverInstance()
+        .includeJavascriptTests()
+        .create();
   }
 
-  public static class TestFirefoxDriverWithNativeEvents extends FirefoxDriver {
-    public TestFirefoxDriverWithNativeEvents() {
-      super(createNativeEventsEnabledProfile());
-    }
-
-    private static FirefoxProfile createNativeEventsEnabledProfile() {
-      FirefoxProfile profile = new FirefoxProfile();
-      profile.setEnableNativeEvents(true);
-      return profile;
-    }
-  }
 }

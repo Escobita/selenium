@@ -19,6 +19,7 @@ package org.openqa.selenium.android;
 
 import com.google.common.collect.HashBiMap;
 
+import android.app.Activity;
 import android.webkit.WebView;
 
 import org.openqa.selenium.WebDriverException;
@@ -32,6 +33,7 @@ class WebViewManager implements JavascriptResultNotifier {
   private volatile boolean done;
   private volatile String result;
   private Object syncObject = new Object();
+  private Activity activity;
 
   public WebView getView(String nameOrHandle) {
     synchronized (syncObject) {

@@ -138,7 +138,7 @@ public class AndroidWebElement implements WebElement,
 
     driver.resetPageIsLoading();
 
-    MotionEventSender.send(events, driver.getWebView(), driver.getActivity());
+    EventSender.sendMotion(events, driver.getWebView(), driver.getActivity());
 
     // If the page started loading we should wait
     // until the page is done loading.
@@ -163,18 +163,13 @@ public class AndroidWebElement implements WebElement,
     driver.executeAtom(AndroidAtoms.CLEAR.getValue(), this);
   }
 
-  public void sendKeys(CharSequence... value) {
+  public void sendKeys(final CharSequence... value) {
     if (value == null || value.length == 0) {
       return;
     }
     if (!isEnabled()) {
       throw new InvalidElementStateException("Cannot send keys to disabled element.");
     }
-    final CharSequence[] keys = new CharSequence[value.length];
-    for (int i = 0; i < value.length; i++) {
-      keys[i] = value[i].toString();
-    }
-
     // focus on the element
     this.click();
     driver.waitUntilEditAreaHasFocus();
@@ -189,7 +184,7 @@ public class AndroidWebElement implements WebElement,
     driver.getActivity().runOnUiThread(new Runnable() {
       public void run() {
         synchronized (syncObject) {
-          WebViewAction.sendKeys(view, keys);
+          EventSender.sendKeys(view, driver.getActivity(), value);
           done = true;
           syncObject.notify();
         }
@@ -320,7 +315,7 @@ public class AndroidWebElement implements WebElement,
     // If the Id is empty, this reffers to the window document context.
     if (elementId.equals("")) {
       return (List<WebElement>) driver
-          .executeAtom(org.openqa.selenium.android.AndroidAtoms.FIND_ELEMENTS.getValue(), strategy, locator);
+          .executeAtom(AndroidAtoms.FIND_ELEMENTS.getValue(), strategy, locator);
     } else {
       return (List<WebElement>) driver
           .executeAtom(AndroidAtoms.FIND_ELEMENTS.getValue(), strategy, locator, this);

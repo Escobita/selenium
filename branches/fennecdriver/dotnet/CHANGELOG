@@ -1,3 +1,32 @@
+v2.14.0
+=======
+ * Implemented iPad desired capability.
+ * Updated Json.NET version to 4.0r4
+
+v2.13.0
+=======
+ * Do not use "which" to find Firefox on Windows in the .NET bindings.
+ * Pass '-foreground' to the firefox binary. Ensures focus by default on OS X.
+
+v2.12.0
+=======
+ * Added experimental IWindow interface for controling size and position of
+   browser windows.
+
+v2.11.0
+=======
+ * Updated to be consistent with other language bindings. Change to java
+   server to allow use of safariproxy driver type. No functional changes.
+
+v2.10.0
+=======
+ * Added "extensions.autoDisableScopes" to default Firefox profile
+ * Removes the deprecated SendModifierKey command, replacing it with
+   SendKeysToActiveElement
+ * Added IntroduceInstabilityByIgnoringProtectedModeSettings to
+   InternetExplorerDriver to make setting capabilities easier when
+   bypassing the Protected Mode settings check of the IE driver
+
 v2.9.0
 ======
   * Look up private parent fields when using the support classes PageFactory.

@@ -6,7 +6,7 @@
 <title>
   Class: Selenium::WebDriver::Keyboard
   
-    &mdash; Documentation by YARD 0.7.2
+    &mdash; Documentation by YARD 0.7.3
   
 </title>
 
@@ -104,6 +104,7 @@
 </div>
 <div class="tags">
   
+
 </div>
   <h2>Constant Summary</h2>
   
@@ -122,6 +123,7 @@
 </div>
 <div class="tags">
   
+
 </div>
         </dt>
         <dd><pre class="code"><span class='lbracket'>[</span><span class='symbol'>:control</span><span class='comma'>,</span> <span class='symbol'>:shift</span><span class='comma'>,</span> <span class='symbol'>:alt</span><span class='comma'>,</span> <span class='symbol'>:command</span><span class='comma'>,</span> <span class='symbol'>:meta</span><span class='rbracket'>]</span></pre></dd>
@@ -264,6 +266,7 @@ A new instance of Keyboard
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -314,6 +317,7 @@ Release a modifier key
 </div>
 <div class="tags">
   
+
   <h3>See Also:</h3>
   <ul class="see">
     
@@ -330,14 +334,16 @@ Release a modifier key
 21
 22
 23
-24</pre>
+24
+25</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/common/keyboard.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id press'>press</span><span class='lparen'>(</span><span class='id key'>key</span><span class='rparen'>)</span>
   <span class='id assert_modifier'>assert_modifier</span> <span class='id key'>key</span>
-  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id sendModifierKeyToActiveElement'>sendModifierKeyToActiveElement</span> <span class='const'>Keys</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>true</span>
+
+  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id sendKeysToActiveElement'>sendKeysToActiveElement</span> <span class='const'>Keys</span><span class='period'>.</span><span class='id encode'>encode</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -366,6 +372,7 @@ Release a modifier key
 </div>
 <div class="tags">
   
+
   <h3>See Also:</h3>
   <ul class="see">
     
@@ -379,17 +386,19 @@ Release a modifier key
       <pre class="lines">
 
 
-32
 33
 34
-35</pre>
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/common/keyboard.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/common/keyboard.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id release'>release</span><span class='lparen'>(</span><span class='id key'>key</span><span class='rparen'>)</span>
   <span class='id assert_modifier'>assert_modifier</span> <span class='id key'>key</span>
-  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id sendModifierKeyToActiveElement'>sendModifierKeyToActiveElement</span> <span class='const'>Keys</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>false</span>
+
+  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id sendKeysToActiveElement'>sendKeysToActiveElement</span> <span class='const'>Keys</span><span class='period'>.</span><span class='id encode'>encode</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -415,6 +424,7 @@ Release a modifier key
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -429,7 +439,7 @@ Release a modifier key
       <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/common/keyboard.rb', line 11</span>
 
 <span class='kw'>def</span> <span class='id send_keys'>send_keys</span><span class='lparen'>(</span><span class='op'>*</span><span class='id keys'>keys</span><span class='rparen'>)</span>
-  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id getActiveElement'>getActiveElement</span><span class='period'>.</span><span class='id send_keys'>send_keys</span><span class='lparen'>(</span><span class='op'>*</span><span class='id keys'>keys</span><span class='rparen'>)</span>
+  <span class='ivar'>@bridge</span><span class='period'>.</span><span class='id sendKeysToActiveElement'>sendKeysToActiveElement</span> <span class='const'>Keys</span><span class='period'>.</span><span class='id encode'>encode</span><span class='lparen'>(</span><span class='id keys'>keys</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -441,9 +451,9 @@ Release a modifier key
 </div>
     
     <div id="footer">
-  Generated on Fri Sep 23 15:53:37 2011 by 
+  Generated on Tue Nov 29 01:07:03 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.2 (ruby-1.9.2).
+  0.7.3 (ruby-1.9.2).
 </div>
 
   </body>

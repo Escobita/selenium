@@ -25,6 +25,8 @@ package org.openqa.selenium.remote;
  */
 public interface DriverCommand {
   String NEW_SESSION = "newSession";
+  
+  String STATUS = "status";
 
   String CLOSE = "close";
   String QUIT = "quit";
@@ -138,7 +140,6 @@ public interface DriverCommand {
   String IME_DEACTIVATE = "imeDeactivate";
   String IME_ACTIVATE_ENGINE = "imeActivateEngine";
 
-
   // These belong to the Advanced Touch API
   String TOUCH_SINGLE_TAP = "touchSingleTap";
   String TOUCH_DOWN = "touchDown";
@@ -148,4 +149,11 @@ public interface DriverCommand {
   String TOUCH_DOUBLE_TAP = "touchDoubleTap";
   String TOUCH_LONG_PRESS = "touchLongPress";
   String TOUCH_FLICK = "touchFlick";
+
+  String SET_WINDOW_SIZE = "setWindowSize";
+  String SET_WINDOW_POSITION = "setWindowPosition";
+  String GET_WINDOW_SIZE = "getWindowSize";
+  String GET_WINDOW_POSITION = "getWindowPosition";
+
+  String LOGS_DRIVER = "getLogs";
 }

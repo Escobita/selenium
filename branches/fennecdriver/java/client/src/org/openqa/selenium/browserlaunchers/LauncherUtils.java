@@ -78,7 +78,7 @@ public class LauncherUtils {
       recursivelyDeleteDir(dir);
     } catch (RuntimeException e) {
       if (tries > 0) {
-        AsyncExecute.sleepTight(2000);
+        Sleeper.sleepTight(2000);
         deleteTryTryAgain(dir, tries - 1);
       } else {
         throw e;
@@ -309,6 +309,9 @@ public class LauncherUtils {
     // Disable cache
     out.println("user_pref('browser.cache.disk.enable', false);");
     out.println("user_pref('browser.cache.memory.enable', true);");
+
+    //Allow extensions to be installed into the profile and still work
+    out.println("user_pref('extensions.autoDisableScopes', 10);");
 
     // Disable "do you want to remember this password?"
     out.println("user_pref('signon.rememberSignons', false);");

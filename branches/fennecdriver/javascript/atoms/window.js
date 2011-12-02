@@ -24,6 +24,10 @@ goog.provide('bot.window');
 goog.require('bot');
 goog.require('bot.Error');
 goog.require('bot.ErrorCode');
+goog.require('goog.array');
+goog.require('goog.dom');
+goog.require('goog.math.Size');
+goog.require('goog.math.Coordinate');
 goog.require('goog.userAgent');
 
 
@@ -103,4 +107,97 @@ bot.window.checkNumPages_ = function(maxPages, opt_numPages) {
         'number of pages must be less than the length of the browser history');
   }
   return numPages;
+};
+
+
+/**
+ * Determine the size of the window that a user could interact with. This will
+ * be the greatest of document.body.(width|scrollWidth), the same for
+ * document.documentElement or the size of the viewport.
+ *
+ * @param {!Window=} opt_win Window to determine the size of. Defaults to
+ *   bot.getWindow().
+ * @return {!goog.math.Size} The calculated size.
+ */
+bot.window.getInteractableSize = function(opt_win) {
+  var win = opt_win || bot.getWindow();
+  var doc = win.document;
+  var elem = doc.documentElement;
+  var body = doc.body;
+
+  var widths = [
+      elem.clientWidth, elem.scrollWidth, elem.offsetWidth,
+      body.scrollWidth, body.offsetWidth
+  ];
+  var heights = [
+      elem.clientHeight, elem.scrollHeight, elem.offsetHeight,
+      body.scrollHeight, body.offsetHeight
+  ];
+
+  var sortFunc = function(a, b) {
+    return a - b;
+  };
+
+  var width = /**@type {number}*/goog.array.peek(widths.sort(sortFunc)) || 0;
+  var height = /**@type {number}*/goog.array.peek(heights.sort(sortFunc)) || 0;
+
+  return new goog.math.Size(width, height);
+};
+
+
+/**
+ * Determine the outer size of the window.
+ *
+ * @param {!Window=} opt_win Window to determine the size of. Defaults to
+ *   bot.getWindow().
+ * @return {!goog.math.Size} The calculated size.
+ */
+bot.window.getSize = function(opt_win) {
+  var win = opt_win || bot.getWindow();
+
+  var width = win.outerWidth;
+  var height = win.outerHeight;
+
+  return new goog.math.Size(width, height);
+};
+
+
+/** Set the outer size of the window.
+ *
+ * @param {!goog.math.Size} size The new window size.
+ * @param {!Window=} opt_win Window to determine the size of. Defaults to
+ *   bot.getWindow().
+ */
+bot.window.setSize = function(size, opt_win) {
+  var win = opt_win || bot.getWindow();
+
+  win.resizeTo(size.width, size.height);
+};
+
+
+/** Get the position of the window.
+ *
+ * @param {!Window=} opt_win Window to determine the position of. Defaults to
+ *   bot.getWindow().
+ * @return {!goog.math.Coordinate} The position of the window.
+ */
+bot.window.getPosition = function(opt_win) {
+  var win = opt_win || bot.getWindow();
+
+  var x = win.screenX;
+  var y = win.screenY;
+
+  return new goog.math.Coordinate(x, y);
+};
+
+
+/** Set the position of the window.
+ *
+ * @param {!goog.math.Coordinate} targetPosition The target position.
+ * @param {!Window=} opt_win Window to set the position of. Defaults to
+ *   bot.getWindow().
+ */
+bot.window.setPosition = function(targetPosition, opt_win) {
+  var win = opt_win || bot.getWindow();
+  win.moveTo(targetPosition.x, targetPosition.y);
 };

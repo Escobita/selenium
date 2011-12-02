@@ -1,4 +1,4 @@
-// Copyright 2011 Software Freedom Conservatory
+// Copyright 2011 Software Freedom Conservancy
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -137,6 +137,7 @@ class SendKeysCommandHandler : public IECommandHandler {
         this->WaitUntilElementFocused(element);
 
         sendKeys(window_handle, keys.c_str(), executor.speed());
+        releaseModifierKeys(window_handle, executor.speed());
         response->SetSuccessResponse(Json::Value::null);
         return;
       } else {

@@ -1,7 +1,7 @@
 // <copyright file="SelectElement.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ namespace OpenQA.Selenium.Support.UI
             }
 
             // try to find the option via XPATH ...
-            IList<IWebElement> options = this.element.FindElements(By.XPath(".//option[. = " + EscapeQuotes(text) + "]"));
+            IList<IWebElement> options = this.element.FindElements(By.XPath(".//option[normalize-space(.) = " + EscapeQuotes(text) + "]"));
 
             bool matched = false;
             foreach (IWebElement option in options)
@@ -278,7 +278,7 @@ namespace OpenQA.Selenium.Support.UI
         /// </remarks>
         public void DeselectByText(string text)
         {
-            StringBuilder builder = new StringBuilder(".//option[. = ");
+            StringBuilder builder = new StringBuilder(".//option[normalize-space(.) = ");
             builder.Append(EscapeQuotes(text));
             builder.Append("]");
             IList<IWebElement> options = this.element.FindElements(By.XPath(builder.ToString()));

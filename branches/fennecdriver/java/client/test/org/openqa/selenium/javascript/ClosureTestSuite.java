@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Throwables;
 
+import org.openqa.selenium.DefaultDriverSupplierSupplier;
 import org.openqa.selenium.DriverTestDecorator;
 import org.openqa.selenium.EnvironmentStarter;
 import org.openqa.selenium.WebDriver;
@@ -58,8 +59,8 @@ public class ClosureTestSuite {
       String path = file.getAbsolutePath()
           .replace(testDir.getAbsolutePath() + File.separator, "")
           .replace(File.separator, "/");
-      TestCase test = new JsApiTestCase(urlPath + path);
-      suite.addTest(new DriverTestDecorator(test, driverClazz,
+      TestCase test = new ClosureTestCase(urlPath + path);
+      suite.addTest(new DriverTestDecorator(test, new DefaultDriverSupplierSupplier(driverClazz).get(),
           /* keepDriver= */true, /* freshDriver= */false, /* refreshDriver= */false));
     }
 

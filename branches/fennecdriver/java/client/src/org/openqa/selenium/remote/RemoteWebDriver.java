@@ -30,6 +30,7 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.remote.internal.JsonToWebElementConverter;
 import org.openqa.selenium.remote.internal.WebElementToJsonConverter;
 
@@ -42,11 +43,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     FindsById, FindsByClassName, FindsByLinkText, FindsByName,
     FindsByCssSelector, FindsByTagName, FindsByXPath,
     HasInputDevices, HasCapabilities {
+
+  private static final Logger logger = Logger.getLogger(RemoteWebDriver.class.getName());
 
   private final ErrorHandler errorHandler = new ErrorHandler();
 
@@ -58,21 +63,18 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   private JsonToWebElementConverter converter;
 
-  private final RemoteKeyboard keyboard;
-  private final RemoteMouse mouse;
+  private RemoteKeyboard keyboard;
+  private RemoteMouse mouse;
+  private Logs logs;
 
   // For cglib
   protected RemoteWebDriver() {
     init();
-    keyboard = new RemoteKeyboard(executeMethod);
-    mouse = new RemoteMouse(executeMethod);
   }
 
   public RemoteWebDriver(CommandExecutor executor, Capabilities desiredCapabilities) {
     this.executor = executor;
     init();
-    keyboard = new RemoteKeyboard(executeMethod);
-    mouse = new RemoteMouse(executeMethod);
     startClient();
     startSession(desiredCapabilities);
   }
@@ -88,17 +90,23 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   private void init() {
     converter = new JsonToWebElementConverter(this);
     executeMethod = new ExecuteMethod(this);
+    keyboard = new RemoteKeyboard(executeMethod);
+    mouse = new RemoteMouse(executeMethod);
+    logs = new RemoteLogs(executeMethod);
+  }
+
+  public Logs logs() {
+    return logs;
   }
 
   /**
-   * Set the file detector to be used when sending keyboard input. By default,
-   * this is set to a file detector that does nothing.
+   * Set the file detector to be used when sending keyboard input. By default, this is set to a file
+   * detector that does nothing.
    *
+   * @param detector The detector to use. Must not be null.
    * @see FileDetector
    * @see LocalFileDetector
    * @see UselessFileDetector
-   *
-   * @param detector The detector to use. Must not be null.
    */
   public void setFileDetector(FileDetector detector) {
     if (detector == null) {
@@ -367,7 +375,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
   /**
    * Creates a new {@link RemoteWebElement} that is a child of this instance. Subtypes should
    * override this method to customize the type of RemoteWebElement returned.
-   * 
+   *
    * @return A new RemoteWebElement that is a child of this instance.
    */
   @Deprecated
@@ -385,20 +393,29 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
     return converter;
   }
 
+  /**
+   * Sets the RemoteWebDriver's client log level. Logs at a level lower than the
+   * given level will be discarded.
+   * 
+   * @param level 
+   */
+  public static void setLogLevel(Level level) {
+    logger.setLevel(level);
+  }
+
   protected Response execute(String driverCommand, Map<String, ?> parameters) {
     Command command = new Command(sessionId, driverCommand, parameters);
-
     Response response;
 
     long start = System.currentTimeMillis();
-
-
     try {
       log(sessionId, command.getName(), command);
+
+      logger.info("Executing: " + command);
       response = executor.execute(command);
 
       if (response == null) {
-        log(sessionId, command.getName(), response);
+        log(sessionId, command.getName(), command);
         return null;
       }
 
@@ -406,13 +423,16 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
       // {"ELEMENT": id} to RemoteWebElements.
       Object value = converter.apply(response.getValue());
       response.setValue(value);
-      log(sessionId, command.getName(), response);
-    } catch (RuntimeException e) {
-      log(sessionId, command.getName(), e);
-      throw e;
+      log(sessionId, command.getName(), command);
     } catch (Exception e) {
-      log(sessionId, command.getName(), e);
-      throw new WebDriverException(e);
+      log(sessionId, command.getName(), command);
+      String errorMessage = "Error communicating with the remote browser. " +
+          "It may have died.";
+      if (driverCommand.equals(DriverCommand.NEW_SESSION)) {
+        errorMessage = "Could not start a new session. Possible causes are " +
+            "invalid address of the remote server of browser start-up failure.";
+      }
+      throw new BrowserConnectivityException(errorMessage, e);
     }
 
     return errorHandler.throwIfResponseFailed(response, System.currentTimeMillis() - start);
@@ -436,10 +456,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
 
   /**
    * Override this to be notified at key points in the execution of a command.
-   * 
-   * @param sessionId the session id.
+   *
+   * @param sessionId   the session id.
    * @param commandName the command that is being executed.
-   * @param toLog any data that might be interesting.
+   * @param toLog       any data that might be interesting.
    */
   protected void log(SessionId sessionId, String commandName, Object toLog) {
     // By default do nothing
@@ -519,7 +539,13 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
       return new RemoteInputMethodManager();
     }
 
+    @Beta
+    public Window window() {
+      return new RemoteWindow();
+    }
+
     protected class RemoteInputMethodManager implements WebDriver.ImeHandler {
+
       public List<String> getAvailableEngines() {
         Response response = execute(DriverCommand.IME_GET_AVAILABLE_ENGINES);
         return (List<String>) response.getValue();
@@ -558,6 +584,46 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor,
         return this;
       }
     } // timeouts class.
+
+    @Beta
+    protected class RemoteWindow implements Window {
+
+      public void setSize(Dimension targetSize) {
+        execute(DriverCommand.SET_WINDOW_SIZE,
+            ImmutableMap.of("windowHandle", "current",
+                "width", targetSize.width, "height", targetSize.height));
+      }
+
+      public void setPosition(Point targetPosition) {
+        execute(DriverCommand.SET_WINDOW_POSITION,
+            ImmutableMap
+                .of("windowHandle", "current", "x", targetPosition.x, "y", targetPosition.y));
+      }
+
+      @SuppressWarnings({"unchecked"})
+      public Dimension getSize() {
+        Response response = execute(DriverCommand.GET_WINDOW_SIZE,
+            ImmutableMap.of("windowHandle", "current"));
+        Map<String, Object> rawSize = (Map<String, Object>) response.getValue();
+
+        int width = ((Number) rawSize.get("width")).intValue();
+        int height = ((Number) rawSize.get("height")).intValue();
+
+        return new Dimension(width, height);
+      }
+
+      @SuppressWarnings({"unchecked"})
+      public Point getPosition() {
+        Response response = execute(DriverCommand.GET_WINDOW_POSITION,
+            ImmutableMap.of("windowHandle", "current"));
+        Map<String, Object> rawPoint = (Map<String, Object>) response.getValue();
+
+        int x = ((Number) rawPoint.get("x")).intValue();
+        int y = ((Number) rawPoint.get("y")).intValue();
+
+        return new Point(x, y);
+      }
+    }
   }
 
   private class RemoteNavigation implements Navigation {

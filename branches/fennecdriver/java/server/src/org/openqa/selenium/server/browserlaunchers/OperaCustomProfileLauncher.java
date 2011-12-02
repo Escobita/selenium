@@ -17,7 +17,7 @@
 package org.openqa.selenium.server.browserlaunchers;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.browserlaunchers.AsyncExecute;
+import org.openqa.selenium.browserlaunchers.Sleeper;
 import org.openqa.selenium.browserlaunchers.LauncherUtils;
 import org.openqa.selenium.browserlaunchers.Proxies;
 import org.openqa.selenium.os.CommandLine;
@@ -45,7 +45,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
   private String[] cmdarray;
   private boolean closed = false;
   private String commandPath;
-  private Process process;
+  private CommandLine process;
 
   // Opera has been a real pain for me (Lightbody), and so I'm adding a simple hook in the browser
   // launcher that lets
@@ -138,11 +138,11 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
       }
 
 
-      CommandLine command = new CommandLine(cmdarray);
-      command.setEnvironmentVariable("MOZ_NO_REMOTE", "1");
-      getOperaBinary(command);
+      process = new CommandLine(cmdarray);
+      process.setEnvironmentVariable("MOZ_NO_REMOTE", "1");
+      getOperaBinary(process);
 
-      process = command.executeAsync();
+      process.executeAsync();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -259,7 +259,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
         taskKillException = e;
       }
     }
-    int exitValue = AsyncExecute.killProcess(process);
+    int exitValue = process.destroy();
     if (exitValue == 0) {
       log.warning("Opera seems to have ended on its own (did we kill the real browser???)");
     }
@@ -290,7 +290,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
   }
 
   public Process getProcess() {
-    return process;
+    return null;
   }
 
   /**
@@ -305,7 +305,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
       throws FileLockRemainedException {
     File lock = new File(customProfileDir, "parent.lock");
     for (long start = System.currentTimeMillis(); System.currentTimeMillis() < start + timeout;) {
-      AsyncExecute.sleepTight(500);
+      Sleeper.sleepTight(500);
       if (!lock.exists() && makeSureFileLockRemainsGone(lock, timeToWait)) return;
     }
     if (lock.exists())
@@ -324,7 +324,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
    */
   private boolean makeSureFileLockRemainsGone(File lock, long timeToWait) {
     for (long start = System.currentTimeMillis(); System.currentTimeMillis() < start + timeToWait;) {
-      AsyncExecute.sleepTight(500);
+      Sleeper.sleepTight(500);
       if (lock.exists()) return false;
     }
     return !lock.exists();
@@ -337,7 +337,7 @@ public class OperaCustomProfileLauncher extends AbstractBrowserLauncher {
     l.launch("http://www.google.com");
     int seconds = 15;
     System.out.println("Killing browser in " + Integer.toString(seconds) + " seconds");
-    AsyncExecute.sleepTight(seconds * 1000);
+    Sleeper.sleepTight(seconds * 1000);
     l.close();
     System.out.println("He's dead now, right?");
   }

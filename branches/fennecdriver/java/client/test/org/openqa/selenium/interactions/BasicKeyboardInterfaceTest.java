@@ -25,15 +25,12 @@ import static org.openqa.selenium.Ignore.Driver.SELENESE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.openqa.selenium.TestUtilities.isFirefox;
-import static org.openqa.selenium.TestUtilities.isInternetExplorer;
 
 import org.openqa.selenium.AbstractDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Ignore;
 import org.openqa.selenium.JavascriptEnabled;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -63,15 +60,8 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({ANDROID, IPHONE, SELENESE})
+  @Ignore({ANDROID, IPHONE, SELENESE, IE})
   public void testSendingKeyDownOnly() {
-    if (Platform.getCurrent().is(Platform.WINDOWS) &&
-        (isInternetExplorer(driver) || isFirefox(driver))) {
-      System.out.println("Skipping testSendingKeyDownOnly on Windows: native events library" +
-          " does not support storing modifiers state yet.");
-      return;
-    }
-
     driver.get(pages.javascriptPage);
 
     WebElement keysEventInput = driver.findElement(By.id("theworks"));
@@ -91,15 +81,8 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({ANDROID, IPHONE, SELENESE})
+  @Ignore({ANDROID, IPHONE, SELENESE, IE})
   public void testSendingKeyUp() {
-    if (Platform.getCurrent().is(Platform.WINDOWS) &&
-        (isInternetExplorer(driver) || isFirefox(driver))) {
-      System.out.println("Skipping testSendingKeyUp on Windows: native events library" +
-          " does not support storing modifiers state yet.");
-      return;
-    }
-
     driver.get(pages.javascriptPage);
     WebElement keysEventInput = driver.findElement(By.id("theworks"));
 
@@ -122,20 +105,15 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore({ANDROID, HTMLUNIT, IPHONE, SELENESE})
+  @Ignore({ANDROID, HTMLUNIT, IPHONE, SELENESE, IE})
   public void testSendingKeysWithShiftPressed() {
-    if (Platform.getCurrent().is(Platform.WINDOWS) &&
-        (isInternetExplorer(driver) || isFirefox(driver))) {
-      System.out.println("Skipping testSendingKeysWithShiftPressed on Windows: native events " +
-          "library does not support storing modifiers state yet.");
-      return;
-    }
-
     driver.get(pages.javascriptPage);
 
     WebElement keysEventInput = driver.findElement(By.id("theworks"));
 
     keysEventInput.click();
+
+    String existingResult = getFormEvents();
 
     Action pressShift = getBuilder(driver).keyDown(keysEventInput, Keys.SHIFT).build();
     pressShift.perform();
@@ -146,15 +124,9 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
     Action releaseShift = getBuilder(driver).keyUp(keysEventInput, Keys.SHIFT).build();
     releaseShift.perform();
 
-    String expectedEvents = "focus keydown keydown keypress keyup keydown keypress keyup keyup";
-    if (Platform.getCurrent().is(Platform.MAC)) {
-      // On Mac, by default the Firefox instances spawned for testing do not have focus.
-      // when Firefox doesn't have focus, it will not issue focus events when an element
-      // is clicked. So don't expect it.
-      expectedEvents = expectedEvents.replace("focus ", "");
-    }
+    String expectedEvents = " keydown keydown keypress keyup keydown keypress keyup keyup";
     assertThatFormEventsFiredAreExactly("Shift key not held",
-        expectedEvents);
+        existingResult + expectedEvents);
 
     assertThat(keysEventInput.getAttribute("value"), is("AB"));
   }
@@ -187,7 +159,11 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
   }
 
   private void assertThatFormEventsFiredAreExactly(String message, String expected) {
-    assertThat(message, driver.findElement(By.id("result")).getText().trim(), is(expected));
+    assertThat(message, getFormEvents(), is(expected.trim()));
+  }
+
+  private String getFormEvents() {
+    return driver.findElement(By.id("result")).getText().trim();
   }
 
   private void assertThatFormEventsFiredAreExactly(String expected) {
@@ -195,6 +171,6 @@ public class BasicKeyboardInterfaceTest extends AbstractDriverTestCase {
   }
 
   private void assertThatBodyEventsFiredAreExactly(String expected) {
-    assertThat(driver.findElement(By.id("body_result")).getText().trim(), is(expected));
+    assertThat(driver.findElement(By.id("body_result")).getText().trim(), is(expected.trim()));
   }
 }

@@ -17,6 +17,7 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -179,7 +180,8 @@ public class TextHandlingTest extends AbstractDriverTestCase {
         "after pre"));
   }
 
-  @Ignore(value = {SELENESE, IPHONE, CHROME, IE, OPERA}, reason = "iPhone: sendKeys is broken;"
+  @Ignore(value = {SELENESE, IPHONE, CHROME, IE, OPERA}, reason =
+      "iPhone: sendKeys is broken;"
       + " Chrome: not handling a space character properly."
       + " Opera,IE: inserts \r\n instead of \n.")
   public void testShouldBeAbleToSetMoreThanOneLineOfTextInATextArea() {
@@ -189,7 +191,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
 
     waitFor(WaitingConditions.elementValueToEqual(textarea, ""));
 
-    String expectedText = "I like cheese" + newLine + newLine + "It's really nice";
+    String expectedText = "i like cheese" + newLine + newLine + "it's really nice";
 
     textarea.sendKeys(expectedText);
 
@@ -222,7 +224,7 @@ public class TextHandlingTest extends AbstractDriverTestCase {
     assertThat(text, equalTo(""));
   }
 
-  @Ignore
+  @Ignore(ALL)
   public void testShouldReturnEmptyStringWhenTagIsSelfClosing() {
     driver.get(pages.xhtmlTestPage);
 

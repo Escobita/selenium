@@ -438,7 +438,11 @@ public class HtmlUnitDriver implements WebDriver, JavascriptExecutor,
   }
 
   public String getWindowHandle() {
-    return String.valueOf(System.identityHashCode(currentWindow.getTopWindow()));
+    WebWindow topWindow = currentWindow.getTopWindow();
+    if (topWindow.isClosed()) {
+      throw new NoSuchWindowException("Window is closed");
+    }
+    return String.valueOf(System.identityHashCode(topWindow));
   }
 
   public Object executeScript(String script, final Object... args) {
@@ -1173,6 +1177,11 @@ public class HtmlUnitDriver implements WebDriver, JavascriptExecutor,
     public ImeHandler ime() {
       throw new UnsupportedOperationException("Cannot input IME using HtmlUnit.");
     }
+
+    public Window window() {
+      throw new UnsupportedOperationException("Window handling not yet implemented in HtmlUnit");
+    }
+
   }
 
   class HtmlUnitTimeouts implements Timeouts {

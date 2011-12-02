@@ -18,7 +18,6 @@
 package org.openqa.selenium.server.browserlaunchers;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.browserlaunchers.AsyncExecute;
 import org.openqa.selenium.browserlaunchers.LauncherUtils;
 import org.openqa.selenium.browserlaunchers.locators.BrowserInstallation;
 import org.openqa.selenium.browserlaunchers.locators.GoogleChromeLocator;
@@ -27,11 +26,14 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.server.ApplicationRegistry;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +57,7 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
 
   private File customProfileDir;
 
-  private Process process;
+  private CommandLine process;
 
   public GoogleChromeLauncher(Capabilities browserOptions,
       RemoteControlConfiguration configuration,
@@ -78,8 +80,8 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
 
     createProfile(sessionId, url);
     final String[] cmdArray = createCommandArray(url);
-    CommandLine exe = new CommandLine(cmdArray);
-    process = exe.executeAsync();
+    process = new CommandLine(cmdArray);
+    process.executeAsync();
   }
 
   public void close() {
@@ -89,7 +91,7 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
       return;
     }
 
-    int exitValue = AsyncExecute.killProcess(process);
+    int exitValue = process.destroy();
     if (exitValue == 0) {
       log.warning("Google Chrome seems to have ended on its own.");
     }
@@ -104,7 +106,7 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
   }
 
   public Process getProcess() {
-    return process;
+    return null;
   }
 
   private String getUntrustedCertificatesFlag() {
@@ -165,7 +167,8 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
   private String[] createCommandArray(String url) {
     String userDir = customProfileDir.getAbsolutePath();
 
-    return new String[] {
+    List<String> array = Lists.newArrayList(
+      new String[] {
         browserInstallation.launcherFilePath(),
         // Disable hang monitor dialogs in renderer process.
         "--disable-hang-monitor",
@@ -190,12 +193,17 @@ public class GoogleChromeLauncher extends AbstractBrowserLauncher {
         "--no-default-browser-check",
         // Disable the "translate page" in-page toolbar from appearing
         "--disable-translate",
+        // Don't enforce the same-origin policy
+        "--disable-web-security",
         // Set the user data (i.e. profile) directory.
         "--user-data-dir=" + userDir,
-        getUntrustedCertificatesFlag(),
-        getCommandLineFlags(),
-        url
-    };
+        getUntrustedCertificatesFlag()
+      }
+    );
+    array.addAll(Lists.newArrayList(getCommandLineFlagsAsArray()));
+    array.add(url);
+
+    return (String[]) array.toArray(new String[array.size()]);
   }
 
   /**

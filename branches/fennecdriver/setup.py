@@ -21,6 +21,10 @@ from os.path import dirname, join, isfile, abspath
 from shutil import copy
 import sys
 
+from distutils.command.install import INSTALL_SCHEMES
+for scheme in INSTALL_SCHEMES.values():
+    scheme['data'] = scheme['purelib']
+
 def setup_python3():
     # Taken from "distribute" setup.py
     from distutils.filelist import FileList
@@ -55,7 +59,7 @@ else:
 setup(
     cmdclass={'install': install},
     name='selenium',
-    version="2.9.0",
+    version="2.14.0",
     description='Python bindings for Selenium',
     long_description=open(join(abspath(dirname(__file__)), "py", "README")).read(),
     url='http://code.google.com/p/selenium/',
@@ -114,7 +118,9 @@ setup(
         'selenium.webdriver.firefox': ['*.xpi'],
     },
     data_files=[('selenium/webdriver/ie/win32',['py/selenium/webdriver/ie/win32/IEDriver.dll']),
-		    ('selenium/webdriver/ie/x64',['py/selenium/webdriver/ie/x64/IEDriver.dll'])],
+		    ('selenium/webdriver/ie/x64',['py/selenium/webdriver/ie/x64/IEDriver.dll']),
+            ('selenium/webdriver/firefox/x86', ['py/selenium/webdriver/firefox/x86/x_ignore_nofocus.so']),
+            ('selenium/webdriver/firefox/amd64', ['py/selenium/webdriver/firefox/amd64/x_ignore_nofocus.so'])],
     include_package_data=True,
     install_requires=['rdflib==3.1.0'],
     zip_safe=False,

@@ -23,11 +23,21 @@ var FirefoxDriver = FirefoxDriver || function(){};
 
 
 FirefoxDriver.prototype.elementEquals = function(respond, parameters) {
-  var elementA = Utils.getElementAt(parameters.id,
-                                    respond.session.getDocument());
-  var elementB = Utils.getElementAt(parameters.other,
-                                    respond.session.getDocument());
-  respond.value = elementA == elementB;
+  try {
+    var elementA = Utils.getElementAt(parameters.id,
+                                      respond.session.getDocument());
+    var elementB = Utils.getElementAt(parameters.other,
+                                      respond.session.getDocument());
+    respond.value = elementA == elementB;
+  } catch (e) {
+    if (e.code && e.code == bot.ErrorCode.STALE_ELEMENT_REFERENCE) {
+      // Assume any style elements are not equal to any others.
+      // Users shouldn't care about equality of stale elements.
+      respond.value = false;
+    } else {
+      throw e;
+    }
+  }
   respond.send();
 };
 
@@ -35,8 +45,9 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
 
+  var unwrapped = fxdriver.moz.unwrapFor4(element);
   var nativeEvents = Utils.getNativeEvents();
-  var node = Utils.getNodeForNativeEvents(element);
+  var node = Utils.getNodeForNativeEvents(unwrapped);
   var appInfo = Components.classes["@mozilla.org/xre/app-info;1"].
       getService(Components.interfaces.nsIXULAppInfo);
   var versionChecker = Components.
@@ -50,11 +61,11 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   var thmgr_cls = Components.classes["@mozilla.org/thread-manager;1"];
 
   // For now, we need to bypass native events for option elements
-  var isOption = "option" == element.tagName.toLowerCase();
+  var isOption = "option" == unwrapped.tagName.toLowerCase();
 
   if (!isOption && this.enableNativeEvents && nativeEvents && node && useNativeClick && thmgr_cls) {
     fxdriver.Logger.dumpn("Using native events for click");
-    var loc = Utils.getLocationOnceScrolledIntoView(element, element.tagName == "A");
+    var loc = Utils.getLocationOnceScrolledIntoView(unwrapped, unwrapped.tagName == "A");
     var x = loc.x + (loc.width ? loc.width / 2 : 0);
     var y = loc.y + (loc.height ? loc.height / 2 : 0);
 
@@ -67,15 +78,15 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
         getService(Components.interfaces.nsIVersionComparator);
     if (versionChecker.compare(appInfo.version, '3.6') >= 0) {
       // Get the ultimate parent frame
-      var current = element.ownerDocument.defaultView;
-      var ultimateParent = element.ownerDocument.defaultView.parent;
+      var current = unwrapped.ownerDocument.defaultView;
+      var ultimateParent = unwrapped.ownerDocument.defaultView.parent;
       while (ultimateParent != current) {
         current = ultimateParent;
         ultimateParent = current.parent;
       }
 
-      var offX = element.ownerDocument.defaultView.mozInnerScreenX - ultimateParent.mozInnerScreenX;
-      var offY = element.ownerDocument.defaultView.mozInnerScreenY - ultimateParent.mozInnerScreenY;
+      var offX = unwrapped.ownerDocument.defaultView.mozInnerScreenX - ultimateParent.mozInnerScreenX;
+      var offY = unwrapped.ownerDocument.defaultView.mozInnerScreenY - ultimateParent.mozInnerScreenY;
 
       x += offX;
       y += offY;
@@ -92,13 +103,13 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
       nativeEvents.mouseMove(node, currentPosition.x + browserOffset.x,
           currentPosition.y + browserOffset.y, adjustedX, adjustedY);
 
-      var pageUnloadedIndicator = Utils.getPageUnloadedIndicator(element);
+      var pageUnloadedIndicator = Utils.getPageUnloadedIndicator(unwrapped);
 
       nativeEvents.click(node, adjustedX, adjustedY, 1);
 
       respond.session.setMousePosition(x, y);
 
-      Utils.waitForNativeEventsProcessing(element, nativeEvents,
+      Utils.waitForNativeEventsProcessing(unwrapped, nativeEvents,
           pageUnloadedIndicator, this.jsTimer);
 
       respond.send();
@@ -125,8 +136,7 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
   Utils.installWindowCloseListener(respond);
   Utils.installClickListener(respond, WebLoadingListener);
 
-  var wrapped = XPCNativeWrapper(element);
-  var res = this.mouse.move(wrapped, null, null);
+  var res = this.mouse.move(element, null, null);
   if (res.status != bot.ErrorCode.SUCCESS) {
     respond.status = res.status;
     respond.value = res.message;
@@ -134,7 +144,7 @@ FirefoxDriver.prototype.clickElement = function(respond, parameters) {
     return;
   }
 
-  res = this.mouse.click(wrapped);
+  res = this.mouse.click(element);
   respond.status = res.status;
   respond.value = res.message;
 };
@@ -189,10 +199,9 @@ FirefoxDriver.prototype.sendKeysToElement = function(respond, parameters) {
 
   var alreadyFocused = true;
   var currentlyActive = Utils.getActiveElement(respond.session.getDocument());
-  var unwrappedActive = fxdriver.moz.unwrapFor4(currentlyActive);
-  var newDocument = goog.dom.getOwnerDocument(unwrappedActive);
+  var newDocument = goog.dom.getOwnerDocument(currentlyActive);
 
-  if (unwrappedActive != element || currentDocument != new XPCNativeWrapper(newDocument)) {
+  if (currentlyActive != element || currentDocument != new XPCNativeWrapper(newDocument)) {
     fxdriver.Logger.dumpn("Need to switch focus");
     alreadyFocused = false;
     currentlyActive.blur();
@@ -212,6 +221,18 @@ FirefoxDriver.prototype.sendKeysToElement = function(respond, parameters) {
     use = element.ownerDocument.getElementsByTagName("html")[0];
   }
 
+  // Handle the special case of the file input element here
+
+  if (element.tagName == "INPUT") {
+    var inputtype = element.getAttribute("type");
+    if (inputtype && inputtype.toLowerCase() == "file") {
+      element.value = parameters.value.join('');
+      Utils.fireHtmlEvent(element, "change");
+      respond.send();
+      return;
+    }
+  }
+
   var originalDriver = this;
 
   // We may need a beat for firefox to hand over focus.
@@ -219,7 +240,8 @@ FirefoxDriver.prototype.sendKeysToElement = function(respond, parameters) {
     // Unless the element already had focus, set the cursor location to the end of the line
     // TODO(simon): This seems a little arbitrary.
     if(!alreadyFocused && bot.dom.isEditable(element)) {
-        goog.dom.selection.setCursorPosition(element, element.value.length);
+        var length = element.value ? element.value.length : goog.dom.getTextContent(element).length;
+        goog.dom.selection.setCursorPosition(element, length);
     }
 
     Utils.type(respond.session.getDocument(), use, parameters.value.join(''),
@@ -235,36 +257,11 @@ FirefoxDriver.prototype.sendKeysToElement.preconditions =
 FirefoxDriver.prototype.clearElement = function(respond, parameters) {
   var element = Utils.getElementAt(parameters.id,
                                    respond.session.getDocument());
-
-  var isTextField = element["value"] !== undefined;
-
-  var currentlyActive = Utils.getActiveElement(respond.session.getDocument());
-  if (currentlyActive != element) {
-    currentlyActive.blur();
-    element.focus();
-  }
-
-  var currentValue = undefined;
-  if (element["value"] !== undefined) {
-    currentValue = element.value;
-  } else if (element.hasAttribute("value")) {
-    currentValue = element.getAttribute("value");
-  }
-
-  if (isTextField) {
-    element.value = "";
-  } else {
-    element.setAttribute("value", "");
-  }
-
-  if (currentValue !== undefined && currentValue != "") {
-    Utils.fireHtmlEvent(element, "change");
-  }
-
+  bot.action.clear(element);
   respond.send();
 };
 FirefoxDriver.prototype.clearElement.preconditions =
-    [ fxdriver.preconditions.visible ];
+    [ fxdriver.preconditions.visible, fxdriver.preconditions.enabled, fxdriver.preconditions.writable ];
 
 
 FirefoxDriver.prototype.getElementTagName = function(respond, parameters) {

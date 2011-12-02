@@ -78,6 +78,19 @@ or the remote driver server.</p>
 </dd></dl>
 
 <dl class="exception">
+<dt id="selenium.common.exceptions.ImeActivationFailedException">
+<em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">ImeActivationFailedException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#ImeActivationFailedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.ImeActivationFailedException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that activating an IME engine has failed.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="selenium.common.exceptions.ImeNotAvailableException">
+<em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">ImeNotAvailableException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#ImeNotAvailableException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.ImeNotAvailableException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that IME support is not available. This exception is thrown for every IME-related
+method call if IME support is not available on the machine.</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="selenium.common.exceptions.InvalidCookieDomainException">
 <em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">InvalidCookieDomainException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#InvalidCookieDomainException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.InvalidCookieDomainException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Thrown when attempting to add a cookie under a different domain
@@ -90,10 +103,25 @@ than the current URL.</p>
 <dd></dd></dl>
 
 <dl class="exception">
+<dt id="selenium.common.exceptions.InvalidSelectiorException">
+<em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">InvalidSelectiorException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#InvalidSelectiorException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.InvalidSelectiorException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thrown when the selector which is used to find an element does not return
+a WebElement. Currently this only happens when the selector is an xpath
+expression is used which is either syntactically invalid (i.e. it is not a
+xpath expression) or the expression does not select WebElements
+(e.g. &#8220;count(//input)&#8221;).</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="selenium.common.exceptions.InvalidSwitchToTargetException">
 <em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">InvalidSwitchToTargetException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#InvalidSwitchToTargetException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.InvalidSwitchToTargetException" title="Permalink to this definition">¶</a></dt>
 <dd><p>The frame or window target to be switched doesn&#8217;t exist.</p>
 </dd></dl>
+
+<dl class="exception">
+<dt id="selenium.common.exceptions.NoAlertPresentException">
+<em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">NoAlertPresentException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#NoAlertPresentException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.NoAlertPresentException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="exception">
 <dt id="selenium.common.exceptions.NoSuchAttributeException">
@@ -139,6 +167,12 @@ element no longer appears on the DOM of the page.</p>
 <dt id="selenium.common.exceptions.UnableToSetCookieException">
 <em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">UnableToSetCookieException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#UnableToSetCookieException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.UnableToSetCookieException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Thrown when a driver fails to set a cookie.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="selenium.common.exceptions.UnexpectedTagNameException">
+<em class="property">exception </em><tt class="descclassname">selenium.common.exceptions.</tt><tt class="descname">UnexpectedTagNameException</tt><big>(</big><em>msg=None</em>, <em>screen=None</em>, <em>stacktrace=None</em><big>)</big><a class="reference internal" href="../_modules/selenium/common/exceptions.html#UnexpectedTagNameException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selenium.common.exceptions.UnexpectedTagNameException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thrown when a support class did not get an expected web element</p>
 </dd></dl>
 
 <dl class="exception">
@@ -203,7 +237,6 @@ element no longer appears on the DOM of the page.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2011, plightbo, simon.m.stewart, hbchai, jrhuggins, et al..
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

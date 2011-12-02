@@ -45,9 +45,6 @@ function FirefoxDriver(server, enableNativeEvents, win) {
       [ function() { atoms.fxdriver.preconditions.alertPresent(this) } ];
 
 
-  var utils = {};
-  Components.utils.import('resource://fxdriver/modules/utils.js', utils);
-
   goog.userAgent.GECKO = true;
 
   FirefoxDriver.listenerScript = Utils.loadUrl("resource://fxdriver/evaluate.js");
@@ -315,24 +312,34 @@ FirefoxDriver.prototype.getPageSource = function(respond) {
 
 
 /**
- * Map of strategy keys used by the wire protocol to those used by the
- * automation atoms.
- *
- *  TODO: this really needs to be handled by bot.locators.
- *
- * @type {!Object.<string, string>}
- * @const
+ * If the given error is a {@link bot.ErrorCode.INVALID_SELECTOR_ERROR}, will
+ * annotate that error with additional info for the user.
+ * @param {string} selector The selector used which generated the error.
+ * @param {!Error} ex The error to check.
+ * @return {!Error} The new error.
  * @private
  */
-FirefoxDriver.WIRE_TO_ATOMS_STRATEGY_ = {
-  'id': 'id',
-  'name': 'name',
-  'class name': 'className',
-  'css selector': 'css',
-  'tag name': 'tagName',
-  'link text': 'linkText',
-  'partial link text': 'partialLinkText',
-  'xpath': 'xpath'
+FirefoxDriver.annotateInvalidSelectorError_ = function(selector, ex) {
+  if(ex.code == bot.ErrorCode.INVALID_SELECTOR_ERROR) {
+    return new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
+        'The given selector ' + selector +
+            ' is either invalid or does not result' +
+            ' in a WebElement. The following error occurred:\n' + ex);
+  }
+
+  try {
+    var converted = ex.QueryInterface(Components.interfaces['nsIException']);
+    fxdriver.Logger.dumpn("Converted the exception: " + converted.name);
+    if ("NS_ERROR_DOM_SYNTAX_ERR" == converted.name) {
+      return new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
+          'The given selector ' + selector +
+              ' is either invalid or does not result' +
+              ' in a WebElement. The following error occurred:\n' + ex);
+    }
+  } catch (ignored) {
+  }
+
+  return ex;
 };
 
 
@@ -353,59 +360,39 @@ FirefoxDriver.prototype.findElementInternal_ = function(respond, method,
                                                         selector,
                                                         opt_parentElementId,
                                                         opt_startTime) {
-  var startTime = typeof opt_startTime == 'number' ? opt_startTime :
-                                                     new Date().getTime();
+  var startTime = goog.isNumber(opt_startTime) ? opt_startTime : goog.now();
   var theDocument = respond.session.getDocument();
-  var rootNode = typeof opt_parentElementId == 'string' ?
-      Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
 
-  var target = {};
-  target[FirefoxDriver.WIRE_TO_ATOMS_STRATEGY_[method] || method] = selector;
-
-  var element;
   try {
-    element = bot.locators.findElement(target, rootNode);
-  } catch(ex) {
-    if(ex.code == bot.ErrorCode.INVALID_SELECTOR_ERROR) {
-      // We send the INVALID_SELECTOR_ERROR immediately because it will occur in
-      // every retry.
-      respond.sendError(new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-        'The given selector ' + selector + ' is either invalid or does not result' +
-        ' in a WebElement. The following error occurred:\n' + ex));
-      return;
-    } else {
-      try {
-        var converted = ex.QueryInterface(Components.interfaces['nsIException']);
-        fxdriver.Logger.dumpn("Converted the exception: " + converted.name);
-        if ("NS_ERROR_DOM_SYNTAX_ERR" == converted.name) {
-          respond.sendError(new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-              'The given selector ' + selector + ' is either invalid or does not result' +
-              ' in a WebElement. The following error occurred:\n' + ex));
-          return;
-        }
-      } catch (ignored) {}
-      // this is not the exception we are interested in, so we propagate it.
-      throw ex;
+    var rootNode = goog.isString(opt_parentElementId) ?
+        Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
+
+    var target = {};
+    target[method] = selector;
+
+    var element = bot.locators.findElement(target, rootNode);
+
+    if (element) {
+      var id = Utils.addToKnownElements(element, respond.session.getDocument());
+      respond.value = {'ELEMENT': id};
+      return respond.send();
     }
-  }
-  if (element) {
-    var id = Utils.addToKnownElements(element, respond.session.getDocument());
-    respond.value = {'ELEMENT': id};
-    respond.send();
-  } else {
+
     var wait = respond.session.getImplicitWait();
-    if (wait == 0 || new Date().getTime() - startTime > wait) {
-      respond.sendError(new WebDriverError(bot.ErrorCode.NO_SUCH_ELEMENT,
+    if (wait == 0 || goog.now() - startTime > wait) {
+      return respond.sendError(new WebDriverError(bot.ErrorCode.NO_SUCH_ELEMENT,
           'Unable to locate element: ' + JSON.stringify({
               method: method,
               selector: selector
           })));
-    } else {
-      var callback = goog.bind(this.findElementInternal_, this, respond, method, selector,
-              opt_parentElementId, startTime);
-
-      this.jsTimer.setTimeout(callback, 100);
     }
+
+    var callback = goog.bind(this.findElementInternal_, this, respond, method,
+        selector, opt_parentElementId, startTime);
+    this.jsTimer.setTimeout(callback, 100);
+  } catch (ex) {
+    ex = FirefoxDriver.annotateInvalidSelectorError_(selector, ex);
+    respond.sendError(ex);
   }
 };
 
@@ -459,60 +446,37 @@ FirefoxDriver.prototype.findElementsInternal_ = function(respond, method,
                                                          selector,
                                                          opt_parentElementId,
                                                          opt_startTime) {
-  var startTime = typeof opt_startTime == 'number' ? opt_startTime :
-                                                     new Date().getTime();
+  var startTime = goog.isNumber(opt_startTime) ? opt_startTime : goog.now();
   var theDocument = respond.session.getDocument();
-  var rootNode = typeof opt_parentElementId == 'string' ?
-      Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
 
-  var target = {};
-  target[FirefoxDriver.WIRE_TO_ATOMS_STRATEGY_[method] || method] = selector;
-
-  var elements;
   try {
-    elements = bot.locators.findElements(target, rootNode);
-  } catch (ex) {
-    if(ex.code == bot.ErrorCode.INVALID_SELECTOR_ERROR) {
-      // We send the INVALID_SELECTOR_ERROR immediately because it will occur in
-      // every retry.
-      respond.sendError(new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-        'The given selector "' + selector + ' is either invalid or does not result' +
-        'in a Webelement. The following error occurred:\n' + ex));
-      return;
-    } else {
-      try {
-        var converted = ex.QueryInterface(Components.interfaces['nsIException']);
-        fxdriver.Logger.dumpn("Converted the exception: " + converted.name);
-        if ("NS_ERROR_DOM_SYNTAX_ERR" == converted.name) {
-          respond.sendError(new WebDriverError(bot.ErrorCode.INVALID_SELECTOR_ERROR,
-              'The given selector ' + selector + ' is either invalid or does not result' +
-              ' in a WebElement. The following error occurred:\n' + ex));
-          return;
-        }
-      } catch (ignored) {}
-      // this is not the exception we are interested in, so we propagate it.
-      throw ex;
+    var rootNode = goog.isString(opt_parentElementId) ?
+        Utils.getElementAt(opt_parentElementId, theDocument) : theDocument;
+
+    var target = {};
+    target[method] = selector;
+
+    var elements = bot.locators.findElements(target, rootNode);
+
+    var elementIds = [];
+    for (var j = 0; j < elements.length; j++) {
+      var element = elements[j];
+      var elementId = Utils.addToKnownElements(element, theDocument);
+      elementIds.push({'ELEMENT': elementId});
     }
-  }
 
-  var elementIds = [];
-  for (var j = 0; j < elements.length; j++) {
-    var element = elements[j];
-    var elementId = Utils.addToKnownElements(
-        element, respond.session.getDocument());
-    elementIds.push({'ELEMENT': elementId});
-  }
-
-  var wait = respond.session.getImplicitWait();
-  if (wait && !elementIds.length && new Date().getTime() - startTime <= wait) {
-    var self = this;
-    var callback = function() {
-        self.findElementsInternal_(respond, method, selector, opt_parentElementId, startTime);
-    };
-    this.jsTimer.setTimeout(callback, 10);
-  } else {
-    respond.value = elementIds;
-    respond.send();
+    var wait = respond.session.getImplicitWait();
+    if (wait && !elements.length && goog.now() - startTime <= wait) {
+      var callback = goog.bind(this.findElementsInternal_, this, respond,
+          method, selector, opt_parentElementId, startTime);
+      this.jsTimer.setTimeout(callback, 10);
+    } else {
+      respond.value = elementIds;
+      respond.send();
+    }
+  } catch (ex) {
+    ex = FirefoxDriver.annotateInvalidSelectorError_(selector, ex);
+    respond.sendError(ex);
   }
 };
 
@@ -590,8 +554,11 @@ FirefoxDriver.prototype.switchToFrame = function(respond, parameters) {
     newWindow = currentWindow.frames[parameters.id];
   } else if (goog.isObject(parameters.id) && 'ELEMENT' in parameters.id) {
     fxdriver.Logger.dumpn("Switching to frame by element: " + parameters.id['ELEMENT']);
+
     var element = Utils.getElementAt(parameters.id['ELEMENT'],
         currentWindow.document);
+
+    element = fxdriver.moz.unwrapFor4(element)
 
     if (/^i?frame$/i.test(element.tagName)) {
       // Each session maintains a weak reference to the window it is currently
@@ -1014,31 +981,40 @@ FirefoxDriver.prototype.getBrowserSpecificOffset_ = function(inBrowser) {
   return getBrowserSpecificOffset_(inBrowser);
 };
 
+FirefoxDriver.prototype.sendResponseFromSyntheticMouse_ = function(mouseReturnValue, respond) {
+  if (mouseReturnValue.code != bot.ErrorCode.OK) {
+    respond.sendError(new WebDriverError(mouseReturnValue.code, mouseReturnValue.message));
+  }
+  else {
+    respond['status'] = mouseReturnValue['status'];
+    respond['value'] = { message: mouseReturnValue['message'] };
+    respond.send();
+  }
+}
+
 FirefoxDriver.prototype.mouseMove = function(respond, parameters) {
   var doc = respond.session.getDocument();
   
   // Fast path first
   if (!this.enableNativeEvents) {
-    var raw = parameters['element'] ? Utils.getElementAt(parameters['element'], doc) : null;
-    var target = raw ? new XPCNativeWrapper(raw) : null;
+    var target = parameters['element'] ? Utils.getElementAt(parameters['element'], doc) : null;
     fxdriver.Logger.dumpn("Calling move with: " + parameters['xoffset'] + ', ' + parameters['yoffset'] + ", " + target);
     var result = this.mouse.move(target, parameters['xoffset'], parameters['yoffset']);
-
-    respond['status'] = result['status'];
-    respond['value'] = result['message'];
-    respond.send();
+    this.sendResponseFromSyntheticMouse_(result, respond);
 
     return;
   }
   
-  var mouseMoveTo = function(coordinates, nativeEventsEnabled, jsTimer) {
+  var mouseMoveTo = function(coordinates, nativeEventsEnabled, jsTimer, isMousePressed) {
     var elementForNode = null;
     var browserOffset = getBrowserSpecificOffset_(respond.session.getBrowser());
 
     if (coordinates.auxiliary) {
       var element = fxdriver.moz.unwrap(coordinates.auxiliary);
 
-      var loc = Utils.getLocationOnceScrolledIntoView(element);
+      // No need to scroll the element into view - calling getInViewLocation
+      // later on with the right coordinates will scroll properly.
+      var loc = Utils.getLocation(element);
 
       toX = loc.x + coordinates.x;
       toY = loc.y + coordinates.y;
@@ -1069,6 +1045,15 @@ FirefoxDriver.prototype.mouseMove = function(respond, parameters) {
         throw ex;
       }
     }
+
+    var storeX = to.x;
+    var storeY = to.y;
+    if (isMousePressed) {
+      fxdriver.Logger.dumpn("Mouse button is pressed: using original coordinates.");
+      to.x = toX;
+      to.y = toY;
+    }
+
     var events = Utils.getNativeEvents();
     var node = Utils.getNodeForNativeEvents(elementForNode);
 
@@ -1086,7 +1071,7 @@ FirefoxDriver.prototype.mouseMove = function(respond, parameters) {
 
       Utils.waitForNativeEventsProcessing(elementForNode, events, dummyIndicator, jsTimer);
 
-      respond.session.setMousePosition(to.x, to.y);
+      respond.session.setMousePosition(storeX, storeY);
     } else {
       throw generateErrorForNativeEvents(nativeEventsEnabled, events, node);
     }
@@ -1094,7 +1079,8 @@ FirefoxDriver.prototype.mouseMove = function(respond, parameters) {
   };
 
   var coords = fxdriver.events.buildCoordinates(parameters, doc);
-  mouseMoveTo(coords, this.enableNativeEvents, this.jsTimer);
+  var isMouseButtonPressed = respond.session.isMousePressed();
+  mouseMoveTo(coords, this.enableNativeEvents, this.jsTimer, isMouseButtonPressed);
 
   respond.send();
 };
@@ -1103,10 +1089,8 @@ FirefoxDriver.prototype.mouseDown = function(respond, parameters) {
   if (!this.enableNativeEvents) {
     var coords = fxdriver.utils.newCoordinates(null, 0, 0);
     var result = this.mouse.down(coords);
-    
-    respond['status'] = result['status'];
-    respond['value'] = result['message'];
-    respond.send();
+
+    this.sendResponseFromSyntheticMouse_(result, respond);
     return;
   }
   
@@ -1128,7 +1112,7 @@ FirefoxDriver.prototype.mouseDown = function(respond, parameters) {
     };
 
     Utils.waitForNativeEventsProcessing(elementForNode, events, dummyIndicator, this.jsTimer);
-
+    respond.session.setMousePressed(true);
   } else {
     throw generateErrorForNativeEvents(this.enableNativeEvents, events, node);
   }
@@ -1140,10 +1124,8 @@ FirefoxDriver.prototype.mouseUp = function(respond, parameters) {
   if (!this.enableNativeEvents) {
     var coords = fxdriver.utils.newCoordinates(null, 0, 0);
     var result = this.mouse.up(coords);
-    
-    respond['status'] = result['status'];
-    respond['value'] = result['message'];
-    respond.send();
+
+    this.sendResponseFromSyntheticMouse_(result, respond);
     return;
   }
   
@@ -1165,6 +1147,7 @@ FirefoxDriver.prototype.mouseUp = function(respond, parameters) {
     };
 
     Utils.waitForNativeEventsProcessing(elementForNode, events, dummyIndicator, this.jsTimer);
+    respond.session.setMousePressed(false);
   } else {
     throw generateErrorForNativeEvents(this.enableNativeEvents, events, node);
   }
@@ -1189,8 +1172,7 @@ FirefoxDriver.prototype.mouseClick = function(respond, parameters) {
       result = this.mouse.click(null);
     }
 
-    respond['status'] = result['status'];
-    respond['value'] = result['message'];
+    this.sendResponseFromSyntheticMouse_(result, respond);
     return;
   }
 
@@ -1227,10 +1209,8 @@ FirefoxDriver.prototype.mouseDoubleClick = function(respond, parameters) {
   Utils.installClickListener(respond, WebLoadingListener);
 
   if (!this.enableNativeEvents) {
-    var response = this.mouse.doubleClick(null);
-    respond.status = response.status;
-    respond.value = response.message;
-    respond.send();
+    var result = this.mouse.doubleClick(null);
+    this.sendResponseFromSyntheticMouse_(result, respond);
     return;
   }
 
@@ -1288,4 +1268,50 @@ FirefoxDriver.prototype.sendKeysToActiveElement = function(respond, parameters) 
   this.modifierKeysState = newState;
 
   respond.send();
+};
+
+FirefoxDriver.prototype.getWindowSize = function(respond, parameters) {
+  this.assertTargetsCurrentWindow_(parameters);
+
+  var size = bot.window.getSize(respond.session.getWindow());
+  respond.value = { width: size.width, height: size.height };
+  respond.send();
+};
+
+FirefoxDriver.prototype.setWindowSize = function(respond, parameters) {
+  this.assertTargetsCurrentWindow_(parameters);
+
+  var size = new goog.math.Size(parameters.width, parameters.height);
+  var win = respond.session.getWindow();
+
+  bot.window.setSize(size, win);
+  respond.send();
+};
+
+FirefoxDriver.prototype.getWindowPosition = function(respond, parameters) {
+  this.assertTargetsCurrentWindow_(parameters);
+
+  var position = bot.window.getPosition(respond.session.getWindow());
+
+  respond.value = { x: position.x, y: position.y };
+  respond.send();
+};
+
+FirefoxDriver.prototype.setWindowPosition = function(respond, parameters) {
+  this.assertTargetsCurrentWindow_(parameters);
+
+  var position = new goog.math.Coordinate(parameters.x, parameters.y);
+  var win = respond.session.getWindow();
+
+  bot.window.setPosition(position, win);
+
+  respond.send();
+};
+
+// TODO(jari): could this be made into a precondition?
+FirefoxDriver.prototype.assertTargetsCurrentWindow_ = function(parameters) {
+  if (parameters.windowHandle != "current") {
+    throw new WebDriverError(bot.ErrorCode.UNSUPPORTED_OPERATION,
+      'Window operations are only supported for the currently focused window.');
+  }
 };

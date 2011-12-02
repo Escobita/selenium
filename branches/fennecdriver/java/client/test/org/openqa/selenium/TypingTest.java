@@ -17,6 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.openqa.selenium.Ignore.Driver.ALL;
 import static org.openqa.selenium.Ignore.Driver.ANDROID;
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -25,12 +31,6 @@ import static org.openqa.selenium.Ignore.Driver.IE;
 import static org.openqa.selenium.Ignore.Driver.IPHONE;
 import static org.openqa.selenium.Ignore.Driver.OPERA;
 import static org.openqa.selenium.Ignore.Driver.SELENESE;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.TestWaiter.waitFor;
 import static org.openqa.selenium.WaitingConditions.elementValueToEqual;
 
@@ -133,14 +133,14 @@ public class TypingTest extends AbstractDriverTestCase {
     assertThat(keyReporter.getAttribute("value"), is(""));
   }
 
-  @Ignore({HTMLUNIT, IPHONE, SELENESE})
+  @Ignore(value = {HTMLUNIT, IPHONE, SELENESE})
   public void testShouldBeAbleToUseArrowKeys() {
     driver.get(pages.javascriptPage);
 
     WebElement keyReporter = driver.findElement(By.id("keyReporter"));
-    keyReporter.sendKeys("Tet", Keys.ARROW_LEFT, "s");
+    keyReporter.sendKeys("tet", Keys.ARROW_LEFT, "s");
 
-    assertThat(keyReporter.getAttribute("value"), is("Test"));
+    assertThat(keyReporter.getAttribute("value"), is("test"));
   }
 
   @JavascriptEnabled
@@ -590,8 +590,8 @@ public class TypingTest extends AbstractDriverTestCase {
 
     WebElement element = driver.findElement(By.id("no-type"));
 
-    element.sendKeys("Should Say Cheese");
-    assertThat(element.getAttribute("value"), is("Should Say Cheese"));
+    element.sendKeys("should say cheese");
+    assertThat(element.getAttribute("value"), is("should say cheese"));
   }
 
   @JavascriptEnabled
@@ -606,7 +606,7 @@ public class TypingTest extends AbstractDriverTestCase {
   }
 
   @JavascriptEnabled
-  @Ignore(value = {IE, ANDROID, CHROME}, reason = "firefox-specific")
+  @Ignore(value = {ANDROID, CHROME, IE, IPHONE}, reason = "firefox-specific")
   public void testGenerateKeyPressEventEvenWhenElementPreventsDefault() {
     driver.get(pages.javascriptPage);
 
@@ -662,5 +662,28 @@ public class TypingTest extends AbstractDriverTestCase {
     WebElement email = driver.findElement(By.id("email"));
     email.sendKeys("foobar");
     assertThat(email.getAttribute("value"), equalTo("foobar"));
+  }
+
+  @Ignore(value = {ANDROID, CHROME, HTMLUNIT, IE, IPHONE, OPERA, SELENESE},
+        reason = "Untested browsers.")
+  public void testShouldBeAbleToTypeIntoEmptyContentEditableElement() {
+    driver.get(pages.readOnlyPage);
+    WebElement editable = driver.findElement(By.id("content-editable"));
+
+    editable.clear();
+    editable.sendKeys("cheese"); // requires focus on OS X
+
+    assertThat(editable.getText(), equalTo("cheese"));
+  }
+
+  @Ignore(value = {ALL}, reason = "Untested except in Firefox", issues = {2825})
+  public void testShouldBeAbleToTypeIntoContentEditableElementWithExistingValue() {
+    driver.get(pages.readOnlyPage);
+    WebElement editable = driver.findElement(By.id("content-editable"));
+
+    String initialText = editable.getText();
+    editable.sendKeys(", edited");
+
+    assertThat(editable.getText(), equalTo(initialText + ", edited"));
   }
 }

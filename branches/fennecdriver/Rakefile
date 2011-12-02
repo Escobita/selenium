@@ -12,6 +12,7 @@ verbose false
 # The CrazyFun build grammar. There's no magic here, just ruby
 require 'rake-tasks/crazy_fun'
 require 'rake-tasks/crazy_fun/mappings/android'
+require 'rake-tasks/crazy_fun/mappings/export'
 require 'rake-tasks/crazy_fun/mappings/gcc'
 require 'rake-tasks/crazy_fun/mappings/java'
 require 'rake-tasks/crazy_fun/mappings/javascript'
@@ -35,7 +36,7 @@ require 'rake-tasks/ie_code_generator'
 require 'rake-tasks/gecko_sdks'
 
 def version
-  "2.9.0"
+  "2.14.0"
 end
 ide_version = "1.0.12"
 
@@ -57,6 +58,7 @@ crazy_fun = CrazyFun.new
 # If crazy fun doesn't know how to handle a particular output type ("java_library"
 # in the example above) then it will throw an exception, stopping the build
 AndroidMappings.new.add_all(crazy_fun)
+ExportMappings.new.add_all(crazy_fun)
 GccMappings.new.add_all(crazy_fun)
 JavaMappings.new.add_all(crazy_fun)
 JavascriptMappings.new.add_all(crazy_fun)
@@ -134,19 +136,19 @@ task :test_grid => [
 ]
 task :test_ie => [ "//java/client/test/org/openqa/selenium/ie:test:run" ]
 task :test_jobbie => [ :test_ie ]
-task :test_firefox => [ "//java/client/test/org/openqa/selenium/firefox:test:run", "//java/client/test/org/openqa/selenium/firefox:test_native:run" ]
+task :test_firefox => [ "//java/client/test/org/openqa/selenium/firefox:test_synthesized:run", "//java/client/test/org/openqa/selenium/firefox:test_native:run" ]
 task :test_opera => [ "//java/client/test/org/openqa/selenium/opera:test:run" ]
+task :test_remote_server => [ '//java/server/test/org/openqa/selenium/remote/server:test:run' ]
 task :test_remote => [
   '//java/client/test/org/openqa/selenium/remote:client-tests:run',
-  '//java/server/test/org/openqa/selenium/remote/server:test:run'
+  :test_remote_server
 ]
 task :test_support => [
   "//java/client/test/org/openqa/selenium/lift:test:run",
   "//java/client/test/org/openqa/selenium/support:SmallTests:run",
   "//java/client/test/org/openqa/selenium/support:LargeTests:run"
 ]
-task :test_iphone_client => [:'webdriver-iphone-client-test']
-task :test_iphone => [:test_iphone_server, :test_iphone_client]
+task :test_iphone => [:test_iphone_server, '//java/client/test/org/openqa/selenium/iphone:test:run']
 task :android => [:android_client, :android_server]
 task :android_client => ['//java/client/src/org/openqa/selenium/android']
 task :android_server => ['//android/app:android-server']
@@ -156,23 +158,29 @@ task :test_selenium => [ :'test-rc', :'test-v1-emulation', :'test-selenium-backe
 
 task :'test-selenium-backed-webdriver' => ['//java/client/test/org/openqa/selenium/v1:selenium-backed-webdriver-test:run']
 task :'test-v1-emulation' => [ '//java/client/test/com/thoughtworks/selenium:firefox-emulation-test:run' ]
-task :'test-rc' => [ '//java/client/test/com/thoughtworks/selenium:firefox-rc-test:run' ]
+task :'test-rc' => ['//java/client/test/com/thoughtworks/selenium:firefox-rc-test:run',
+                    '//java/client/test/com/thoughtworks/selenium:firefox-proxy-rc-test:run',
+                    '//java/client/test/com/thoughtworks/selenium:firefox-singlewindow-rc-test:run']
 task :'test-core' => [:'test-core-firefox']
 
 if (windows?)
   task :'test-v1-emulation' => ['//java/client/test/com/thoughtworks/selenium:ie-emulation-test:run']
-  task :'test-rc' => ['//java/client/test/com/thoughtworks/selenium:ie-rc-test:run']
+  task :'test-rc' => ['//java/client/test/com/thoughtworks/selenium:ie-rc-test:run',
+                      '//java/client/test/com/thoughtworks/selenium:ie-proxy-rc-test:run',
+                      '//java/client/test/com/thoughtworks/selenium:ie-singlewindow-rc-test:run']
   task :'test-core' => [:'test-core-ie']
+# TODO(santi): why are these disabled?
 #elsif (mac?)
-#  task :'test-rc' => ['//java/client/test/com/thoughtworks/selenium:safari-rc-test:run']
+#  task :'test-rc' => ['//java/client/test/com/thoughtworks/selenium:safari-rc-test:run',
+#                       '//java/client/test/com/thoughtworks/selenium:safari-proxy-rc-test:run']
 #  task :'test-core' => [:'test-core-safari']
 end
 
 task :test_java_webdriver => [
-  "//java/client/test/org/openqa/selenium/htmlunit:test:run",
-  "//java/client/test/org/openqa/selenium/firefox:test:run",
-  "//java/client/test/org/openqa/selenium/ie:test:run",
-  "//java/server/test/org/openqa/selenium/remote/server:test:run",
+  :test_htmlunit,
+  :test_firefox,
+  :test_ie,
+  :test_remote_server,
 ]
 if (present?("chromedriver"))
   task :test_java_webdriver => [:test_chrome]
@@ -227,6 +235,7 @@ desc 'Clean build artifacts.'
 task :clean do
   rm_rf 'build/'
   rm_rf 'iphone/build/'
+  rm_rf 'iphone/src/objc/atoms.h'
   rm_rf 'android/app/bin/'
   rm_rf 'android/app/build/'
   rm_rf 'android/app/libs/'
@@ -253,8 +262,8 @@ ie_generate_type_mapping(:name => "ie_result_type_java",
 
 GeckoSDKs.new do |sdks|
   sdks.add 'third_party/gecko-1.9.2/linux',
-           'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/3.6.22/sdk/xulrunner-3.6.22.en-US.linux-i686.sdk.tar.bz2',
-           '6c1c3a990495baacc2bb40aef3b54025'
+           'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/3.6.23/sdk/xulrunner-3.6.23.en-US.linux-i686.sdk.tar.bz2',
+           'f13055d2b793b6ab32797cc292f18de4'
 
   sdks.add 'third_party/gecko-2/linux',
            'http://ftp.mozilla.org/pub/mozilla.org/xulrunner/nightly/2.0-candidates/build3/sdk/xulrunner-2.0.en-US.linux-i686.sdk.tar.bz2',
@@ -312,6 +321,17 @@ GeckoSDKs.new do |sdks|
            'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/7.0/sdk/xulrunner-7.0.en-US.win32.sdk.zip',
            'd9c366d3dd54e020e372841053806f5d'
 
+  sdks.add 'third_party/gecko-8/linux',
+           'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/8.0/sdk/xulrunner-8.0.en-US.linux-i686.sdk.tar.bz2',
+           '3460799adf6173573590fdf2fcc75406'
+
+  sdks.add 'third_party/gecko-8/linux64',
+           'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/8.0/sdk/xulrunner-8.0.en-US.linux-x86_64.sdk.tar.bz2',
+           '1117d461036e6f6f6ea7d2f7ee1a42c8'
+
+  sdks.add 'third_party/gecko-8/win32',
+           'http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/8.0/sdk/xulrunner-8.0.en-US.win32.sdk.zip',
+           'd9c366d3dd54e020e372841053806f5d'
 end
 
 task :'selenium-server_zip' do
@@ -359,7 +379,7 @@ end
 # Installs the webdriver python bindings using virtualenv for testing.
 task :webdriver_py do
   if python? then
-    pip_pkg = "pip install simplejson pytest==2.0.3 rdflib"
+    pip_pkg = "pip install third_party/py/simplejson-2.2.1.tar.gz third_party/py/py-1.4.5.zip third_party/py/pytest-2.0.3.zip third_party/py/rdflib-3.1.0.tar.gz"
     virtualenv = "virtualenv --no-site-packages build/python"
     pip_install = 'build/python/bin/' + pip_pkg
     if (windows?) then
@@ -432,6 +452,8 @@ task :test_firefox_py => [:webdriver_py, :firefox, "//javascript/firefox-driver:
   if python? then
     xpi_zip_build = 'build/javascript/firefox-driver/webdriver.xpi'
     firefox_py_home = "py/selenium/webdriver/firefox/"
+    x86 = firefox_py_home + "x86/"
+    amd64 = firefox_py_home + "amd64/"
     py_test_path = 'build/python/bin/py.test'
     py_setup = "build/python/bin/python " + 'setup.py build'
     if (windows?) then
@@ -439,7 +461,15 @@ task :test_firefox_py => [:webdriver_py, :firefox, "//javascript/firefox-driver:
       firefox_py_home = firefox_py_home .gsub(/\//, "\\")
       py_test_path = 'build\\python\\Scripts\\py.test.exe'
       py_setup = 'build\\python\\Scripts\\python ' + 'setup.py build'
+      x86 = x86.gsub(/\//,"\\")
+      amd64 = amd64.gsub(/\//,"\\")
     end
+
+    mkdir_p x86 unless File.exists?(x86)
+    mkdir_p amd64 unless File.exists?(amd64)
+    
+    cp "cpp/prebuilt/i386/libnoblur.so", x86+"x_ignore_nofocus.so", :verbose => true
+    cp "cpp/prebuilt/amd64/libnoblur64.so", amd64+"x_ignore_nofocus.so", :verbose => true
 
     cp xpi_zip_build , firefox_py_home, :verbose => true
 
@@ -451,10 +481,14 @@ task :test_firefox_py => [:webdriver_py, :firefox, "//javascript/firefox-driver:
     else
         py_test = 'py.test'
     end
+    
+
     test_dir = Dir.glob('build/lib**/selenium/test/selenium/webdriver/firefox').first
     sh py_test, test_dir, :verbose => true
     webdriver_zip = firefox_py_home + 'webdriver.xpi'
     rm webdriver_zip , :verbose => true
+    rm_rf x86 , :verbose => true
+    rm_rf amd64 , :verbose => true
   end
 end
 
@@ -486,6 +520,8 @@ task :py_prep_for_install_release => ["//javascript/firefox-driver:webdriver", :
 
         firefox_py_home = "py/selenium/webdriver/firefox/"
         xpi_zip_build = 'build/javascript/firefox-driver/webdriver.xpi'
+        x86 = firefox_py_home + "x86/"
+        amd64 = firefox_py_home + "amd64/"
 
         ie_driver_32 = 'cpp/prebuilt/Win32/Release/IEDriver.dll'
         ie_driver_64 = 'cpp/prebuilt/x64/Release/IEDriver.dll'
@@ -493,6 +529,8 @@ task :py_prep_for_install_release => ["//javascript/firefox-driver:webdriver", :
         if (windows?) then
             xpi_zip_build = xpi_zip_build.gsub(/\//, "\\")
             firefox_py_home = firefox_py_home .gsub(/\//, "\\")
+            x86 = x86.gsub(/\//,"\\")
+            amd64 = amd64.gsub(/\//,"\\")
             ie_driver_32 = ie_driver_32.gsub(/\//, "\\")
             ie_driver_64 = ie_driver_64.gsub(/\//, "\\")
             ie_py_home = ie_py_home.gsub(/\//, "\\")
@@ -500,6 +538,12 @@ task :py_prep_for_install_release => ["//javascript/firefox-driver:webdriver", :
 
         mkdir_p ie_py_home + "win32" unless File.exists?(ie_py_home + "win32")
         mkdir_p ie_py_home + "x64" unless File.exists?(ie_py_home + "x64")
+        mkdir_p x86 unless File.exists?(x86)
+        mkdir_p amd64 unless File.exists?(amd64)
+    
+        cp "cpp/prebuilt/i386/libnoblur.so", x86+"x_ignore_nofocus.so", :verbose => true
+        cp "cpp/prebuilt/amd64/libnoblur64.so", amd64+"x_ignore_nofocus.so", :verbose => true
+
         cp xpi_zip_build , firefox_py_home, :verbose => true
         cp ie_driver_32, ie_py_home + "win32", :verbose => true
         cp ie_driver_64, ie_py_home + "x64", :verbose => true
@@ -520,17 +564,6 @@ task :test_selenium_py => [:'selenium-core', :'selenium-server-standalone'] do
         sh "python2.6 selenium/test/py/runtests.py", :verbose => true
     end
 end
-
-
-iphone_test(:name => "webdriver-iphone-client-test",
-            :srcs => [ "java/client/test/org/openqa/selenium/iphone/**/*.java" ],
-            :deps => [
-                       "//java/client/test/org/openqa/selenium:tests",
-                       "//third_party/java/junit",
-                       :iphone_server,
-                       :iphone_client
-                     ])
-
 
 #### iPhone ####
 task :iphone_server do
@@ -587,6 +620,72 @@ end
 
 desc "Calculate dependencies required for testing the automation atoms"
 task :calcdeps => "javascript/deps.js"
+
+task :test_webdriverjs => [
+  "//javascript/webdriver-jsapi:test_firefox:run",
+  "//javascript/webdriver-jsapi:test_chrome:run",
+  "//javascript/webdriver-jsapi:test_firefox_e2e:run",
+  "//javascript/webdriver-jsapi:test_chrome_e2e:run"
+]
+
+# TODO(jleyba): Integrate cleanly with build.desc files.
+desc "Generate a single file with WebDriverJS' public API"
+task :webdriverjs do
+  files = FileList[
+    "javascript/webdriver-jsapi/*.js",
+    "javascript/webdriver-jsapi/http/*.js",
+    "javascript/webdriver-jsapi/node/node.js" ]
+
+  files = files.to_a.collect do |f|
+    "-i #{f}"
+  end
+
+  py = "java -jar third_party/py/jython.jar"
+  if (python?)
+    py = "python"
+  end
+
+  # Wrap the compiled output in a function to prevent polluting the global
+  # scope. Call the function with the correct context based on a quick check for
+  # whether the file has been loaded as a Node module or in a browser.
+  #
+  # Also: we use --generate_exports to export the public API based on @export
+  # jsdoc annotations. The Closure compiler exports such functions using their
+  # fully-qualified path, where we need to drop the root "webdriver" object
+  # since that is controlled by the function's context (e.g. export
+  # "webdriver.WebDriver" as "WebDriver").
+  wrapper = "(function(){%output%" +
+            ";for (var key in this.webdriver)" +
+            " this[key] = this.webdriver[key];" +
+            " delete this.webdriver;}).call(" +
+            "typeof exports !== 'undefined' && exports == this ? " +
+            "exports : this.webdriver = this.webdriver || {})"
+
+  output_file = "build/javascript/webdriver-jsapi/webdriver.js"
+
+  # TODO(jleyba): Write a Java app that compiles webdriver.js with custom
+  # settings for us. We want SIMPLE_OPTIMIZATIONS (what's used here), but we
+  # also want all dead code removed. There's a lot of Closure pulled in that
+  # we don't use.  We could get rid of this with ADVANCED_OPTIMIZATIONS, but
+  # then everything would be obfuscated and users wouldn't be able to step
+  # through the code.
+  cmd = [
+    "#{py} third_party/closure/bin/calcdeps.py",
+    "-c third_party/closure/bin/compiler-20110502.jar",
+    "-o compiled",
+    "-f \"--js_output_file=#{output_file}\"",
+    '-f "--generate_exports"',
+    '-f "--formatting=PRETTY_PRINT"',
+    "-f \"--output_wrapper='#{wrapper}'\"",
+    '-p javascript/atoms',
+    '-p third_party/closure/goog'
+  ]
+  cmd = cmd.concat(files)
+
+  mkdir_p File.dirname(output_file)
+
+  sh "#{cmd.join(' ')}"
+end
 
 task :release => [
     '//java/server/src/org/openqa/selenium/server:server:zip',

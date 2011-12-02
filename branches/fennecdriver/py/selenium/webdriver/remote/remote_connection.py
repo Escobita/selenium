@@ -178,8 +178,8 @@ class RemoteConnection(object):
             Command.GET_ELEMENT_TEXT: ('GET', '/session/$sessionId/element/$id/text'),
             Command.SEND_KEYS_TO_ELEMENT:
                 ('POST', '/session/$sessionId/element/$id/value'),
-            Command.SEND_MODIFIER_KEY_TO_ACTIVE_ELEMENT:
-                ('POST', '/session/$sessionId/modifier'),
+            Command.SEND_KEYS_TO_ACTIVE_ELEMENT:
+                ('POST', '/session/$sessionId/keys'),
             Command.GET_ELEMENT_VALUE:
                 ('GET', '/session/$sessionId/element/$id/value'),
             Command.GET_ELEMENT_TAG_NAME:
@@ -245,7 +245,20 @@ class RemoteConnection(object):
             Command.MOUSE_UP:
                 ('POST', '/session/$sessionId/buttonup'),
             Command.MOVE_TO:
-                ('POST', '/session/$sessionId/moveto')}
+                ('POST', '/session/$sessionId/moveto'),
+            Command.GET_WINDOW_SIZE:
+                ('GET', '/session/$sessionId/window/$windowHandle/size'),
+            Command.SET_WINDOW_SIZE:
+                ('POST', '/session/$sessionId/window/$windowHandle/size'),
+            Command.GET_WINDOW_POSITION:
+                ('GET', '/session/$sessionId/window/$windowHandle/position'),
+            Command.SET_WINDOW_POSITION:
+                ('POST', '/session/$sessionId/window/$windowHandle/position'),
+            Command.SET_SCREEN_ORIENTATION:
+                ('POST', '/session/$sessionId/orientation'),
+            Command.GET_SCREEN_ORIENTATION:
+                ('GET', '/session/$sessionId/orientation'),
+            }
 
     def execute(self, command, params):
         """

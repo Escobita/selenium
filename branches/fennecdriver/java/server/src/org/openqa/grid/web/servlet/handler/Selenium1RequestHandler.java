@@ -1,5 +1,6 @@
 /*
-Copyright 2007-2011 WebDriver committers
+Copyright 2011 WebDriver committers
+Copyright 2011 Software Freedom Conservancy
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,10 +13,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
+
 package org.openqa.grid.web.servlet.handler;
 
 import org.openqa.grid.common.RegistrationRequest;
+import org.openqa.grid.common.SeleniumProtocol;
+import org.openqa.grid.internal.ExternalSessionKey;
+import org.openqa.grid.internal.exception.NewSessionException;
+import org.openqa.grid.internal.utils.ForwardConfiguration;
 import org.openqa.grid.internal.Registry;
 import org.openqa.grid.internal.TestSession;
 import org.openqa.grid.web.utils.BrowserNameUtils;
@@ -60,7 +66,7 @@ public class Selenium1RequestHandler extends RequestHandler {
   }
 
   @Override
-  public String extractSession() {
+  public ExternalSessionKey extractSession() {
     if (getRequestType() == RequestType.START_SESSION) {
       throw new IllegalAccessError("Cannot call that method of a new session request.");
     }
@@ -68,9 +74,11 @@ public class Selenium1RequestHandler extends RequestHandler {
     // the request body.
     String command = getRequestBody();
     String[] pieces = command.split("&");
+    ExternalSessionKey externalSessionKey;
     for (String piece : pieces) {
-      if (piece.startsWith("sessionId=")) {
-        return piece.replace("sessionId=", "");
+      externalSessionKey = ExternalSessionKey.fromSe1Request( piece);
+      if (externalSessionKey != null){
+        return externalSessionKey;
       }
     }
     return null;
@@ -117,7 +125,7 @@ public class Selenium1RequestHandler extends RequestHandler {
   // TODO freynaud do some real parsing here instead. BrowserString to
   // Capabilities service or so.
   @Override
-  public String forwardNewSessionRequest(TestSession session) {
+  public ExternalSessionKey forwardNewSessionRequestAndUpdateRegistry(TestSession session) throws NewSessionException {
     String responseBody;
 
     try {
@@ -152,17 +160,14 @@ public class Selenium1RequestHandler extends RequestHandler {
         builder.append(piece).append("&");
       }
 
-      responseBody = session.forward(getRequest(), getResponse(), builder.toString(), true);
+      ForwardConfiguration config = new ForwardConfiguration();
+      config.setProtocol(SeleniumProtocol.Selenium);
+      config.setNewSessionRequest(true);
+      config.setContentOverWrite(builder.toString());
+      responseBody = session.forward(getRequest(), getResponse(), config);
     } catch (IOException e) {
-      log.warning("Error forwarding the request " + e.getMessage());
-      return null;
+      throw new NewSessionException("Error forwarding the request " + e.getMessage(),e);
     }
-
-    if (responseBody != null && responseBody.startsWith("OK,")) {
-      String externalKey = responseBody.replace("OK,", "");
-      return externalKey;
-    }
-
-    return null;
+    return ExternalSessionKey.fromResponseBody(responseBody);
   }
 }

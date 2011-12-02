@@ -17,7 +17,12 @@ limitations under the License.
 
 package org.openqa.selenium.remote.server.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.ErrorCodes;
@@ -38,12 +43,11 @@ import java.io.BufferedReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
@@ -57,8 +61,7 @@ public class ResultConfig {
   private final String[] sections;
   private final HandlerFactory handlerFactory;
   private final DriverSessions sessions;
-  private final Map<ResultType, Set<Result>> resultToRender =
-      new HashMap<ResultType, Set<Result>>();
+  private final Multimap<ResultType, Result> resultToRender = LinkedHashMultimap.create();
   private final String url;
   private final Logger log;
 
@@ -84,6 +87,10 @@ public class ResultConfig {
   }
 
   public boolean isFor(String urlToMatch) {
+    if (urlToMatch == null) {
+      return sections.length == 0;
+    }
+
     String[] allParts = urlToMatch.split("/");
 
     if (sections.length != allParts.length) {
@@ -105,6 +112,10 @@ public class ResultConfig {
 
 
   protected Handler populate(Handler handler, String pathString) {
+    if (pathString == null) {
+      return handler;
+    }
+
     String[] strings = pathString.split("/");
 
     for (int i = 0; i < sections.length; i++) {
@@ -121,28 +132,47 @@ public class ResultConfig {
     return handler;
   }
 
-  public ResultConfig on(ResultType success, Renderer renderer) {
-    return on(success, renderer, "");
+  /**
+   * Configures this instance to handle a particular type of result with the given renderer. This
+   * result handler will be registered with an empty mime-type.  Accordingly, it will only be used
+   * if there are no other handlers registered with an exact mime-type match.
+   *
+   * @param resultType The type of result to configure.
+   * @param renderer The renderer to use.
+   * @return A self reference for fluency.
+   * @see #on(ResultType, Result)
+   */
+  public ResultConfig on(ResultType resultType, Renderer renderer) {
+    return on(resultType, renderer, "");
   }
 
   /*
    * Configure this ResultConfig to handle results of type ResultType with a specific renderer. The
    * mimeType is used to distinguish between JSON calls and "ordinary" browser pointed at the remote
    * WD Server, which is not implemented at all yet.
+   * @see #on(ResultType, Result)
    */
   public ResultConfig on(ResultType success, Renderer renderer, String mimeType) {
-    Set<Result> results = resultToRender.get(success);
-    if (results == null) {
-      results = new LinkedHashSet<Result>();
-      resultToRender.put(success, results);
-    }
+    return on(success, new Result(mimeType, renderer));
+  }
 
+  /**
+   * Configures how this instance will handle specific types of results. Each ResultType may be
+   * handled by multiple Results. Upon rendering a response, this instance will select the first
+   * Result that is an exact mime-type match for the original HTTP request (results are checked in
+   * the order registered). There may only be one Result registered for each mime-type.
+   *
+   * @param type The type of result to configure for.
+   * @param result The handler for the given result type.
+   * @return A self reference for fluency.
+   */
+  public ResultConfig on(ResultType type, Result result) {
     // There should not be more than one renderer for each result and
     // mime type.
-    for (Result existingResult : results) {
-      assert(!existingResult.isExactMimeTypeMatch(mimeType));
+    for (Result existingResult : resultToRender.get(type)) {
+      assert(!existingResult.isExactMimeTypeMatch(result.getMimeType()));
     }
-    results.add(new Result(mimeType, renderer));
+    resultToRender.put(type, result);
     return this;
   }
 
@@ -183,19 +213,12 @@ public class ResultConfig {
       request.setAttribute("exception", e);
     }
 
-    Set<Result> results = resultToRender.get(result);
-    Result tempToUse = null;
-    for (Result res : results) {
-      if (tempToUse == null || res.isExactMimeTypeMatch(request.getHeader("Accept"))) {
-        tempToUse = res;
-      }
-    }
-    final Result toUse = tempToUse;
+    final Renderer renderer = getRenderer(result, request);
 
     if (handler instanceof WebDriverHandler) {
       FutureTask<ResultType> task = new FutureTask<ResultType>(new Callable<ResultType>() {
         public ResultType call() throws Exception {
-          toUse.getRenderer().render(request, response, handler);
+          renderer.render(request, response, handler);
           return null;
         }
       });
@@ -212,8 +235,21 @@ public class ResultConfig {
 
 
     } else {
-      toUse.getRenderer().render(request, response, handler);
+      renderer.render(request, response, handler);
     }
+  }
+
+  @VisibleForTesting
+  Renderer getRenderer(ResultType resultType, HttpServletRequest request) {
+    Collection<Result> results = checkNotNull(resultToRender.get(resultType));
+    Result tempToUse = null;
+    for (Result res : results) {
+      if (tempToUse == null && !res.isOnlyForExactMatch()
+          || res.isExactMimeTypeMatch(request.getHeader("Accept"))) {
+        tempToUse = res;
+      }
+    }
+    return checkNotNull(tempToUse).getRenderer();
   }
 
   @SuppressWarnings("unchecked")

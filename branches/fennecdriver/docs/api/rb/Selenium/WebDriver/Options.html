@@ -6,7 +6,7 @@
 <title>
   Class: Selenium::WebDriver::Options
   
-    &mdash; Documentation by YARD 0.7.2
+    &mdash; Documentation by YARD 0.7.3
   
 </title>
 
@@ -284,6 +284,27 @@ A new instance of Options.
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#window-instance_method" title="#window (instance method)">- (Object) <strong>window</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -312,6 +333,7 @@ A new instance of Options
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -397,7 +419,7 @@ the options to create a cookie with.
 A name
 </p>
 </div>
-        </tr>
+        </li>
       
         <li>
           <span class="name">:value</span>
@@ -409,7 +431,7 @@ A name
 A value
 </p>
 </div>
-        </tr>
+        </li>
       
         <li>
           <span class="name">:path</span>
@@ -424,7 +446,7 @@ A value
 A path
 </p>
 </div>
-        </tr>
+        </li>
       
         <li>
           <span class="name">:secure</span>
@@ -439,7 +461,7 @@ A path
 A boolean
 </p>
 </div>
-        </tr>
+        </li>
       
         <li>
           <span class="name">:expires</span>
@@ -454,10 +476,11 @@ A boolean
 Expiry date, either as a Time, DateTime, or seconds since epoch.
 </p>
 </div>
-        </tr>
+        </li>
       
     </ul>
   
+
 <h3>Raises:</h3>
 <ul class="raise">
   
@@ -509,7 +532,7 @@ if :name or :value is not specified
   <span class='id opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:path</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span>
   <span class='id opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:secure</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='kw'>false</span>
 
-  <span class='kw'>if</span> <span class='id obj'>obj</span> <span class='op'>=</span> <span class='id opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:expires</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='id obj'>obj</span> <span class='op'>=</span> <span class='id opts'>opts</span><span class='period'>.</span><span class='id delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:expires</span><span class='rparen'>)</span>
     <span class='id opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:expiry</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id seconds_from'>seconds_from</span><span class='lparen'>(</span><span class='id obj'>obj</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
@@ -538,7 +561,8 @@ Get all cookies
   </div>
 </div>
 <div class="tags">
-  <h3>Returns:</h3>
+  
+<h3>Returns:</h3>
 <ul class="return">
   
     <li>
@@ -635,6 +659,7 @@ the name of the cookie
     </li>
   
 </ul>
+
 <h3>Returns:</h3>
 <ul class="return">
   
@@ -694,6 +719,7 @@ Delete all cookies
 </div>
 <div class="tags">
   
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -754,6 +780,7 @@ the name of the cookie to delete
   
 </ul>
 
+
 </div><table class="source_code">
   <tr>
     <td>
@@ -803,14 +830,51 @@ the name of the cookie to delete
 </table>
 </div>
     
+      <div class="method_details ">
+  <p class="signature " id="window-instance_method">
+  
+    - (<tt>Object</tt>) <strong>window</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'rb/lib/selenium/webdriver/common/options.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id window'>window</span>
+  <span class='ivar'>@window</span> <span class='op'>||=</span> <span class='const'>Window</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='ivar'>@bridge</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
     
     <div id="footer">
-  Generated on Fri Sep 23 15:53:36 2011 by 
+  Generated on Tue Nov 29 01:07:03 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.2 (ruby-1.9.2).
+  0.7.3 (ruby-1.9.2).
 </div>
 
   </body>

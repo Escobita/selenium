@@ -1,7 +1,7 @@
 ﻿// <copyright file="DriverCommand.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -289,6 +289,36 @@ namespace OpenQA.Selenium.Remote
         Screenshot,
 
         /// <summary>
+        /// Represents GetOrientation command
+        /// </summary>
+        GetOrientation,
+
+        /// <summary>
+        /// Represents SetOrientation command
+        /// </summary>
+        SetOrientation,
+
+        /// <summary>
+        /// Represents GetWindowSize command
+        /// </summary>
+        GetWindowSize,
+
+        /// <summary>
+        /// Represents SetWindowSize command
+        /// </summary>
+        SetWindowSize,
+
+        /// <summary>
+        /// Represents GetWindowPosition command
+        /// </summary>
+        GetWindowPosition,
+
+        /// <summary>
+        /// Represents SetWindowPosition command
+        /// </summary>
+        SetWindowPosition,
+
+        /// <summary>
         /// Represents the DismissAlert command
         /// </summary>
         DismissAlert,
@@ -346,12 +376,6 @@ namespace OpenQA.Selenium.Remote
         /// <summary>
         /// Represents the SendKeysToActiveElement command.
         /// </summary>
-        SendKeysToActiveElement,
-
-        // TODO: Remove this when Windows supports SendKeysToActiveElement
-        /// <summary>
-        /// Represents the SendModifierKey command.
-        /// </summary>
-        SendModifierKey
+        SendKeysToActiveElement
     }
 }

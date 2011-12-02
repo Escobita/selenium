@@ -19,6 +19,7 @@ package org.openqa.selenium.chrome;
 
 import static org.openqa.selenium.Ignore.Driver.CHROME;
 
+import org.openqa.selenium.SauceDriver;
 import org.openqa.selenium.TestSuiteBuilder;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -34,10 +35,12 @@ public class ChromeDriverTestSuite extends TestCase {
   private static ChromeDriverService chromeDriverService;
 
   public static Test suite() throws Exception {
-    try {
-      chromeDriverService = ChromeDriverService.createDefaultService();
-    } catch (Throwable t) {
-      return new InitializationError(t);
+    if (!SauceDriver.shouldUseSauce()) {
+      try {
+        chromeDriverService = ChromeDriverService.createDefaultService();
+      } catch (Throwable t) {
+        return new InitializationError(t);
+      }
     }
 
     Test rawTest = new TestSuiteBuilder()
@@ -80,12 +83,16 @@ public class ChromeDriverTestSuite extends TestCase {
     @Override
     protected void setUp() throws Exception {
       super.setUp();
-      chromeDriverService.start();
+      if (chromeDriverService != null) {
+        chromeDriverService.start();
+      }
     }
 
     @Override
     protected void tearDown() throws Exception {
-      chromeDriverService.stop();
+      if (chromeDriverService != null) {
+        chromeDriverService.stop();
+      }
       super.tearDown();
     }
   }

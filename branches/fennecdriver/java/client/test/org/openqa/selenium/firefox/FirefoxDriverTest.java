@@ -20,6 +20,7 @@ package org.openqa.selenium.firefox;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.openqa.selenium.Ignore.Driver.FIREFOX;
@@ -27,6 +28,7 @@ import static org.openqa.selenium.TestWaiter.waitFor;
 import static org.openqa.selenium.WaitingConditions.pageTitleToBe;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,11 +43,13 @@ import org.openqa.selenium.DevMode;
 import org.openqa.selenium.Ignore;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NeedsFreshDriver;
+import org.openqa.selenium.NeedsLocalEnvironment;
 import org.openqa.selenium.NoDriverAfterTest;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.ParallelTestRunner;
 import org.openqa.selenium.ParallelTestRunner.Worker;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.TestUtilities;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -53,10 +57,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.environment.GlobalTestEnvironment;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.io.TemporaryFilesystem;
+import org.openqa.selenium.remote.BrowserConnectivityException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-
+@NeedsLocalEnvironment(reason = "Requires local browser launching environment")
 public class FirefoxDriverTest extends AbstractDriverTestCase {
   public void testShouldContinueToWorkIfUnableToFindElementById() {
     driver.get(pages.formPage);
@@ -69,6 +74,41 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     // Is this works, then we're golden
     driver.get(pages.xhtmlTestPage);
   }
+
+  private static class ConnectionCapturingDriver extends FirefoxDriver {
+    public ExtensionConnection keptConnection;
+
+    public ConnectionCapturingDriver() {
+      super();
+    }
+
+    @Override
+    protected ExtensionConnection connectTo(FirefoxBinary binary, FirefoxProfile profile, String host) {
+      this.keptConnection = super.connectTo(binary, profile, host);
+
+      return keptConnection;
+    }
+  }
+
+  public void testShouldGetMeaningfulExceptionOnBrowserDeath() {
+    if (TestUtilities.isFirefox35(driver)){
+        // This test does not work on firefox 3.5.19 on linux. Seems to be related to 3.5.19 forking child process
+        return;
+    }
+    ConnectionCapturingDriver driver2 = new ConnectionCapturingDriver();
+    driver2.get(pages.formPage);
+
+
+    try {
+      driver2.keptConnection.quit();
+      driver2.get(pages.formPage);
+      fail("Should have thrown.");
+    } catch (BrowserConnectivityException e) {
+      assertThat("Must contain descriptive error", e.getMessage(),
+          containsString("Error communicating with the remote browser"));
+    }
+  }
+
 
   @NeedsFreshDriver
   @Ignore(value = FIREFOX, reason = "Need to figure out how to open a new browser instance mid-test")
@@ -127,11 +167,10 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     }
   }
 
-  public void testShouldBeAbleToStartFromProfileWithLogFileSet() {
+  public void testShouldBeAbleToStartFromProfileWithLogFileSet() throws IOException {
     FirefoxProfile profile = new FirefoxProfile();
-    File destDir =
-        TemporaryFilesystem.getDefaultTmpFS().createTempDir("webdriver", "logging-profile");
-    File logFile = new File(destDir, "firefox.log");
+    File logFile = File.createTempFile("test", "firefox.log");
+    logFile.deleteOnExit();
 
     profile.setPreference("webdriver.log.file", logFile.getAbsolutePath());
 
@@ -145,7 +184,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     }
   }
 
-  @Ignore
+  @Ignore(FIREFOX)
   public void testShouldBeAbleToStartANamedProfile() {
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
 
@@ -492,7 +531,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
     instance.quit();
   }
 
-  public void testAnExceptionThrownIfUsingAQuittedInstance() {
+  public void testAnExceptionThrownIfUsingAQuitInstance() {
     WebDriver instance = newFirefoxDriver();
 
     instance.quit();
@@ -500,7 +539,8 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
       instance.get(pages.xhtmlTestPage);
       fail("Expected an exception to be thrown because the instance is dead.");
     } catch (WebDriverException e) {
-      assertTrue(e.getMessage().contains("cannot be used after quit"));
+      assertTrue("Unexpected exception message:" + e.getMessage(),
+          e.getMessage().contains("It may have died"));
     }
 
   }
@@ -539,7 +579,7 @@ public class FirefoxDriverTest extends AbstractDriverTestCase {
   private WebDriver newFirefoxDriver(FirefoxProfile profile) {
     if (DevMode.isInDevMode()) {
       try {
-        return new FirefoxDriverTestSuite.TestFirefoxDriver(profile);
+        return new SynthesizedFirefoxDriver(profile);
       } catch (Exception e) {
         throw Throwables.propagate(e);
       }

@@ -1,7 +1,7 @@
 ﻿// <copyright file="FirefoxProfile.cs" company="WebDriver Committers">
 // Copyright 2007-2011 WebDriver committers
 // Copyright 2007-2011 Google Inc.
-// Portions copyright 2011 Software Freedom Conservatory
+// Portions copyright 2011 Software Freedom Conservancy
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -447,6 +447,7 @@ namespace OpenQA.Selenium.Firefox
             AddDefaultPreference(prefs, "devtools.errorconsole.enabled", "true");
             AddDefaultPreference(prefs, "dom.disable_open_during_load", "false");
             AddDefaultPreference(prefs, "dom.max_script_run_time", "30");
+            AddDefaultPreference(prefs, "extensions.autoDisableScopes", "10");
             AddDefaultPreference(prefs, "extensions.logging.enabled", "true");
             AddDefaultPreference(prefs, "extensions.update.enabled", "false");
             AddDefaultPreference(prefs, "extensions.update.notifyUser", "false");

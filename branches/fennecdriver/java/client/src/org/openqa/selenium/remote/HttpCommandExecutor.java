@@ -24,6 +24,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
@@ -105,6 +106,8 @@ import static org.openqa.selenium.remote.DriverCommand.GET_SESSION_STORAGE_KEYS;
 import static org.openqa.selenium.remote.DriverCommand.GET_SESSION_STORAGE_SIZE;
 import static org.openqa.selenium.remote.DriverCommand.GET_TITLE;
 import static org.openqa.selenium.remote.DriverCommand.GET_WINDOW_HANDLES;
+import static org.openqa.selenium.remote.DriverCommand.GET_WINDOW_SIZE;
+import static org.openqa.selenium.remote.DriverCommand.GET_WINDOW_POSITION;
 import static org.openqa.selenium.remote.DriverCommand.GO_BACK;
 import static org.openqa.selenium.remote.DriverCommand.GO_FORWARD;
 import static org.openqa.selenium.remote.DriverCommand.HOVER_OVER_ELEMENT;
@@ -119,6 +122,7 @@ import static org.openqa.selenium.remote.DriverCommand.IS_BROWSER_VISIBLE;
 import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_DISPLAYED;
 import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_ENABLED;
 import static org.openqa.selenium.remote.DriverCommand.IS_ELEMENT_SELECTED;
+import static org.openqa.selenium.remote.DriverCommand.LOGS_DRIVER;
 import static org.openqa.selenium.remote.DriverCommand.MOUSE_DOWN;
 import static org.openqa.selenium.remote.DriverCommand.MOUSE_UP;
 import static org.openqa.selenium.remote.DriverCommand.MOVE_TO;
@@ -138,6 +142,9 @@ import static org.openqa.selenium.remote.DriverCommand.SET_LOCATION;
 import static org.openqa.selenium.remote.DriverCommand.SET_SCREEN_ORIENTATION;
 import static org.openqa.selenium.remote.DriverCommand.SET_SCRIPT_TIMEOUT;
 import static org.openqa.selenium.remote.DriverCommand.SET_SESSION_STORAGE_ITEM;
+import static org.openqa.selenium.remote.DriverCommand.SET_WINDOW_POSITION;
+import static org.openqa.selenium.remote.DriverCommand.SET_WINDOW_SIZE;
+import static org.openqa.selenium.remote.DriverCommand.STATUS;
 import static org.openqa.selenium.remote.DriverCommand.SUBMIT_ELEMENT;
 import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_FRAME;
 import static org.openqa.selenium.remote.DriverCommand.SWITCH_TO_WINDOW;
@@ -275,6 +282,10 @@ public class HttpCommandExecutor implements CommandExecutor {
         .put(DELETE_COOKIE, delete("/session/:sessionId/cookie/:name"))
         .put(SWITCH_TO_FRAME, post("/session/:sessionId/frame"))
         .put(SWITCH_TO_WINDOW, post("/session/:sessionId/window"))
+        .put(GET_WINDOW_SIZE, get("/session/:sessionId/window/:windowHandle/size"))
+        .put(GET_WINDOW_POSITION, get("/session/:sessionId/window/:windowHandle/position"))
+        .put(SET_WINDOW_SIZE, post("/session/:sessionId/window/:windowHandle/size"))
+        .put(SET_WINDOW_POSITION, post("/session/:sessionId/window/:windowHandle/position"))
         .put(CLOSE, delete("/session/:sessionId/window"))
         .put(DRAG_ELEMENT, post("/session/:sessionId/element/:id/drag"))
         .put(GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
@@ -337,6 +348,10 @@ public class HttpCommandExecutor implements CommandExecutor {
         .put(TOUCH_LONG_PRESS, post("/session/:sessionId/touch/longclick"))
         .put(TOUCH_FLICK, post("/session/:sessionId/touch/flick"))
 
+        .put(LOGS_DRIVER, post("/session/:sessionId/log"))
+
+        .put(STATUS, get("/status"))
+
         .build();
   }
 
@@ -382,16 +397,23 @@ public class HttpCommandExecutor implements CommandExecutor {
     try {
       return client.execute(targetHost, httpMethod, context);
     } catch (BindException e) {
-      // If we get this, there's a chance we've used all the emphemeral sockets
+      // If we get this, there's a chance we've used all the local ephemeral sockets
       // Sleep for a bit to let the OS reclaim them, then try the request again.
       try {
         Thread.sleep(2000);
       } catch (InterruptedException ie) {
         throw Throwables.propagate(ie);
       }
-
-      return client.execute(targetHost, httpMethod, context);
+    } catch (NoHttpResponseException e) {
+      // If we get this, there's a chance we've used all the remote ephemeral sockets
+      // Sleep for a bit to let the OS reclaim them, then try the request again.
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException ie) {
+        throw Throwables.propagate(ie);
+      }
     }
+    return client.execute(targetHost, httpMethod, context);
   }
 
   private void setAcceptHeader(HttpUriRequest httpMethod) {
@@ -404,6 +426,16 @@ public class HttpCommandExecutor implements CommandExecutor {
       return response;
     }
 
+    try {
+      // Make sure that the previous connection is freed.
+      HttpEntity httpEntity = response.getEntity();
+      if (httpEntity != null) {
+        EntityUtils.consume(httpEntity);
+      }
+    } catch (IOException e) {
+      throw new WebDriverException(e);
+    }
+
     if (redirectCount > MAX_REDIRECTS) {
       throw new WebDriverException("Maximum number of redirects exceeded. Aborting");
     }
@@ -412,12 +444,6 @@ public class HttpCommandExecutor implements CommandExecutor {
     URI uri;
     try {
       uri = buildUri(context, location);
-
-      // Make sure that the previous connection is freed.
-      HttpEntity httpEntity = response.getEntity();
-      if (httpEntity != null) {
-        EntityUtils.consume(httpEntity);
-      }
 
       HttpGet get = new HttpGet(uri);
       setAcceptHeader(get);
@@ -454,17 +480,18 @@ public class HttpCommandExecutor implements CommandExecutor {
     private final String charSet;
     private final byte[] content;
 
-    EntityWithEncoding(HttpEntity entity)
-        throws IOException {
-      if (entity != null) {
-        content = EntityUtils.toByteArray(entity);
-        charSet = EntityUtils.getContentCharSet(entity);
+    EntityWithEncoding(HttpEntity entity) throws IOException {
+      try {
+        if (entity != null) {
+          content = EntityUtils.toByteArray(entity);
+          charSet = EntityUtils.getContentCharSet(entity);
+        } else {
+          content = new byte[0];
+          charSet = null;
+        }
+      } finally {
         EntityUtils.consume(entity);
-      } else {
-        content = new byte[0];
-        charSet = null;
       }
-
     }
 
     public String getContentString()
@@ -584,7 +611,8 @@ public class HttpCommandExecutor implements CommandExecutor {
 
     public HttpUriRequest getMethod(URL base, Command command) {
       StringBuilder urlBuilder = new StringBuilder();
-      urlBuilder.append(base.toExternalForm());
+
+      urlBuilder.append(base.toExternalForm().replaceAll("/$", ""));
       for (String part : url.split("/")) {
         if (part.length() == 0) {
           continue;

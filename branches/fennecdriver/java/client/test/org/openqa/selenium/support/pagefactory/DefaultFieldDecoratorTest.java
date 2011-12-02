@@ -37,6 +37,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import org.jmock.Expectations;
@@ -53,8 +54,16 @@ public class DefaultFieldDecoratorTest extends MockTestBase {
   @SuppressWarnings("unused") private WebElement element1;
   @SuppressWarnings("unused") private WebElement element2;
   @SuppressWarnings("unused") private List<WebElement> list1;
-  @SuppressWarnings("unused") private List<WebElement> list2;
+  @SuppressWarnings("unused") private List<Object> list2;
   @SuppressWarnings("unused") private Integer num;
+
+  @SuppressWarnings("unused")
+  @FindBy(tagName = "div")
+  private List<WebElement> list3;
+
+  @SuppressWarnings("unused")
+  @FindBys({@FindBy(tagName = "div"), @FindBy(tagName = "a")})
+  private List<WebElement> list4;
 
   private FieldDecorator createDecoratorWithNullLocator() {
     return new DefaultFieldDecorator(new ElementLocatorFactory() {
@@ -81,14 +90,25 @@ public class DefaultFieldDecoratorTest extends MockTestBase {
   }
 
   @Test
-  public void decoratesWebElementList() throws Exception {
+  public void decoratesAnnotatedWebElementList() throws Exception {
+    FieldDecorator decorator = createDecoratorWithDefaultLocator();
+    assertThat(decorator.decorate(getClass().getClassLoader(),
+        getClass().getDeclaredField("list3")),
+        is(notNullValue()));
+    assertThat(decorator.decorate(getClass().getClassLoader(),
+        getClass().getDeclaredField("list4")),
+        is(notNullValue()));
+  }
+
+  @Test
+  public void doesDecorateNonAnnotatedWebElementList() throws Exception {
     FieldDecorator decorator = createDecoratorWithDefaultLocator();
     assertThat(decorator.decorate(getClass().getClassLoader(),
         getClass().getDeclaredField("list1")),
         is(notNullValue()));
     assertThat(decorator.decorate(getClass().getClassLoader(),
         getClass().getDeclaredField("list2")),
-        is(notNullValue()));
+        is(nullValue()));
   }
 
   @Test
