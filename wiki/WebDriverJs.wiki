@@ -31,7 +31,7 @@ Once both targets have compiled, start the server, launch node, and start writin
 {{{
 $ java -jar build/java/server/src/org/openqa/selenium/server/server-standalone.jar &
 $ node
-> var webdriver = require('./build/javascript/webdriver-jsapi/webdriver');
+> var webdriver = require('./build/javascript/webdriver/webdriver');
 > var driver = new webdriver.Builder().
     usingServer('http://localhost:4444/wd/hub').
     withCapabilities({
@@ -42,8 +42,8 @@ $ node
     }).
     build();
 > driver.get('http://www.google.com');
-> driver.findElement(By.name('q')).sendKeys('webdriver');
-> driver.findElement(By.name('btnG')).click();
+> driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
+> driver.findElement(webdriver.By.name('btnG')).click();
 > driver.getTitle().then(function(title) {
   require('assert').equal('webdriver - Google Search', title);
 });
