@@ -28,7 +28,8 @@ The following system properties (read using {{{System.getProperty()}}} and set u
 || webdriver.firefox.port || ? ||
 || webdriver.firefox.profile || The name of the profile to use when starting firefox. This defaults to webdriver creating an anonymous profile ||
 || webdriver.firefox.useExisting || *Never use in production* Use a running instance of firefox if one is present ||
-|| webdriver.log.file || ? ||
+|| webdriver.log.file || Log file to dump javascript console logging to ||
+|| webdriver.firefox.logfile || Log file to dump firefox stdout/stderr to ||
 || webdriver.reap_profile || Should be "true" if temporary files and profiles should not be deleted ||
 
 Normally the Firefox binary is assumed to be in the default location for your particular operating system:
