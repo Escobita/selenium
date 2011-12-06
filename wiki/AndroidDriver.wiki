@@ -408,4 +408,4 @@ $adb uninstall org.openqa.selenium.android.app/.MainActivity
 You can also uninstall an app manually, by opening the Settings -> Applications -> select WebDriver -> Uninstall.
 
 === X compatibility ===
-Note: The android emulator is not compatible with xvfb, and will not run in it.  If you need a headless X environment, tightvncserver may help.
+Note: The android emulator is not compatible with xvfb, and will not run in it.  If you need a headless X environment, run your emulator with the -no-window option, or use tightvncserver.
