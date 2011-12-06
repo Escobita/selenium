@@ -97,6 +97,7 @@ Useful parameters:
 || debug || Enable the java remote debugger when starting JVMs for tests.  Useful in conjunction with suspend. Default is false. Default debugger port is 5005. || ./go test_firefox suspend=true debug=true ||
 || offline || If set, don't try to download any components from the internet (e.g. the gecko sdk). Default is false. || ./go test_firefox offline=true ||
 || leaverunning || If set the browser window will not be closed after the last test. || ./go test_firefox leaverunning=true ||
+|| headless || Only applies to the android emulator.  If set, the android emulator window will not be opened (and so the test run will not require an X display) || ./go test_android headless=true ||
 
 For Javascript:
 
