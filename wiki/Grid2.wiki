@@ -126,3 +126,18 @@ maxInstances={maximum number of browsers of this type}
 platform={WINDOWS, LINUX, MAC}
 
  * -registerCycle = how often in ms the node will try to register itself again.Allow to restart the hub without having to restart the nodes.
+
+==Hub diagnostic messages==
+Upon detecting anomalious usage patterns, the hub can give the following message:
+{{{
+Client requested session XYZ that was terminated due to REASON
+}}}
+
+|| *Reason* || *Cause/fix* ||
+|| TIMEOUT || The node timed out because the client did not access it within the timeout. If the client has been somehow suspended, this may happen when it wakes up ||
+|| ORPHAN || A client waiting in queue has given up once it was offered the node ||
+|| CLIENT_STOPPED_SESSION || The session was stopped using an ordinary call to stop/quit on the client. Why are you using it again?? ||
+|| CLIENT_GONE || The client process appears to have died or otherwise not responded to our requests, intermittent network issues likely cause ||
+|| FORWARDING_TO_NODE_FAILED || The hub was unable to forward to the node. Out of memory errors/node stability issues or network problems ||
+|| CREATIONFAILED || The node failed to create the browser. This can typically happen when there are environmental/configuration problems on the node. Try using the node directly to track problem. ||
+|| PROXY_REREGISTRATION || The session has been discarded because the node has re-registered on the grid (in mid-test) ||
