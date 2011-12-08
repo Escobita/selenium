@@ -279,7 +279,7 @@ $./go android_server
 }}}
    * To build the library
 {{{
-$./go //android/library/src/java/org/openqa/selenium/android:android-library
+$./go //android/library/src/java/org/openqa/selenium/android:android_library
 }}}
    * To run the tests
 {{{
