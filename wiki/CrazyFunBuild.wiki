@@ -136,6 +136,20 @@ The following attributes are commonly used:
 || srcs || array || As above ||
 || deps || array || As above ||
 
+== js_test ==
+
+  * *Output:* 
+  * *Implicit Targets:* _BROWSER:run, run
+  * *Required Attributes:* None.
+
+|| *Attribute Name* || *Type* || *Meaning* ||
+|| deps || array || As above. ||
+|| srcs || array || As above. ||
+|| path || string || The path at which to expect the test files to be hosted on the test server. ||
+|| browsers || array || List of browsers, from rake_tasks/browsers.rb, to run the tests in.  Will only attempt to run tests in those browsers which are available on the system.  If absent, defaults to all browsers on the system. ||
+
+Assuming browsers = ['ff', 'chrome'], for target //foo, the implicit targets: //foo_ff:run and //foo_chrome:run will be generated, which run the tests in each of those browsers, and the implicit target //foo:run will be generated, which runs the tests in both ff and chrome.
+
 == rake_task ==
 
   * *Output:* A crazy fun build rule that can be referred to "blow the escape" hatch and use ordinary rake targets.
