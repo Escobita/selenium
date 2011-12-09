@@ -139,7 +139,7 @@ The following attributes are commonly used:
 == js_test ==
 
   * *Output:* 
-  * *Implicit Targets:* _BROWSER:run, run
+  * *Implicit Targets:* `_`BROWSER:run, run
   * *Required Attributes:* None.
 
 || *Attribute Name* || *Type* || *Meaning* ||
