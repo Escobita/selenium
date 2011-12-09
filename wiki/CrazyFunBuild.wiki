@@ -156,6 +156,21 @@ The following attributes are commonly used:
 
 Assuming browsers = ['ff', 'chrome'], for target //foo, the implicit targets: //foo_ff:run and //foo_chrome:run will be generated, which run the tests in each of those browsers, and the implicit target //foo:run will be generated, which runs the tests in both ff and chrome.
 
+== py_test ==
+
+  * *Output:* Creates the directory structure required to run the listed python tests.
+  * *Implicit Targets:* `_`BROWSER:run, run
+  * *Required Attributes:* name.
+
+|| *Attribute Name* || *Type* || *Meaning* ||
+|| deps || array || Other py_test rule(s), whose tests should also be run. ||
+|| common_tests || array || Test file(s) to be run in all browsers.  These tests will be passed through a template, with browser-specific substitutions, so that they are laid out properly for each browser in the python output file tree. ||
+|| BROWSER_specific_tests || array || Test file(s) to be run only in browser BROWSER. ||
+|| resources || array || Resources which should be copied to the python directory structure. ||
+|| browsers || array || List of browsers, from rake_tasks/browsers.rb, to run the tests in.  Will only attempt to run tests in those browsers which are available on the system.  If absent, defaults to all browsers on the system. ||
+
+Note: Every py_test invocation is performed in a new virtualenv.
+
 == rake_task ==
 
   * *Output:* A crazy fun build rule that can be referred to "blow the escape" hatch and use ordinary rake targets.
