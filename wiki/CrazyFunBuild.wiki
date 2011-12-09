@@ -48,6 +48,12 @@ Each target specified in a "build.desc" file produces one and only one output. T
 
 Take a look at the "deps" section of the "single" target above. The {{{":tests"}}} is a reference to a target in the current "build.desc" file, in this case, it's a "java_library" target immediately above. You'll also see that there's a reference to several full paths. For example {{{"//java/server/src/org/openqa/selenium/server"}}} This refers to another target defined in a crazy fun build.desc file.
 
+== Browsers ==
+
+The py_test and js_test rules have special handling for running the same tests in multiple browsers.  Relevant browser-specific meta-data is held in rake-tasks/browsers.rb.  The general way to use this is to append `_`browsername to the target name; without the `_`browsername suffix, the tests will be run for all browsers.
+
+As an example, if we had a js_test rule //foo/bar, we would run its tests in firefox by running the target //foo/bar_ff:run or we would run in all available browsers by running the target //foo/bar:run
+
 = Build Targets = 
 
 Being a brief description of the available targets that you can use.
