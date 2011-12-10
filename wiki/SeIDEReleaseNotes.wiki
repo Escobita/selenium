@@ -1,13 +1,19 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
-==upcoming release==
+==1.5.0==
 
-   * Bug - Fixed 'break' command (#725)
-   * Bug - Source view is monospace now (#522)
-   * New - Implemented 'select' formatting for WebDriver bindings (Java, C#, Python, Ruby)
-   * Bug - Fixed compile-time and run-time errors in the code formatted for WebDriverBackedSelenium
-   * Bug - Fixed 'baseUrl' and 'get' formatting errors in various formatters to handle relative and absolute URLs
+*Note:* This version has not yet been officially released, however a snapshot is available for testing [http://xserve.openqa.org:8085/browse/IDE-EDITOR-210/artifact/MULTI/Selenium-IDE/selenium-ide.xpi here]. If you find any issues please check if they've already been reported in our [http://code.google.com/p/selenium/issues/list?can=2&q=Component%3DIDE issue tracker]. If not, please [http://code.google.com/p/selenium/issues/entry raise a new issue].
+
+  * New - Added support for Firefox 9
+  * Bug - Changes to user extensions weren't being updated in Firefox 8 - issue 2801
+  * Bug - Security error was thrown when trying to type into file (upload) input fields in Firefox 8 - issue 2826
+  * Bug - Improved French locale - issue 1912
+  * Bug - break command was failing - issue 725
+  * Bug - source view is now fixed width (monospace) - issue 522
+  * New - Implemented 'select' formatting for WebDriver bindings (Java, C#, Python, Ruby)
+  * Bug - Fixed compile-time and run-time errors in the code formatted for WebDriverBackedSelenium
+  * Bug - Fixed 'baseUrl' and 'get' formatting errors in various formatters to handle relative and absolute URLs
 
 ==1.4.1==
 
