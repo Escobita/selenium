@@ -3,7 +3,7 @@
 
 ==1.5.0==
 
-*Note:* This version has not yet been officially released, however a snapshot is available for testing [http://xserve.openqa.org:8085/browse/IDE-EDITOR-210/artifact/MULTI/Selenium-IDE/selenium-ide.xpi here]. If you find any issues please check if they've already been reported in our [http://code.google.com/p/selenium/issues/list?can=2&q=Component%3DIDE issue tracker]. If not, please [http://code.google.com/p/selenium/issues/entry raise a new issue].
+*Note:* This version has not yet been officially released, however a snapshot is available for testing [http://xserve.openqa.org:8085/browse/IDE-EDITOR-211/artifact/MULTI/Selenium-IDE/selenium-ide.xpi here]. If you find any issues please check if they've already been reported in our [http://code.google.com/p/selenium/issues/list?can=2&q=Component%3DIDE issue tracker]. If not, please [http://code.google.com/p/selenium/issues/entry raise a new issue].
 
   * New - Added support for Firefox 9
   * Bug - Changes to user extensions weren't being updated in Firefox 8 - issue 2801
