@@ -407,7 +407,7 @@ $adb uninstall org.openqa.selenium.android.app/.MainActivity
 
 You can also uninstall an app manually, by opening the Settings -> Applications -> select WebDriver -> Uninstall.
 
-== Can't access the Android WebDriver Server from another machine ==
+== Can't access the Android WebDriver server from another machine ==
 
 If you want to access the Android WebDriver server from another machine (or an interface which isn't localhost), do the following after doing the port forwarding:
 
