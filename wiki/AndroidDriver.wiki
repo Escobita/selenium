@@ -407,5 +407,18 @@ $adb uninstall org.openqa.selenium.android.app/.MainActivity
 
 You can also uninstall an app manually, by opening the Settings -> Applications -> select WebDriver -> Uninstall.
 
+== Can't access the Android WebDriver Server from another machine ==
+
+If you want to access the Android WebDriver server from another machine (or an interface which isn't localhost), do the following after doing the port forwarding:
+
+{{{
+# Instal socat, one time setup
+$sudo apt-get install socat
+
+$socat TCP-LISTEN:8081,fork TCP:localhost:8080
+}}}
+
+Now the Android WebDriver server can be accessed from http://hostname:8081/wd/hub from any machine or network interface.
+
 === X compatibility ===
 Note: The android emulator is not compatible with xvfb, and will not run in it.  If you need a headless X environment, run your emulator with the -no-window option, or use tightvncserver.
