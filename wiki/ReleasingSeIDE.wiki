@@ -18,15 +18,27 @@ The steps to releasing Se-IDE (because I keep forgetting something)
   # Wait for build
   # Download build from bamboo
   # Do a quick test
-  # Upload final xpi to /tmp on releases.seleniumhq.org
-  # Become the release user (sudo su - release) and copy release.openqa.org/htdocs/selenium-ide/x.y.z 
-  # update website release page
-  # test download
-  # update update.rdf
-  # test upgrade
-  # update release notes
+  # Upload XPIs to release.seleniumhq.org
+    # SFTP to www.openqa.org and upload all XPIs from the Bamboo build used for the release
+    # SSH to www.openqa.org
+    # Copy all XPIs to /tmp
+    # Switch to the release user (sudo su - release)
+    # Copy the XPIs to the relevant locations in release.openqa.org/htdocs/selenium-ide
+  # Update download page on seleniumhq.org with new release details
+  # Test download
+  # Add the release to the update.rdf files the IDE iteself and all bundled plugins
+    # Add a new `<RDF:li>` at the top for the new release
+    # Make sure the following are correct
+      * `<em:version>` matches the new version number
+      * `<em:maxVersion>` matches the Firefox version support
+      * `<em:updateLink>` matches the download link for XPI
+      * `<em:updateHash>` is the correct hash for the XPI
+        * You can generate this using: openssl md5 -sha1 `<file>`
+        * Note that for the IDE the hash is of the multi-xpi
+  # Test upgrade
+  # Update release notes
   # close out issues in the tracker
-  # announce
+  # Announce
   # merge your changes from the branch to trunk so a reversion exists with just the clean version
   # increment the version with -SNAPSHOT
   # disable branch build in bamboo
