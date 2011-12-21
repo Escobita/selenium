@@ -69,7 +69,7 @@ A: The InternetExplorerDriver requires that all security domains are set to the 
 
 {{{
 DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
-capabilities.set(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
 WebDriver driver = new InternetExplorerDriver(capabilities);
 }}}
 
