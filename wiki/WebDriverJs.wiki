@@ -51,7 +51,7 @@ $ node
 
 === In the Browser ===
 
-In addition to node, WebDriverJS may also be used directly in the browser. When running in a browser, WebDriverJS communicates with the !WebDriver server using the same [JsonWireProtocol protocol] as the other language bindings. While the !WebDriver client is not bound by a security sandbox when running in node, it will be bound by the [http://www.google.com/url?q=http://www.w3.org/Security/wiki/Same_Origin_Policy same origin policy] in a browser. In order to communicate with a !WebDriver server which may be on a different domain, the client will select the most appropriate mechanism based on the capabilities of the current browser: [#Cross-Origin_Resource_Sharing cross-origin resource sharing] or [#JSONP JSONP]. This selection is handled by the `Builder`:
+In addition to node, WebDriverJS may also be used directly in the browser.  In order to communicate with a !WebDriver server which may be on a different domain, the client uses a modified version of the JsonWireProtocol and [#Cross-Origin_Resource_Sharing cross-origin resource sharing]:
 
 {{{
 <!DOCTYPE html>
@@ -109,9 +109,9 @@ After starting the server, open a browser to the !WebDriver control panel: `http
 
 WebDriverJS is supported in the following browsers:
  * IE 8+
- * Firefox 3.6+
+ * Firefox 4+
  * Chrome 12+
- * Opera 11.51+
+ * Opera 12.0a+
  * Android 4.0+
 
 == Design Details ==
@@ -224,11 +224,11 @@ driver.getTitle();
 
 === Communicating with the Server ===
 
-WebDriverJS communicates with the !WebDriver server using the same [JsonWireProtocol protocol] as the other language bindings. When running in a server-side environment, the client is not bound by a security sandbox and may use a simple HTTP client to send commands (eg, node's [http://nodejs.org/docs/v0.6.0/api/http.html#http.ClientRequest http.ClientRequest]). When running inside a browser, however, the WebDriverJS client will be bound by the [http://www.w3.org/Security/wiki/Same_Origin_Policy same origin policy]. In order to communicate with a server which may be on a different domain, the client will select the most appropriate mechanism based on the capabilities of the current browser: cross-origin resource sharing or JSONP.
+When running in a server-side environment, the client is not bound by a security sandbox and may use a simple HTTP client to send commands (eg, node's [http://nodejs.org/docs/v0.6.0/api/http.html#http.ClientRequest http.ClientRequest]). When running inside a browser, however, the WebDriverJS client will be bound by the [http://www.w3.org/Security/wiki/Same_Origin_Policy same origin policy]. In order to communicate with a server which may be on a different domain, the WebDriverJS client will use a modified version of the JsonWireProtocol and cross-origin resource sharing.
 
 ==== Cross-Origin Resource Sharing ====
 
-If a browser supports [http://www.w3.org/TR/cors/ cross-origin resource sharing] (CORS), WebDriverJS will use cross-origin XMLHttpRequests to send commands to the server. Servers that wish to support WebDriverJS via CORS must respond to preflight requests (identified by requests with an `Origin` header) with the appropriate access-control headers:
+If a browser supports [http://www.w3.org/TR/cors/ cross-origin resource sharing] (CORS), WebDriverJS will use cross-origin XMLHttpRequests to send commands to the server. Servers that wish to support WebDriverJS via CORS must respond to preflight requests (identified by `OPTIONS` requests with an `Origin` header) with the appropriate access-control headers:
 
 {{{
 Access-Control-Origin: *
@@ -236,33 +236,33 @@ Access-Control-Allow-Methods: DELETE,GET,HEAD,POST
 Access-Control-Allow-Headers: Accept,Content-Type
 }}}
 
-As of this writing, CORS is supported by Firefox 4+, Chrome 12+, Safari 4+, Mobile Safari 3.2+, and Android 2.1+.  While IE8 and IE9 partially support CORS using the [http://www.google.com/url?q=http%3A%2F%2Fmsdn.microsoft.com%2Fen-us%2Flibrary%2Fcc288060(v%3Dvs.85).aspx&sa=D&sntz=1&usg=AFQjCNFAy9IwwS1SmIYBIogaHo3rD96-Nw XDomainRequest] object, it is, by design, [http://www.google.com/url?q=http%3A%2F%2Fblogs.msdn.com%2Fb%2Fieinternals%2Farchive%2F2010%2F05%2F13%2Fxdomainrequest-restrictions-limitations-and-workarounds.aspx&sa=D&sntz=1&usg=AFQjCNF5quaFXbf77M4mCa-3c2XRDexVsA less capable] than its XMLHttpRequest counterpart. The XDomainRequest is only capable of sending requests that could be sent by a standard HTML form. This limits IE to sending GET and POST requests (the wire protocol requires support for DELETE requests).  Furthermore, the wire protocol dictates that [JsonWireProtocol#Failed_Commands command failures] be returned to the client as HTTP/1.1 500 responses, with the failure details encoded in a JSON message. Upon receiving a 500 response, the XDomainRequest object would fire its onerror handler, but without the details returned by the server. For these reasons, with respect to WebDriverJS, IE is considered to _not_ support CORS.
+As of this writing, CORS is supported by Firefox 4+, Chrome 12+, Safari 4+, Mobile Safari 3.2+, and Android 2.1+, Opera 12.0a, and IE8+.  Unfortunately, the various browser's implementations are inconsistent and not all adhere to the W3C specification.
+ * IE's [http://www.google.com/url?q=http%3A%2F%2Fmsdn.microsoft.com%2Fen-us%2Flibrary%2Fcc288060(v%3Dvs.85).aspx&sa=D&sntz=1&usg=AFQjCNFAy9IwwS1SmIYBIogaHo3rD96-Nw XDomainRequest] object is, by design, [http://www.google.com/url?q=http%3A%2F%2Fblogs.msdn.com%2Fb%2Fieinternals%2Farchive%2F2010%2F05%2F13%2Fxdomainrequest-restrictions-limitations-and-workarounds.aspx&sa=D&sntz=1&usg=AFQjCNF5quaFXbf77M4mCa-3c2XRDexVsA less capable] than its XMLHttpRequest counterpart. The XDomainRequest is only capable of sending requests that could be sent by a standard HTML form. This limits IE to sending GET and POST requests (the wire protocol requires support for DELETE requests).
+ * WebKit's implementation of CORS currently forbids redirects on cross-domain requests, even if the access-control headers are properly set.
+ * If the server returns an error response (4xx or 5xx), IE and Opera's implementations will fire the XDomainRequest/XMLHttpRequest object's onerror handler, but without the text of the server's response. This renders IE and Opera incapable of handling failures in the standard JSON protocol.
 
-==== JSONP ====
-
-In order to support browsers without CORS (ie, IE and Opera), a non-standard command shall be added to the [JsonWireProtocol JSON wire protocol]. This command, which is summarized below, need only be implemented by servers that wish to support WebDriverJS via JSONP.
+To compensate for these short-comings, when running in a browser, WebDriverJS will use a modified version of the JsonWireProtocol and route all commands through the `/xdrpc` end-point.
 
 ----
 <dl>
 <dd>
-==== GET /jsonp ====
+==== POST /xdrpc ====
 </dd>
 <dd>
 <dl>
-<dd>Serves as a proxy for another command, which shall be encoded in the query data for this command. The encoded command's result shall be returned to the client as a !JavaScript snippet that invokes the specified global callback function.</dd>
+<dd>Serves as a proxy for another command, which shall be encoded in the JSON body for this command.  The encoded command's result shall always be returned as a standard [JsonWireProtocol#Responses response] object in a HTTP 200 response. Client's must rely on the response's `status` field to determine whether the command [JsonWireProtocol#Response_Status_Codes succeeded].</dd>
 <dd>
 <dl>
-<dt>*Query Parameters:*</dt>
-<dd>`method` - The HTTP method for the encoded command.</dd>
-<dd>`path` - The path for the command.</dd>
-<dd>`body` - A stringified JSON object with the parameters for the encoded command This may be omitted for non-POST commands.</dd>
-<dd>`callback` - The name of the global !JavaScript function that should be invoked with the command response.</dd>
+<dt>*JSON Parameters:*</dt>
+<dd>`method` - `{string}` The HTTP method for the encoded command.</dd>
+<dd>`path` - `{string}` The path for the command.</dd>
+<dd>`data` - `{Object}` The JSON parameters for the encoded command.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
-<dd>`{string}` A !JavaScript snippet that invokes the command `callback` with the encoded command's [JsonWireProtocol#Responses JSON response].</dd>
+<dd>`{*}` The command result.</dd>
 </dl>
 </dd>
 </dl>
@@ -270,14 +270,18 @@ In order to support browsers without CORS (ie, IE and Opera), a non-standard com
 </dl>
 ----
 
-As an example, consider the following `/jsonp` command:
+As an example, consider the following `/xdrpc` command:
 
 {{{
-GET /jsonp?method=POST&path=/session/123/element/0a/element&body={"using":"id","value":"foo"}&callback=myCallback HTTP/1.1
-Accept: */*
+POST /xdrpc HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Content-Length: 94
+
+{"method":"POST","path":"/session/123/element/0a/element","data":{"using":"id","value":"foo"}}
 }}}
 
-The JSONP handler should decode this command and re-dispatch it as:
+The server should decode this command and re-dispatch it as:
 
 {{{
 POST /session/123/element/0a/element HTTP/1.1
@@ -288,23 +292,14 @@ Content-Length: 28
 {"using":"id","value":"foo"}
 }}}
 
-The JSONP handler would intercept the response and return it to the client as a !JavaScript invocation instead of pure JSON:
+The command's response would be returned as a standard JSON response, even if it failed:
 
 {{{
 HTTP/1.1 200 OK
-Content-Type: text/javascript
-Content-Length: 51
+Content-Type: application/json
+Content-Length: 60
 
-myCallback({"status":0,"value":{"ELEMENT":"1fa"}});
-}}}
-
-==== Command Caching ====
-
-Any GET-based command sent by a browser-based WebDriverJS client will be susceptible to undesired caching. To prevent this, the client should append a "cache-buster" to each request URL (`'cacheBuster=' + new Date().getTime()`). Likewise, WebDriverJS-compatible servers should include no-cache directives on all GET responses.
-
-{{{
-Cache-Control: no-cache
-Expires: Thu, 01 Jan 1970 00:00:00 GMT
+{"status":7,"value":{"message":"Unable to locate element."}}
 }}}
 
 == Future Work ==
