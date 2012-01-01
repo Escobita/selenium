@@ -209,9 +209,16 @@ driver.findElement(By.id("userPreferences")).click();
 
 Since every WebDriverJS action executes asynchronously, you cannot use try-catch blcoks. Instead, you must register _errbacks_ on the promised result of teh command in question. Each errback may either throw another Error, in which case it will be passed to the next errback in the chain or it may return a different value to suppress the error and switch back to the callback processing chain.
 
-If a rejected promise (not just those from !WebDriver commands) is not handled by an errback handler, that error will propagate to the parent frame's errback chain. If an error makes its way to the top frame without being suppressed, the promise manager will dispatch an `uncaughtException` event, discarding all other commands that have been queued:
+If a rejected promise (not just those from !WebDriver commands) is not handled by an errback handler, that error will propagate to the parent frame's errback chain. If an error makes its way to the top frame without being suppressed, the promise manager will either dispatch an `uncaughtException` event (if a listener is currently registered), or re-throw the error to the global error handler. In either case, the promise manager will discard all other commands that have been queued:
 
 {{{
+// Register an event listener to be notified whenever there is an unhandled error.
+webdriver.promise.Application.
+    getInstance().
+    on('uncaughtException', function(e) {
+      console.error('There was an uncaught exception: ' + e.message);
+    });
+
 driver.switchTo().window('foo').then(null, function(e) {
   // Ignore NoSuchWindow errors. Let any others bubble up.
   if (e.code !== bot.ErrorCode.NO_SUCH_WINDOW) {
@@ -244,6 +251,8 @@ As of this writing, CORS is supported by Firefox 4+, Chrome 12+, Safari 4+, Mobi
 To compensate for these short-comings, when running in a browser, WebDriverJS will use a modified version of the JsonWireProtocol and route all commands through the `/xdrpc` end-point.
 
 ----
+=== /xdrpc ===
+
 <dl>
 <dd>
 ==== POST /xdrpc ====
