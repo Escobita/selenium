@@ -31,8 +31,10 @@ Once both targets have compiled, start the server, launch node, and start writin
 {{{
 $ java -jar build/java/server/src/org/openqa/selenium/server/server-standalone.jar &
 $ node
-> var webdriver = require('./build/javascript/webdriver/webdriver');
-> var driver = new webdriver.Builder().
+
+var webdriver = require('./build/javascript/webdriver/webdriver');
+
+var driver = var driver = new webdriver.Builder().
     usingServer('http://localhost:4444/wd/hub').
     withCapabilities({
       'browserName': 'chrome',
@@ -41,12 +43,16 @@ $ node
       'javascriptEnabled': true
     }).
     build();
-> driver.get('http://www.google.com');
-> driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
-> driver.findElement(webdriver.By.name('btnG')).click();
-> driver.getTitle().then(function(title) {
+
+driver.get('http://www.google.com');
+driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
+driver.findElement(webdriver.By.name('btnG')).click();
+driver.getTitle().then(function(title) {
   require('assert').equal('webdriver - Google Search', title);
+
 });
+
+driver.quit();
 }}}
 
 === In the Browser ===
@@ -57,15 +63,16 @@ In addition to node, WebDriverJS may also be used directly in the browser.  In o
 <!DOCTYPE html>
 <script src="webdriver.js"></script>
 <script>
-  var driver = new webdriver.Builder().
-      usingServer('http://localhost:4444/wd/hub').
-      withCapabilities({
-        'browserName': 'chrome',
-        'version': '',
-        'platform': 'ANY',
-        'javascriptEnabled': true
-      }).
-      build();
+  var client = new webdriver.http.CorsClient('http://localhost:4444/wd/hub');
+  var executor = new webdriver.http.Executor(client);
+
+  // Launches a new browser, which can be controlled by this script.
+  var driver = webdriver.WebDriver.createSession(executor, {
+    'browserName': 'chrome',
+    'version': '',
+    'platform': 'ANY',
+    'javascriptEnabled': true
+  });
 
   driver.get('http://www.google.com');
   driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
@@ -76,10 +83,14 @@ In addition to node, WebDriverJS may also be used directly in the browser.  In o
           'Expected "webdriver - Google Search", but was "' + title + '"');
     }
   });
+
+  driver.quit();
 </script>
 }}}
 
-One of the advantages to running WebDriverJS in the browser is that WebDriverJS can control the browser running the script, as long as the URL for the server and session ID for the browser are known. While the URL and session may be passed to the builder directly, they may also be defined using the `wdurl` and `wdsid` "environment variables", which are parsed from the loading page's URL query data:
+==== Controlling the Host Browser ====
+
+Launching a browser to run a !WebDriver test against another browser is a tad redundant (compared to simply using [WebDriverJs#Node node]).  Instead, using WebDriverJS in the browser is intended for automating the browser actually running the script. This can be accomplished as long as the URL for the server and session ID for the browser are known. While these values may be passed to the builder directly, they may also be defined using the `wdurl` and `wdsid` "environment variables", which are parsed from the loading page's URL query data:
 
 {{{
 <!-- Assuming HTML URL is /test.html?wdurl=http://localhost:4444/wd/hub&wdsid=foo1234 -->
@@ -87,7 +98,9 @@ One of the advantages to running WebDriverJS in the browser is that WebDriverJS 
 <script src="webdriver.js"></script>
 <input id="input" type="text"/>
 <script>
+  // Attaches to the server and session controlling this browser.
   var driver = new webdriver.Builder().build();
+
   var input = driver.findElement(webdriver.By.tagName('input'));
   input.sendKeys('foo bar baz').then(function() {
     assertEquals('foo bar baz',
@@ -95,6 +108,30 @@ One of the advantages to running WebDriverJS in the browser is that WebDriverJS 
   });
 </script>
 }}}
+
+===== Caveats =====
+
+There are a few caveats to using WebDriverJS in the browser. First, the `webdriver.Builder` class may _only be used to attach to an existing session_. In order to create a new session, you must manually create a session, as shown in the first [WebDriverJs#In_the_Browser browser-based] example.  Second, there are commands which may impact the page running the WebDriverJS script.
+
+ * `webdriver.WebDriver#quit`: The `quit` command will terminate the entire browser process, including the window running WebDriverJS.  Do not use this command unless you are absolutely sure you want to lose everything.
+
+ * `webdriver.WebDriver#get`: !WebDriver is designed to emulate a user as closely as possible. This means that regardless of which frame a !WebDriver client is currently focused on, navigation commands (e.g., `driver.get(url)`) always target the top-most frame. When controlling its host browser, a WebDriverJS script could navigate away from itself by issuing a `WebDriver.get` command while focused on its own window. If you wish to automate the host browser and still navigate between pages, focus your !WebDriver client on a second window (this is similar in concept to Selenium RC's multi-window mode):
+
+{{{
+<!DOCTYPE html>
+<script src="webdriver.js"></script>
+<script>
+  var testWindow = window.open('', 'slave');
+
+  var driver = new webdriver.Builder().build();
+  driver.switchTo().window('slave');
+  driver.get('http://www.google.com');
+  driver.findElement(webdriver.By.name('q')).sendKeys('webdriver');
+  driver.findElement(webdriver.By.name('btnG')).click(); 
+</script>
+}}}
+
+==== Debugging Tests ====
 
 You can debug a WebDriverJS test in the browser using !WebDriver's stand alone server:
 
@@ -196,7 +233,7 @@ This test case could be rewritten using !WebDriver's Java API as follows:
 
 {{{
 driver.get(MY_APP_URL);
-if (driver.getTitle().equals("Login Page")) {
+if ("Login Page".equals(driver.getTitle())) {
   driver.findElement(By.id("user")).sendKeys("bugs");
   driver.findElement(By.id("pw")).sendKeys("bunny");
   driver.findElement(By.id("login")).click();
