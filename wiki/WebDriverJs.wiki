@@ -88,7 +88,7 @@ One of the advantages to running WebDriverJS in the browser is that WebDriverJS 
 <input id="input" type="text"/>
 <script>
   var driver = new webdriver.Builder().build();
-  var input = driver.findElement(By.tagName('input'));
+  var input = driver.findElement(webdriver.By.tagName('input'));
   input.sendKeys('foo bar baz').then(function() {
     assertEquals('foo bar baz',
         document.getElementById('input').value);
@@ -143,9 +143,9 @@ Using promises, users can string together a sequence of asynchronous actions, en
 {{{
 var driver = new webdriver.Builder().build();
 driver.get('http://www.google.com').then(function() {
-  return driver.findElement(By.name('q')).then(function(searchBox){
+  return driver.findElement(webdriver.By.name('q')).then(function(searchBox){
     return searchBox.sendKeys('webdriver').then(function() {
-      return driver.findElement(By.name('btnG')).then(function(submitButton) {
+      return driver.findElement(webdriver.By.name('btnG')).then(function(submitButton) {
         return submitButton.click().then(function() {
           return driver.getTitle().then(function(title) {
             assertEquals('webdriver - Google Search', title);
@@ -165,10 +165,10 @@ Simply put, the promise manager handles the scheduling and execution of user def
 var driver = new webdriver.Builder().build();
 driver.get('http://www.google.com');
 
-var searchBox = driver.findElement(By.name('q'));
+var searchBox = driver.findElement(webdriver.By.name('q'));
 searchBox.sendKeys('webdriver');
 
-var submitButton = driver.findElement(By.name('btnG'));
+var submitButton = driver.findElement(webdriver.By.name('btnG'));
 submitButton.click();
 
 driver.getTitle().then(function(title) {
@@ -184,12 +184,12 @@ Internally, the promise manager maintains a call stack. Upon each turn of the ma
 driver.get(MY_APP_URL);
 driver.getTitle().then(function(title) {
   if (title === 'Login page') {
-    driver.findElement(By.id('user')).sendKeys('bugs');
-    driver.findElement(By.id('pw')).sendKeys('bunny');
-    driver.findElement(By.id('login')).click();
+    driver.findElement(webdriver.By.id('user')).sendKeys('bugs');
+    driver.findElement(webdriver.By.id('pw')).sendKeys('bunny');
+    driver.findElement(webdriver.By.id('login')).click();
   }
 });
-driver.findElement(By.id('userPreferences')).click();
+driver.findElement(webdriver.By.id('userPreferences')).click();
 }}}
 
 This test case could be rewritten using !WebDriver's Java API as follows:
