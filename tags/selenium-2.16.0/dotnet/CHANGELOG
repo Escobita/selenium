@@ -1,0 +1,114 @@
+v2.16.0
+=======
+ * Made By, Cookie and Screenshot .NET classes serializable.
+ * Slightly modifying build output to be more informative when building
+   .NET bindings from within the Visual Studio IDE.
+ * Explicitly setting socket.ExclusiveAddressUse = true when attempting to 
+   find a free port for the .NET bindings' FirefoxDriver.
+ * Updating the .NET remote Command object to return an empty JSON object 
+   ("{}") instead of an empty string when the command has no parameters.
+ * Implementing the /sessions and /status commands for the IE driver and the
+   .NET bindings.
+ * Check elements' internal IDs for equality before making RPC call to 
+   determine IWebElement equality in .NET.
+ * Removed unused JSON wire protocol command values from the .NET bindings.
+
+v2.15.0
+=======
+ * Added support for window positioning and sizing API to IE.
+ * Introduced DefaultWait class to WebDriver.Support assembly, to allow fully
+   configurable waits.
+ * Added IRotatable interface for driving client browsers supporting rotation.
+ * Introduced experimental ExpectedConditions class to WebDriver.Support
+   assembly, providing methods to use to wait for commonly-experienced
+   conditions.
+
+v2.14.0
+=======
+ * Implemented iPad desired capability.
+ * Updated Json.NET version to 4.0r4
+
+v2.13.0
+=======
+ * Do not use "which" to find Firefox on Windows in the .NET bindings.
+ * Pass '-foreground' to the firefox binary. Ensures focus by default on OS X.
+
+v2.12.0
+=======
+ * Added experimental IWindow interface for controling size and position of
+   browser windows.
+
+v2.11.0
+=======
+ * Updated to be consistent with other language bindings. Change to java
+   server to allow use of safariproxy driver type. No functional changes.
+
+v2.10.0
+=======
+ * Added "extensions.autoDisableScopes" to default Firefox profile
+ * Removes the deprecated SendModifierKey command, replacing it with
+   SendKeysToActiveElement
+ * Added IntroduceInstabilityByIgnoringProtectedModeSettings to
+   InternetExplorerDriver to make setting capabilities easier when
+   bypassing the Protected Mode settings check of the IE driver
+
+v2.9.0
+======
+  * Look up private parent fields when using the support classes PageFactory.
+  * Preparing RemoteWebDriver to understand upcoming URI changes to JSON wire
+  * protocol.
+
+v2.8.0
+======
+  * Added interactions methods for .Release(), ClickAndHold(), and 
+    DoubleClick() which take no arguments
+  * Added ClickAt() implementation in WebDriverBackedSelenium
+
+v2.7.0
+======
+  * No functional changes
+
+v2.6.0
+======
+  * Issue 2349: Fixed memory leak in PageFactory
+  * Issue 2356: Fixed P/Invoke signatures for native .NET 4.0 projects
+  * Disabled Firefox profile setting "browser.safebrowsing.malware.enabled" by
+    default
+  * Issue 2385: Added protected AddAction method on Actions class to allow
+    subclasses to insert IAction implementations into action chain.
+
+v2.5.1
+======
+  * No functional changes, providing .NET 4.0 binaries and updates to NuGet
+    packaging only.
+
+v2.5.0
+======
+  * Bringing .NET SelectElement support class in line with Java Select class
+  * WebDriver.SwitchTo().Alert() now throws an exception when no alert present.
+  * InvalidSelectorException now thrown when XPath selector syntax is
+    incorrect.
+
+v2.4.1
+======
+  * No functional changes, updates to NuGet packaging only.
+
+v2.4.0
+======
+  * Adding InvalidSelector error code.
+  * Default to field/property name if no Using is specified in PageFactory.
+  * Replaced reference to Ionic.Zip.Reduced.dll with Ionic.Zip.dll to match up
+    NuGet packages.
+
+v2.3.0
+======
+  * Added protected constructors and properties to make it easier to subclass
+    By for custom element finders.
+
+v2.2.0
+======
+  * Adding first pass at .NET implementation of proxy management.
+  * Modifying .NET build process to sign assemblies. Building the .NET bindings
+    through the IDE or through the command line will now produce signed
+	assemblies.
+  * Updating .NET bindings JSON.NET from 3.5 to 4.0.
