@@ -42,3 +42,30 @@ Make sure your device is connected to your computer. Your device must also be ro
 
 Set your build configuration to Device / iPhone OS 5.0 / iWebDriver and click Build & Go.
 
+== Connecting ==
+
+To start using the iphone driver, make sure the iWebDriver project has started (blank screen with url at the bottom) and then connect to it with RemoteWebDriver.
+
+Java -
+{{{
+WebDriver driver = new RemoteWebDriver(new URL("http://localhost:3001/wd/hub"), DesiredCapabilities.iphone());
+// or use the convenience class which uses localhost:3001 by default
+WebDriver driver = new IPhoneDriver();
+}}}
+
+C# -
+{{{
+IWebDriver driver = new RemoteWebDriver(u, DesiredCapabilities.IPhone());
+}}}
+
+Ruby -
+{{{
+driver = Selenium::WebDriver.for :remote, :url => "http://localhost:3001/wd/hub", :desired_capabilities => :iphone
+# or use the convenience class which uses localhost:3001 by default
+driver = Selenium::WebDriver.for :iphone
+}}}
+
+Python -
+{{{
+driver = webdriver.Remote("http://localhost:3001/wd/hub", webdriver.DesiredCapabilitiies.IPHONE)
+}}}
