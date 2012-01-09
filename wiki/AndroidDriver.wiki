@@ -290,6 +290,19 @@ This command will start the emulator install the Android WebDriver application a
 
 Note that "./go test_android" will fail if there is already an emulator running.
 
+== Update the Atoms Used by Android WebDriver ==
+First let's build all the fragment Android WebDriver uses:
+{{{
+./go //javascript/android-driver:atoms
+}}}
+
+Then copy the new AndroidAtoms.java: 
+{{{
+cp build/javascript/android-driver/AndroidAtoms.java java/client/src/org/openqa/selenium/android/library/AndroidAtoms.java
+}}}
+
+Compile and run the tests to make sure nothing broke! Then make a release of the new APK by following the instructions [http://code.google.com/p/selenium/wiki/AndroidDriver#Make_a_Release here].
+
 == Debug on Android ==
    * Run the tests
 It's advised to start your own emulator instance (instructions above), leave the emulator running and run the tests. This will prevent you from paying the cost of starting a new emulator for every test run. To run the tests on an already running emulator:
