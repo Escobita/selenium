@@ -54,6 +54,12 @@ The default target that's used will compile the code and run all the tests. More
 || support || Guess what this does :) ||
 || test_htmlunit || Compile the dependencies and then run the tests for the HtmlUnitDriver. The same "test_x" pattern can be followed for all the compilation targets in this table. ||
 
+=== Running a remote Debugger with Java tests ===
+You can run the tests in debug mode and wait for a remote java listener (which one would setup in eclipse or intellij).
+{{{
+./go debug=true suspend=true test_firefox
+}}}
+
 == Debugging the Firefox Driver ==
 === Getting output from the Firefox process itself ===
 This is usually useful to debug issues with Firefox starting up. The Java system property `webdriver.firefox.logfile` will instruct the FirefoxDriver to redirect the output to a file:
