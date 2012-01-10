@@ -346,7 +346,7 @@ $ ./go //android:android-server
 
 Check-in the new prebuilt apk:
 {{{
-$ svn ci android/app/prebuilt/app/android-server.apk
+$ svn ci android/prebuilt/android-server.apk
 }}}
 
 Upload the new APK on the downloads page with the corresponding release notes.
