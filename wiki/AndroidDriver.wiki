@@ -11,7 +11,7 @@ We try to stay as close as possible to what the user interaction with the browse
 
 == Supported Platforms ==
    * [http://code.google.com/p/selenium/downloads/list The current apk works with Honeycomb SDK 3.1 and onwards including ICS]
-   * [http://code.google.com/p/selenium/downloads/detail?name=android-server-2.6.0.apk&can=1&q=android#makechanges For Android Froyo (2.2) and Gingerbread (2.3), download the apk 2.6.0]. Note that there is an *emulator bug on Gingerbread* that might cause WebDriver to crash.
+   * [http://code.google.com/p/selenium/downloads/detail?name=android-server-2.16.0.apk&can=1&q=android#makechanges For Android Froyo (2.2) and Gingerbread (2.3), download the apk 2.16.0]. Note that there is an *emulator bug on Gingerbread* that might cause WebDriver to crash.
 
 == Useful Related Links ==
    * [http://android-developers.blogspot.com/2011/10/introducing-android-webdriver.html Android WebDriver on Android Blog]
@@ -341,7 +341,7 @@ $ls build/test_logs/
 == Make a Release == 
 To release an apk, build the new apk:
 {{{
-$ ./go //android/app:android-server
+$ ./go //android:android-server
 }}}
 
 Check-in the new prebuilt apk:
