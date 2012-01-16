@@ -1,9 +1,0 @@
-java_test(name = "test",
-  srcs = [ "*.java" ],
-  sysproperties = [
-    { "selenium.browser" : "htmlunit_js" },
-  ],
-  deps = [
-    "//java/client/src/org/openqa/selenium/htmlunit",
-    "//java/client/test/org/openqa/selenium:tests"
-  ])
