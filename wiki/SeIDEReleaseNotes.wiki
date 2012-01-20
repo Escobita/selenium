@@ -3,6 +3,8 @@
 
 ==1.6.0 (not yet released)==
 
+  * New - Added support for Firefox 10
+  * New - Added keyboard shortcuts to launch Selenium IDE - issue 3028
   * Bug - Added break command to autocomplete list - issue 3046
   * Bug - Incorrect tooltip displayed in sidebar - issue 3098
 
