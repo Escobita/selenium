@@ -263,6 +263,29 @@ Selenium::WebDriver::Firefox.path = "/path/to/firefox"
 driver = Selenium::WebDriver.for :firefox
 }}}
 
+=== SSL Certificates ===
+
+The Firefox driver ignores invalid SSL certificates by default. If this is not the behaviour you want, you can do:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile.secure_ssl = true
+
+driver = Selenium::WebDriver.for :firefox, :profile => profile
+}}}
+
+There is an edge case where the default SSL certificate check will not work correctly. WebDriver assumes that the certificate is untrusted whenever there's a problem, which means a certificate from a trusted issuer but with a hostname mismatch (e.g. a production certificate in a test environment) will not be correctly ovverriden.  See UntrustedSSLCertificates for more on why this is. To work around it, tell the Firefox driver to not assume the issuer is untrusted:
+
+{{{
+profile = Selenium::WebDriver::Firefox::Profile.new
+profile.assume_untrusted_certificate_issuer = false
+driver = Selenium::WebDriver.for :firefox, :profile => profile
+}}}
+
+Not that Profile#secure_ssl remains set to the default value of true in the above example.
+
+
+
 === Native events ===
 
 Native events are enabled by default on Windows. To turn them off:
