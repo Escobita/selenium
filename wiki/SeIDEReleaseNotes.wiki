@@ -7,6 +7,8 @@
   * New - Added keyboard shortcuts to launch Selenium IDE - issue 3028
   * Bug - Added break command to autocomplete list - issue 3046
   * Bug - Incorrect tooltip displayed in sidebar - issue 3098
+  * Bug - Improved XPath locator recording when there are multiple matches - issue 3056
+  * Bug - Locators can now be reordered on Mac - issue 3267
 
 ==1.5.0==
 
