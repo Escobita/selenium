@@ -35,6 +35,7 @@ The steps to releasing Se-IDE (because I keep forgetting something)
       * `<em:updateHash>` is the correct hash for the XPI
         * You can generate this using: openssl md5 -sha1 `<file>`
         * Note that for the IDE the hash is of the multi-xpi
+        * Make sure the value starts with sha1:
   # Test upgrade
   # Update release notes
   # close out issues in the tracker
