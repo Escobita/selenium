@@ -3,8 +3,6 @@
 
 ==1.6.0==
 
-*Note:* This version has not yet been officially released, however a snapshot is available for testing [http://xserve.openqa.org:8085/browse/IDE-EDITOR-227/artifact/MULTI/Selenium-IDE/selenium-ide.xpi here]. If you find any issues please check if they've already been reported in our [http://code.google.com/p/selenium/issues/list?can=2&q=Component%3DIDE issue tracker]. If not, please [http://code.google.com/p/selenium/issues/entry raise a new issue].
-
   * New - Added support for Firefox 10
   * New - Added keyboard shortcuts to launch Selenium IDE - issue 3028
   * Bug - Added break command to autocomplete list - issue 3046
