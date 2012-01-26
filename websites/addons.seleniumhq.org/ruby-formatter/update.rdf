@@ -14,7 +14,7 @@
                 <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>10.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/ruby/1.6.0/ruby-format-1.6.0.xpi</em:updateLink>
-                <em:updateHash>ae6b708df5e13c6dee1fc72507e8bebcf97338fa</em:updateHash>
+                <em:updateHash>sha1:ae6b708df5e13c6dee1fc72507e8bebcf97338fa</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>

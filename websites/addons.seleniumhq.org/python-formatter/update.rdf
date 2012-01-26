@@ -14,7 +14,7 @@
                 <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>10.*</em:maxVersion>            
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/python/1.6.0/python-format-1.6.0.xpi</em:updateLink>
-                <em:updateHash>f3bc125ff38cec8f68418d4a0e17e7b134522d71</em:updateHash>
+                <em:updateHash>sha1:f3bc125ff38cec8f68418d4a0e17e7b134522d71</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>

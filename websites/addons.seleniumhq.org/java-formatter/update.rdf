@@ -14,7 +14,7 @@
                 <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>10.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/1.6.0/java-format-1.6.0.xpi</em:updateLink>
-                <em:updateHash>b85245e90fa3e79a7cbd64795a916e948bd6ca63</em:updateHash>
+                <em:updateHash>sha1:b85245e90fa3e79a7cbd64795a916e948bd6ca63</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>

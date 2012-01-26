@@ -14,7 +14,7 @@
                 <em:minVersion>3.6.0</em:minVersion> 
                 <em:maxVersion>10.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/csharp/1.6.0/csharp-format-1.6.0.xpi</em:updateLink>
-                <em:updateHash>236f8384107a6dc804ad6e4fcf62a8ccf7f15816</em:updateHash>
+                <em:updateHash>sha1:236f8384107a6dc804ad6e4fcf62a8ccf7f15816</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
