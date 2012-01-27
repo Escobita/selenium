@@ -104,10 +104,10 @@
    # in py/selenium/webdriver/__init__.py
    # in py/docs/source/index.rst
 
- # `./go py_release` ~ just don't have your credentials stored in ~/.pypirc
- # manually edit setup.py that is inside dist/selenium-2-XX-X.tar.gz and remove all lines with "test" in them
- # repackage artifact and upload to pypi
- # Bump the version number to the next version with dev e.g. 2.0b3dev and commit changes
+ # check that in.
+ # manually edit setup.py and remove all lines with "test" in them
+ # `./go py_release` ~ have your credentials stored in ~/.pypirc
+ # Bump the version number to the next version with dev e.g. 2.(n+1).0 and commit changes
  # Update the SeHQ downloads page with updated links, release numbers and dates
 
 
