@@ -14,7 +14,7 @@
 = For Java =
 
   # Run `./go clean release`
-  # Upload the new versions of the ZIP files from "build/dist" to the downloads page.
+  # Upload the new versions of the ZIP files from "build/dist" to the downloads page. Alternatively, run `./go push_release` to have the artifacts uploaded for you.
   # Upload the new Android APK from build/android/app/android-server.apk to the downloads page.
   # Add a subversion tag: `svn copy https://selenium.googlecode.com/svn/trunk/ https://selenium.googlecode.com/svn/tags/selenium-2.<REVISION>` 
   # Update the docs. I do this on a UNIX variant:
