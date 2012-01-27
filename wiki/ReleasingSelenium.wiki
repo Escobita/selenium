@@ -107,6 +107,7 @@
  # check that in.
  # manually edit setup.py and remove all lines with "test" in them
  # `./go py_release` ~ have your credentials stored in ~/.pypirc
+ # revert changes to setup.py
  # Bump the version number to the next version with dev e.g. 2.(n+1).0 and commit changes
  # Update the SeHQ downloads page with updated links, release numbers and dates
 
