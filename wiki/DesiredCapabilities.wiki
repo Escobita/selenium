@@ -57,7 +57,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || opera.product || string || Which Opera product we're using, e.g. "desktop", "core" ||
 || opera.no_quit || boolean || Whether to quit Opera when OperaDriver is shut down. If enabled, it will keep the browser running after the driver is shut down. ||
 || opera.autostart || boolean || Whether to auto-start the Opera binary. If false, OperaDriver will wait for a connection from the browser. Go to "opera:debug", enter the correct port number, and hit "Connect" to connect manually. ||
-|| opera.display || integer || Which X display to use (*nix only) ||
+|| opera.display || integer || Which X display to use (`*`nix only) ||
 || opera.idle || boolean || Whether to use Opera's alternative implicit wait implementation. It will use an in-browser heuristic to guess when a page has finished loading, allowing us with great accuracy tell whether there are any planned events in the document. This functionality is useful for very simple test cases, but not designed for real-world testing. It is disabled by default. ||
 || opera.profile || object|string || Directory to use for the Opera profile. If an OperaProfile object, that will be used when starting opera. If null a random temporary directory is used. If "", an empty string, then the default .autotest profile directory will be used (for backwards compatibility with Opera < 11.60). ||
 || opera.launcher || string || Path to the launcher binary to use. The launcher is a gateway between OperaDriver and the Opera browser, and is being used for controlling the binary and taking external screenshots. If left blank, OperaDriver will use the launcher supplied with the package. ||
