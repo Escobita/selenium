@@ -23,6 +23,85 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || nativeEvents || boolean || Whether the session is capable of generating native events when simulating user input. ||
 || proxy || proxy object || Details of any proxy to use. If no proxy is specified, whatever the system's current or default state is used. The format is specified under Proxy JSON Object. ||
 
+= Grid-specific =
+|| path || string || ??? Path to route request to, or maybe listen on. ||
+|| seleniumProtocol || string || Which protocol to use. Accepted values: WebDriver, Selenium. ||
+|| maxInstances || integer || Maximum number of instances to allow to connect to grid, ||
+|| environment || string || ??? Possible duplicate of browserName? See RegistrationRequest. ||
+
+= Selenium RC (1.0) only =
+|| proxy_pac || !DoNotUseProxyPac || Legacy proxy mechanism. Do not use. ||
+|| commandLineFlags || string || Flags to pass to browser command line. ||
+|| executablePath || string || Path to browser executable. ||
+|| timeoutInSeconds || long integer || Timeout to wait for the browser to launch, in seconds. ||
+|| onlyProxySeleniumTraffic || boolean || Whether to only proxy selenium traffic. See browserlaunchers.Proxies ||
+|| avoidProxy || boolean || ??? See browserlaunchers.Proxies ||
+|| proxyEverything || boolean || ??? See browserlaunchers.Proxies ||
+|| proxyRequired || boolean || ??? See browserlaunchers.Proxies ||
+|| browserSideLog || boolean || ??? See AbstractBrowserLauncher. ||
+|| optionsSet || boolean || ??? See BrowserOptions. ||
+|| singleWindow || boolean || Whether to enable single window mode. ||
+|| dontInjectRegex || javascript RegExp || Regular expression that proxy injection mode can use to know when to bypss injection. Ignored if not in proxy injection mode. ||
+|| userJSInjection || boolean || ??? Whether to inject user JS. Ignored if not in proxy injection mode. ||
+|| userExtensions || string || Path to a JavaScript file that will be loaded into selenium. ||
+
+== Selenese-Backed-WebDriver specific ==
+|| selenium.server.url || string || URL of Selenium server to use, to back this WebDriver ||
+
+= Browser Specific Capabilities =
+
+== Opera specific ==
+|| opera.binary || string || Path to Opera binary ||
+|| opera.guess_binary_path || boolean || Whether to guess the path to Opera if it isn't set in opera.binary ||
+|| opera.no_restart || boolean || Whether to restart Opera ||
+|| opera.product || string || Which Opera product we're using, e.g. "desktop", "core" ||
+|| opera.no_quit || boolean || Whether to quit Opera when OperaDriver is shut down. If enabled, it will keep the browser running after the driver is shut down. ||
+|| opera.autostart || boolean || Whether to auto-start the Opera binary. If false, OperaDriver will wait for a connection from the browser. Go to "opera:debug", enter the correct port number, and hit "Connect" to connect manually. ||
+|| opera.display || integer || Which X display to use (*nix only) ||
+|| opera.idle || boolean || Whether to use Opera's alternative implicit wait implementation. It will use an in-browser heuristic to guess when a page has finished loading, allowing us with great accuracy tell whether there are any planned events in the document. This functionality is useful for very simple test cases, but not designed for real-world testing. It is disabled by default. ||
+|| opera.profile || object|string || Directory to use for the Opera profile. If an OperaProfile object, that will be used when starting opera. If null a random temporary directory is used. If "", an empty string, then the default .autotest profile directory will be used (for backwards compatibility with Opera < 11.60). ||
+|| opera.launcher || string || Path to the launcher binary to use. The launcher is a gateway between OperaDriver and the Opera browser, and is being used for controlling the binary and taking external screenshots. If left blank, OperaDriver will use the launcher supplied with the package. ||
+|| opera.port || integer || The port to Opera should connect to. 0 = Random, -1 = Opera default (for use with Opera < 11.60) ||
+|| opera.host || string || The host Opera should connect to. Unless you're starting Opera manually you won't need this. ||
+|| opera.arguments || string || Arguments to pass to Opera, separated by spaces. See {{{opera -help}}} for available command-line switches. ||
+|| opera.logging.file || string || Where to send the output of the logging. Default is to not write to file. ||
+|| opera.logging.level || string ||  How verbose the logging should be. Available levels are: SEVERE (highest value), WARNING, INFO, CONFIG, FINE, FINER, FINEST (lowest value), ALL. Default is INFO. TODO: These seem the wrong way around. Also what about off. Also, unify with firefox loggingPrefs. ||
+
+== Chrome specific ==
+|| chrome.chromedriverVersion || string || The version of the chromedriver in use. ||
+
+== Firefox specific ==
+=== WebDriver ===
+|| firefox_profile || string || Base64-encoded profile.  TODO: Document format ||
+|| loggingPrefs || LoggingPreferences object || Preferences for logging ||
+|| firefox_binary || string || Path to firefox binary file to use. ||
+
+=== RC ===
+|| mode || string || Mode for browser. Possible values: chrome, proxyInjection, proxy. Defaults to chrome, if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
+|| captureNetworkTraffic || boolean || Whether to capture network traffic. ||
+|| addCustomRequestHeaders || boolean || Whether to add custom request headers. ||
+|| trustAllSSLCertificates || boolean || Whether to trust all SSL certificates. ||
+|| changeMaxConnections || boolean || ??? See FirefoxChromeLauncher. ||
+|| firefoxProfileTemplate || string || ??? See FirefoxChromeLauncher. ||
+|| profile || string || ??? See FirefoxChromeLauncher ||
+
+== IE specific ==
+=== WebDriver ===
+|| ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. ||
+=== RC ===
+|| mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
+|| killProcessesByName || boolean || Whether to try to kill processes by name, instead (or addition) to killing processes we happen to have handles to. ||
+|| honorSystemProxy || boolean || Whether to honor the sysem proxy. ||
+|| ensureCleanSession || boolean || Whether to make sure the session has no cookies or temporary internet files on Windows. I believe this is passed to the IEDriver as well, but ignored by it. ||
+
+== Safari specific ==
+=== RC ===
+|| mode || string || Mode for browser. Possible values: filebased, proxyInjectionMode, proxy. Defaults to filebased. Note: filebased does not work on newer Safaris. proxyInjection requires -proxyInjection to be passed to server command line. ||
+|| honorSystemProxy || boolean || Whether to honour the sysem proxy. ||
+|| ensureCleanSession || boolean || Whether to make sure the session has no cookies, cache entries. And that any registry and proxy settings are restored after the session. ||
+
+= Object structures =
+
 == Proxy JSON Object ==
 A JSON object describing a Proxy configuration.
 
@@ -30,3 +109,20 @@ A JSON object describing a Proxy configuration.
 || proxyType || string || (Required) The type of proxy being used. Possible values are: *direct* - A direct connection - no proxy in use, *manual* - Manual proxy settings configured, e.g. setting a     proxy for HTTP, a proxy for FTP, etc, *pac* - Proxy autoconfiguration from a URL), autodetect (proxy autodetection, probably with WPAD, *system* - Use system settings ||
 || proxyAutoconfigUrl || string || (Required if proxyType == pac, Ignored otherwise) Specifies the URL to be used for proxy autoconfiguration. Expected format example: http://hostname.com:1234/pacfile  ||
 || ftpProxy, httpProxy, sslProxy || string || (Optional, Ignored if proxyType != manual) Specifies the proxies to be used for FTP, HTTP and HTTPS requests respectively. Behaviour is undefined if a      request is made, where the proxy for the particular protocol is undefined, if proxyType is manual. Expected format example: hostname.com:1234 ||
+
+== LoggingPreferences JSON object ==
+A json object describing logging preferences.
+
+|| *Key* || *Type* || *Description* ||
+|| driver || Level || How verbose the logging should be. Available levels are: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL. Default is INFO. ||
+
+== FirefoxProfile settings ==
+Preferences accepted by the FirefoxProfile with special meaning, in the WebDriver API:
+|| *Key* || *Type* || *Description* ||
+|| webdriver_accept_untrusted_certs || boolean || Whether to trust all SSL certificates. TODO: Maybe in some way different to the acceptSslCerts or trustAllSSLCertificates capabilities. ||
+|| webdriver_assume_untrusted_issuer || boolean || Whether to trust all SSL certificate issuers. TODO: Maybe in some way different to the acceptSslCerts or trustAllSSLCertificates capabilities. ||
+|| webdriver.log.driver || string || Level at which to log FirefoxDriver logging statements to a temporary file, so that they can be retrieved by a getLogs command. Available options; DEBUG, INFO, WARNING, ERROR, OFF. Defaults to OFF. ||
+|| webdriver.log.file || string || Path to file to which to copy firefoxdriver logging output. Defaults to no file (like /dev/null). ||
+|| webdriver_enable_native_events || boolean || Whether to enable native events. TODO: Maybe in some way different to nativeEvents capability. Defaults to false in the FirefoxDriver. Defaults to true on Windows from the WebDriver API, false on other platforms. ||
+|| webdriver.load.strategy || string || Experimental API. Defines different strategies for how long to wait until a page is loaded. Values: fast, patient. Defaults to patient. ||
+|| webdriver_firefox_port || integer || Port to listen on for WebDriver commands. Defaults to 7055. ||
