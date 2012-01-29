@@ -67,7 +67,7 @@ driver = Selenium::WebDriver.for :iphone
 
 Python -
 {{{
-driver = webdriver.Remote("http://localhost:3001/wd/hub", webdriver.DesiredCapabilitiies.IPHONE)
+driver = webdriver.Remote("http://localhost:3001/wd/hub", webdriver.DesiredCapabilities.IPHONE)
 }}}
 
 ==Hooking it up to a Selenium Grid2==
