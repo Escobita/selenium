@@ -338,6 +338,18 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_session/:sessionId/touch/flick session/:sessionId/touch/flick] || Flick on the touch screen using finger motion events. ||
 || GET || [#GET_/session/:sessionId/location /session/:sessionId/location] || Get the current geo location. ||
 || POST || [#POST_/session/:sessionId/location /session/:sessionId/location] || Set the current geo location. ||
+|| GET || [#GET_/session/:sessionId/local_storage /session/:sessionId/local_storage] || Get all keys of the storage. ||
+|| POST || [#POST_/session/:sessionId/local_storage /session/:sessionId/local_storage] || Set the storage item for the given key. ||
+|| DELETE || [#DELETE_/session/:sessionId/local_storage /session/:sessionId/local_storage] || Clear the storage. ||
+|| GET || [#GET_/session/:sessionId/local_storage/key/:key /session/:sessionId/local_storage/key/:key] || Get the storage item for the given key. ||
+|| DELETE || [#DELETE_/session/:sessionId/local_storage/key/:key /session/:sessionId/local_storage/key/:key] || Remove the storage item for the given key. ||
+|| GET || [#GET_/session/:sessionId/local_storage/size /session/:sessionId/local_storage/size] || Get the number of items in the storage. ||
+|| GET || [#GET_/session/:sessionId/session_storage /session/:sessionId/session_storage] || Get all keys of the storage. ||
+|| POST || [#POST_/session/:sessionId/session_storage /session/:sessionId/session_storage] || Set the storage item for the given key. ||
+|| DELETE || [#DELETE_/session/:sessionId/session_storage /session/:sessionId/session_storage] || Clear the storage. ||
+|| GET || [#GET_/session/:sessionId/session_storage/key/:key /session/:sessionId/session_storage/key/:key] || Get the storage item for the given key. ||
+|| DELETE || [#DELETE_/session/:sessionId/session_storage/key/:key /session/:sessionId/session_storage/key/:key] || Remove the storage item for the given key. ||
+|| GET || [#GET_/session/:sessionId/session_storage/size /session/:sessionId/session_storage/size] || Get the number of items in the storage. ||
 
 
 == Command Detail ==
@@ -2824,6 +2836,276 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`location` - `{latitude: number, longitude: number, altitude: number}` The new location.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/local_storage ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/local_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Get all keys of the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<string>}` The list of keys.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== POST /session/:sessionId/local_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Set the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`key` - `{string}` The key to set.</dd>
+<dd>`value` - `{string}` The value to set.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== DELETE /session/:sessionId/local_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Clear the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/local_storage/key/:key ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/local_storage/key/:key ====
+</dd>
+<dd>
+<dl>
+<dd>Get the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:key` - The key to get.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== DELETE /session/:sessionId/local_storage/key/:key ====
+</dd>
+<dd>
+<dl>
+<dd>Remove the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:key` - The key to remove.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/local_storage/size ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/local_storage/size ====
+</dd>
+<dd>
+<dl>
+<dd>Get the number of items in the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{number}` The number of items in the storage.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/session_storage ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/session_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Get all keys of the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<string>}` The list of keys.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== POST /session/:sessionId/session_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Set the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`key` - `{string}` The key to set.</dd>
+<dd>`value` - `{string}` The value to set.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== DELETE /session/:sessionId/session_storage ====
+</dd>
+<dd>
+<dl>
+<dd>Clear the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/session_storage/key/:key ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/session_storage/key/:key ====
+</dd>
+<dd>
+<dl>
+<dd>Get the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:key` - The key to get.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== DELETE /session/:sessionId/session_storage/key/:key ====
+</dd>
+<dd>
+<dl>
+<dd>Remove the storage item for the given key.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+<dd>`:key` - The key to remove.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/session_storage/size ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/session_storage/size ====
+</dd>
+<dd>
+<dl>
+<dd>Get the number of items in the storage.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{number}` The number of items in the storage.</dd>
 </dl>
 </dd>
 </dl>
