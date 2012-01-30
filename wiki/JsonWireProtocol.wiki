@@ -86,7 +86,7 @@ The protocol will assume that the WebDriver API has been "flattened", but there 
 || applicationCacheEnabled || boolean || Whether the session can interact with the application cache. ||
 || browserConnectionEnabled || boolean || Whether the session can query for the browser's connectivity and disable it if desired. ||
 || cssSelectorsEnabled || boolean || Whether the session supports CSS selectors when searching for elements. ||
-|| webStorageEnabled || boolean || Whether the session supports interactions with [http://www.w3.org/TR/2009/WD-webstorage-20091029/ storage objects]. || 
+|| webStorageEnabled || boolean || Whether the session supports interactions with [http://www.w3.org/TR/2009/WD-webstorage-20091029/ storage objects]. ||
 || rotatable || boolean || Whether the session can rotate the current page's current layout between portrait and landscape orientations (only applies to mobile platforms). ||
 || acceptSslCerts || boolean || Whether the session should accept all SSL certs by default. ||
 || nativeEvents || boolean || Whether the session is capable of generating native events when simulating user input. ||
@@ -336,6 +336,8 @@ Given these mappings, the server should always route requests whose final path s
 || POST || [#POST_session/:sessionId/touch/longclick session/:sessionId/touch/longclick] || Long press on the touch screen using finger motion events. ||
 || POST || [#POST_session/:sessionId/touch/flick session/:sessionId/touch/flick] || Flick on the touch screen using finger motion events. ||
 || POST || [#POST_session/:sessionId/touch/flick session/:sessionId/touch/flick] || Flick on the touch screen using finger motion events. ||
+|| GET || [#GET_/session/:sessionId/location /session/:sessionId/location] || Get the current geo location. ||
+|| POST || [#POST_/session/:sessionId/location /session/:sessionId/location] || Set the current geo location. ||
 
 
 == Command Detail ==
@@ -514,7 +516,7 @@ searching for a single element, the driver should poll the page until an element
 the timeout expires, whichever occurs first. When searching for multiple elements, the driver
 should poll the page until at least one element is found or the timeout expires, at which point
 it should return an empty list.
-      
+
 If this command is never sent, the driver should default to an implicit wait of 0ms.</dd>
 <dd>
 <dl>
@@ -2772,6 +2774,56 @@ location for correctly generating native events.</dd>
 <dt>*JSON Parameters:*</dt>
 <dd>`xSpeed` - `{number}` The x speed in pixels per second.</dd>
 <dd>`ySpeed` - `{number}` The y speed in pixels per second.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/location ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/location ====
+</dd>
+<dd>
+<dl>
+<dd>Get the current geo location.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{latitude: number, longitude: number, altitude: number}` The current geo location.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+<dl>
+<dd>
+==== POST /session/:sessionId/location ====
+</dd>
+<dd>
+<dl>
+<dd>Set the current geo location.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`location` - `{latitude: number, longitude: number, altitude: number}` The new location.</dd>
 </dl>
 </dd>
 </dl>
