@@ -22,6 +22,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || acceptSslCerts || boolean || Whether the session should accept all SSL certs by default. ||
 || nativeEvents || boolean || Whether the session is capable of generating native events when simulating user input. ||
 || proxy || proxy object || Details of any proxy to use. If no proxy is specified, whatever the system's current or default state is used. The format is specified under Proxy JSON Object. ||
+|| webdriver.remote.sessionid || string || WebDriver session ID for the session. Readonly. ||
 
 = Grid-specific =
 || path || string || ??? Path to route request to, or maybe listen on. ||
