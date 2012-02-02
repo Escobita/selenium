@@ -121,6 +121,18 @@ Or to load with a specific profile (note that the default profile directories ca
 
 The full list of flags can be found [http://peter.sh/experiments/chromium-command-line-switches/ here].
 
+
+=== Setting Chrome's proxy configuration ===
+
+Since ChromeDriver 18.0.995.0, !WebDriver's [DesiredCapabilities Proxy Desired Capability] can be used.
+If you're using a previous version. The following can be used:
+
+{{{
+  DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+  capabilities.setCapability("chrome.switches", Arrays.asList("--proxy-server=http://your-proxy-domain:4443"));
+  WebDriver driver = new ChromeDriver(capabilities);
+}}}
+
 === Overriding the Chrome binary location ===
 
 You can specify the location of the Chrome binary by passing the "chrome.binary" capability, e.g. with a typical Chromium install on Debian:
@@ -136,6 +148,11 @@ Or in Ruby:
   Selenium::WebDriver::Chrome.path = "/usr/lib/chromium-browser/chromium-browser"
   driver = Selenium::WebDriver.for :chrome
 }}}
+
+=== Chrome Extensions ===
+
+The ‘chrome.extensions’ capability can be used to specify a list of extensions, each in the form of a base64 encoded crx file, to install on startup.
+
 == Known Issues ==
 
 There are a handful of known issues with !ChromeDriver, listed below:
