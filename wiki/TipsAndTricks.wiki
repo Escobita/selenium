@@ -27,7 +27,7 @@ This is easy with the FirefoxDriver:
 
 {{{
 FirefoxProfile profile = new FirefoxProfile();
-profile.addAdditionalPreference("general.useragent.override", "some UA string");
+profile.setPreference("general.useragent.override", "some UA string");
 WebDriver driver = new FirefoxDriver(profile);
 }}}
 
@@ -47,7 +47,7 @@ Alternatively, if the profile isn't already registered with Firefox:
 {{{
 File profileDir = new File("path/to/top/level/of/profile");
 FirefoxProfile profile = new FirefoxProfile(profileDir);
-profile.addAdditionalPreferences(extraPrefs);
+profile.setPreferences(extraPrefs);
 WebDriver driver = new FirefoxDriver(profile);
 }}}
 
