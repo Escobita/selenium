@@ -93,6 +93,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 === WebDriver ===
 || ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. ||
 || useLegacyInternalServer || boolean || Whether to use the internal server for the IE driver. If set to false or not set, looks for the standalone IE driver server executable. Used by the client language bindings, not the server-side components. ||
+
 === RC ===
 || mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
 || killProcessesByName || boolean || Whether to try to kill processes by name, instead (or addition) to killing processes we happen to have handles to. ||
