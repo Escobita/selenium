@@ -70,6 +70,9 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 
 == Chrome specific ==
 || chrome.chromedriverVersion || string || The version of the chromedriver in use. ||
+|| chrome.binary || string || The path to the Chrome binary to use ||
+|| chrome.switches || list || A list of strings including command line switches Chrome should be started with ||
+|| chrome.extensions || list || A list of base64 encoded crx files to be installed in Chrome before the test ||
 
 == Firefox specific ==
 === WebDriver ===
