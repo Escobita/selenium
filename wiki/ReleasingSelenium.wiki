@@ -74,6 +74,11 @@
 = For .NET =
 
   # Verify the build number is correct in dotnet/build.desc
+  # Verify the build number is correct in the AssemblyVersion and AssemblyFileVersion attributes in the AssemblyInfo.cs file of each of the following projects:
+    * Selenium.Core
+    * Selenium.WebDriverBackedSelenium
+    * WebDriver
+    * WebDriver.Support
   # Run `go clean //dotnet:release`. Note that this will require you to have the [http://shfb.codeplex.com .NET documentation generation tools] installed.
   # Upload the selenium-dotnet-xx.zip file from build/dotnet to the downloads page.
   # Update the SeHQ downloads page with updated links, release numbers and dates
