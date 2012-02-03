@@ -130,5 +130,5 @@ Preferences accepted by the FirefoxProfile with special meaning, in the WebDrive
 || webdriver.log.driver || string || Level at which to log FirefoxDriver logging statements to a temporary file, so that they can be retrieved by a getLogs command. Available options; DEBUG, INFO, WARNING, ERROR, OFF. Defaults to OFF. ||
 || webdriver.log.file || string || Path to file to which to copy firefoxdriver logging output. Defaults to no file (like /dev/null). ||
 || webdriver_enable_native_events || boolean || Whether to enable native events. TODO: Maybe in some way different to nativeEvents capability. Defaults to false in the FirefoxDriver. Defaults to true on Windows from the WebDriver API, false on other platforms. ||
-|| webdriver.load.strategy || string || Experimental API. Defines different strategies for how long to wait until a page is loaded. Values: fast, patient. Defaults to patient. ||
+|| webdriver.load.strategy || string || Experimental API. Defines different strategies for how long to wait until a page is loaded. Values: unstable, conservative. Defaults to conservative. ||
 || webdriver_firefox_port || integer || Port to listen on for WebDriver commands. Defaults to 7055. ||
