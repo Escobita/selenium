@@ -1,6 +1,11 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.7.0 (not yet released)==
+
+  * Bug - File extensions being added to all file pickers - issue 3336
+  * Bug - Record interactions with elements with an id of 'id' - issue 3273 
+
 ==1.6.0==
 
   * New - Added support for Firefox 10
