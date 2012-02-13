@@ -263,6 +263,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || [#GET_/sessions /sessions] || Returns a list of the currently active sessions. ||
 || GET || [#GET_/session/:sessionId /session/:sessionId] || Retrieve the capabilities of the specified session. ||
 || DELETE || [#DELETE_/session/:sessionId /session/:sessionId] || Delete the session. ||
+|| POST || [#POST_/session/:sessionId/timeouts /session/:sessionId/timeouts] || Configure the amount of time that a particular type of operation can execute for before they are aborted and a |Timeout| error is returned to the client. ||
 || POST || [#POST_/session/:sessionId/timeouts/async_script /session/:sessionId/timeouts/async_script] || Set the amount of time, in milliseconds, that asynchronous scripts executed by `/session/:sessionId/execute_async` are permitted to run before they are aborted and a |Timeout| error is returned to the client. ||
 || POST || [#POST_/session/:sessionId/timeouts/implicit_wait /session/:sessionId/timeouts/implicit_wait] || Set the amount of time the driver should wait when searching for elements. ||
 || GET || [#GET_/session/:sessionId/window_handle /session/:sessionId/window_handle] || Retrieve the current window handle. ||
@@ -480,6 +481,35 @@ Returns a list of the currently active sessions. Each session will be returned a
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/timeouts ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/timeouts ====
+</dd>
+<dd>
+<dl>
+<dd>
+Configure the amount of time that a particular type of operation can execute for before they are aborted and a |Timeout| error is returned to the client.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`type` - `{string}` The type of operation to set the timeout for. Valid values are: "script" for script timeouts and "implicit" for modifying the implicit wait timeout.</dd>
+<dd>`ms` - `{number}` The amount of time, in milliseconds, that time-limited commands are permitted to run.</dd>
 </dl>
 </dd>
 </dl>
