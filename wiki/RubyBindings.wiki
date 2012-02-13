@@ -153,30 +153,24 @@ driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
 You can also pass an instance of `Selenium::WebDriver::Remote::Capabilities`, e.g.:
 
 {{{
-include Selenium
-
-caps = WebDriver::Remote::Capabilities.htmlunit(:javascript_enabled => true)
-driver = WebDriver.for(:remote, :desired_capabilities => caps)
+caps = Selenium::WebDriver::Remote::Capabilities.htmlunit(:javascript_enabled => true)
+driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
 
 You may want to set the proxy settings of the remote browser (this currently only works for Firefox):
 
 {{{
-include Selenium
-
-caps = WebDriver::Remote::Capabilities.firefox(:proxy => WebDriver::Proxy.new(:http => "myproxyaddress:8080"))
-driver = WebDriver.for(:remote, :desired_capabilities => caps)
+caps = Selenium::WebDriver::Remote::Capabilities.firefox(:proxy => WebDriver::Proxy.new(:http => "myproxyaddress:8080"))
+driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
 
 Or if you have a proxy in front of the remote server:
 
 {{{
-include Selenium
+client = Selenium::WebDriver::Remote::Http::Default.new
+client.proxy = Selenium::Proxy.new(:http => "proxy.org:8080")
 
-client = WebDriver::Remote::Http::Default.new
-client.proxy = Proxy.new(:http => "proxy.org:8080")
-
-driver = WebDriver.for(:remote, :http_client => client)
+driver = Selenium::WebDriver.for(:remote, :http_client => client)
 }}} 
 
 See [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb `Selenium::WebDriver::Proxy`] for more options.
@@ -192,12 +186,10 @@ The FirefoxDriver lets you configure the profile used.
 It's often useful to have Firebug available in the Firefox instance launched by !WebDriver:
 
 {{{
-include Selenium
-
-profile = WebDriver::Firefox::Profile.new
+profile = Selenium::WebDriver::Firefox::Profile.new
 profile.add_extension("/path/to/firebug.xpi")
 
-driver = WebDriver.for :firefox, :profile => profile
+driver = Selenium::WebDriver.for :firefox, :profile => profile
 }}}
 
 === Using an existing profile === 
@@ -374,10 +366,9 @@ For internal HTTP communication, `Net::HTTP` is used by default. If you e.g. hav
 
 {{{
 require 'selenium/webdriver/remote/http/curb'
-include Selenium
 
-client = WebDriver::Remote::Http::Curb.new
-driver = WebDriver.for(:firefox, :http_client => client)
+client = Selenium::WebDriver::Remote::Http::Curb.new
+driver = Selenium::WebDriver.for(:firefox, :http_client => client)
 }}}
 
 If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of !WebDriver, which is useful in [ScalingWebDriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive). 
