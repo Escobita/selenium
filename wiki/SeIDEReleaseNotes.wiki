@@ -3,6 +3,9 @@
 
 ==1.7.0 (not yet released)==
 
+  * Bug - Don't trim whitespace when decoding HTML testcases - issue 755
+  * New - Formatter menu items are now context sensitive - issue 3327 and issue 3385
+  * Bug - Fixed Ruby WebDriver test suite export - issue 3243
   * Bug - File extensions being added to all file pickers - issue 3336
   * Bug - Record interactions with elements with an id of 'id' - issue 3273 
 
