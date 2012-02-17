@@ -16,7 +16,7 @@ The gem also includes the older selenium-client gem for use with Selenium RC. Wh
 
 The WebDriver API is the successor to the Selenium RC API. For people who don't have a significant investment in the legacy API, we recommend starting directly with `Selenium::WebDriver`, and focusing on the two main classes, `Selenium::WebDriver::Driver` and `Selenium::WebDriver::Element`. This is the entry point to the whole !WebDriver API.
 
-For people who already have tests written against the Selenium RC API, it's possible to use [#WebDriver-backed_Selenium WebDriver-backed Selenium] to ease the migration. The rest of this document deals with `Selenium::WebDriver` exclusively.
+For people who already have tests written against the Selenium RC API, it's possible to use [#-backed_Selenium WebDriver-backed Selenium] to ease the migration. The rest of this document deals with `Selenium::WebDriver` exclusively.
 
 = API Example =
 
