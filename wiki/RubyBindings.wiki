@@ -4,7 +4,7 @@
 
 The Ruby bindings for Selenium/!WebDriver are available as the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem. There are many other Selenium gems out there, but this is the only official, maintained gem. If you're looking for a slightly higher level API built on the same technology, you may want to check out [http://watirwebdriver.com/ watir-webdriver].
 
-The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.  
+The bindings support Ruby 1.8.7 through 1.9.2, JRuby and Rubinius.
 
   * [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html API docs]
   * [http://selenium.googlecode.com/svn/trunk/rb/CHANGES Changelog]
@@ -14,8 +14,9 @@ The gem also includes the older selenium-client gem for use with Selenium RC. Wh
   * `Selenium::WebDriver` - the !WebDriver API
   * `Selenium::Client` - Selenium RC API (previously released as the selenium-client gem)
 
-The WebDriver API is the successor to the RC API. For people who don't have a significant investment in the legacy API, we recommend starting directly with `Selenium::WebDriver`, and focusing on the two main classes, `Selenium::WebDriver::Driver` and `Selenium::WebDriver::Element`. This is the entry point to the whole !WebDriver API. 
-The rest of this document deals with `Selenium::WebDriver` exclusively.
+The WebDriver API is the successor to the Selenium RC API. For people who don't have a significant investment in the legacy API, we recommend starting directly with `Selenium::WebDriver`, and focusing on the two main classes, `Selenium::WebDriver::Driver` and `Selenium::WebDriver::Element`. This is the entry point to the whole !WebDriver API.
+
+For people who already have tests written against the Selenium RC API, it's possible to use [#WebDriver-backed_Selenium WebDriver-backed Selenium] to ease the migration. The rest of this document deals with `Selenium::WebDriver` exclusively.
 
 = API Example =
 
@@ -44,7 +45,7 @@ puts driver.execute_script("return window.location.pathname")
 
 # pass elements between Ruby and JavaScript
 element = driver.execute_script("return document.body")
-driver.execute_script("return arguments[0].tagName", element) #=> "BODY" 
+driver.execute_script("return arguments[0].tagName", element) #=> "BODY"
 
 # wait for a specific element to show up
 wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
@@ -52,9 +53,9 @@ wait.until { driver.find_element(:id => "foo") }
 
 # switch to a frame
 driver.switch_to.frame "some-frame" # name or id
-driver.switch_to.frame driver.find_element(:id, 'some-frame') # frame element 
+driver.switch_to.frame driver.find_element(:id, 'some-frame') # frame element
 
-# switch back to the main document 
+# switch back to the main document
 driver.switch_to.default_content
 }}}
 
@@ -62,7 +63,7 @@ Element examples:
 
 {{{
 # get an attribute
-class_name = element.attribute("class") 
+class_name = element.attribute("class")
 
 # is the element visible on the page?
 element.displayed?
@@ -100,13 +101,13 @@ driver.action.key_down(:shift).
 
 == IE ==
 
-Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ setting (on or off, it doesn't matter as long as it is the same value) for all zones. 
+Make sure that _Internet Options_ → _Security_ has the same _Protected Mode_ setting (on or off, it doesn't matter as long as it is the same value) for all zones.
 
 == Chrome ==
 
 === Command line switches ===
- 
-For a list of switches, see [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/chrome_switches.cc&exact_package=chromium chrome_switches.cc]: 
+
+For a list of switches, see [http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/chrome/common/chrome_switches.cc&exact_package=chromium chrome_switches.cc]:
 
 {{{
 driver = Selenium::WebDriver.for :chrome, :switches => %w[--ignore-certificate-errors --disable-popup-blocking --disable-translate]
@@ -171,7 +172,7 @@ client = Selenium::WebDriver::Remote::Http::Default.new
 client.proxy = Selenium::Proxy.new(:http => "proxy.org:8080")
 
 driver = Selenium::WebDriver.for(:remote, :http_client => client)
-}}} 
+}}}
 
 See [http://code.google.com/p/selenium/source/browse/trunk/rb/lib/selenium/webdriver/common/proxy.rb `Selenium::WebDriver::Proxy`] for more options.
 
@@ -192,7 +193,7 @@ profile.add_extension("/path/to/firebug.xpi")
 driver = Selenium::WebDriver.for :firefox, :profile => profile
 }}}
 
-=== Using an existing profile === 
+=== Using an existing profile ===
 
 You can use an existing profile as a template for the WebDriver profile by passing the profile name (see `firefox -ProfileManager` to set up custom profiles.)
 
@@ -239,7 +240,7 @@ If you are using the remote driver you can still configure the Firefox profile:
 {{{
 profile = Selenium::WebDriver::Firefox::Profile.new
 profile['foo.bar'] = true
-  
+
 capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
 driver = Selenium::WebDriver.for :remote, :desired_capabilities => capabilities
 }}}
@@ -342,7 +343,7 @@ Internally, !WebDriver uses HTTP to communicate with a lot of the drivers (the J
 You can use webdriver to handle Javascript `alert()`, `prompt()` and `confirm()` dialogs.
 The API for all three is the same.
 
-Note: At this time alert handling is only available in Firefox and IE (or in those browsers through the remote server), and only alerts that are generated post onload can be captured. 
+Note: At this time alert handling is only available in Firefox and IE (or in those browsers through the remote server), and only alerts that are generated post onload can be captured.
 
 {{{
 require "selenium-webdriver"
@@ -371,4 +372,37 @@ client = Selenium::WebDriver::Remote::Http::Curb.new
 driver = Selenium::WebDriver.for(:firefox, :http_client => client)
 }}}
 
-If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of !WebDriver, which is useful in [ScalingWebDriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive). 
+If you have the [https://github.com/drbrain/net-http-persistent net-http-persistent gem] installed, you can (as of 0.1.3) similarly use "selenium/webdriver/remote/http/persistent" to get keep-alive connections. This will significantly reduce the ephemeral ports usage of !WebDriver, which is useful in [ScalingWebDriver some contexts]. Note that this currently only works with the remote Java server (the other servers doesn't yet support keep-alive).
+
+== WebDriver-backed Selenium ==
+
+If you already have tests written against the RC API, the Selenium server (since version 2.19) gives you ability to run your existing code backed by a WebDriver instance. This can help the migration to WebDriver since it allows you to mix and match the two APIs in the same test. Here's an example:
+
+{{{
+require 'selenium/webdriver'
+require 'selenium/client'
+require 'selenium/server'
+
+server = Selenium::Server.new("selenium-server-standalone-2.19.0.jar", :background => true)
+server.start
+
+begin
+  selenium = Selenium::Client::Driver.new :host    => "localhost",
+                                          :port    => 4444,
+                                          :url     => "http://google.com",
+                                          :browser => "*webdriver"
+  driver = Selenium::WebDriver.for :remote, :url => "http://localhost:4444/wd/hub/"
+
+  selenium.start :driver => driver
+  selenium.open "/"
+  selenium.type 'q', 'webdriver-backed selenium'
+
+  p driver.title == selenium.title
+
+  selenium.stop
+ensure
+  server.stop
+end
+}}}
+
+The opposite of this, a Selenium-backed WebDriver, is not available from Ruby at the moment.
