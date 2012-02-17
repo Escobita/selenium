@@ -3,6 +3,7 @@
 
 ==1.7.0 (not yet released)==
 
+  * Bug - Stored variables can safely contain consecutive dollar signs - issue 834
   * Bug - Don't trim whitespace when decoding HTML testcases - issue 755
   * New - Formatter menu items are now context sensitive - issue 3327 and issue 3385
   * Bug - Fixed Ruby WebDriver test suite export - issue 3243
