@@ -27,7 +27,23 @@ Simply add the {{{selenium-server-standalone.jar}}} to your CLASSPATH. You do no
 
 == Native Events and Internet Explorer ==
 
-As the InternetExplorerDriver is Windows-only, it attempts to use so-called "native", or OS-level events to perform mouse and keyboard operations in the browser. This is in contrast to using simulated JavaScript events for the same operations. The advantage of using native events is that it does not rely on the JavaScript sandbox, and it ensures proper JavaScript event propagation within the browser. However, because of the mechanisms used to construct the native events in IE, the IE driver can sometimes be affected by the browser window not having focus, particularly for mouse events. Additionally, attempting to hover over an element using native events can be problematic if the physical mouse cursor is within the window boundaries. This is not an ideal solution, and remedies for it are under investigation.
+As the InternetExplorerDriver is Windows-only, it attempts to use so-called "native", or OS-level events to perform mouse and keyboard operations in the browser. This is in contrast to using simulated JavaScript events for the same operations. The advantage of using native events is that it does not rely on the JavaScript sandbox, and it ensures proper JavaScript event propagation within the browser. However, there are currently some issues with mouse events when the IE browser window does not have focus, and when attempting to hover over elements.
+
+=== Browser Focus ===
+
+The challenge is that IE itself appears to not fully respect the Windows messages we send the IE browser window (WM_MOUSEDOWN and WM_MOUSEUP) if the window doesn't have the focus. Specifically, the element being clicked on will receive a focus window around it, but the click will not be processed by the element. Arguably, we shouldn't be sending messages at all; rather, we should be using the SendInput() API, but that API explicitly requires the window to have the focus. We have two conflicting goals with the WebDriver project.
+
+First, we strive to emulate the user as closely as possible. This means using so-called "native events" at the OS level rather than simulating the events using JavaScript.
+
+Second, we want to not require focus of the browser window being automated. This means that just forcing the browser window to the foreground is suboptimal.
+
+An additional consideration is the possibility of multiple IE instances running under multiple WebDriver instances, which means any such "bring the window to the foreground" solution will have to be wrapped in some sort of synchronizing construct (mutex?) within the IE driver's C++ code. Even so, this code will still be subject to race conditions, if, for example, the user brings another window to the foreground between the driver bringing IE to the foreground and executing the native event.
+
+The discussion around the requirements of the driver and how to prioritize these two conflicting goals is ongoing. The current prevailing wisdom is to prioritize the former over the latter, and document that your machine will be unavailable for other tasks when using the IE driver. However, that decision is far from finalized, and the code to implement it is likely to be rather complicated. 
+
+=== Hovering Over Elements ===
+
+When you attempt to hover over elements, and your physical mouse cursor is within the boundaries of the IE browser window, the hover will not work. More specifically, the hover will appear to work for a fraction of a second, and then the element will revert back to its previous state. The prevailing theory why this occurs is that IE is doing hit-testing of some sort during its event loop, which causes it to respond to the physical mouse position when the physical cursor is within the window bounds. The WebDriver development team has been unable to discover a workaround for this behavior of IE.
 
 == How InternetExplorerDriver Selects the IE Binary ==
 
@@ -35,4 +51,4 @@ This is done by the client side code. The client side checks to see if the OS is
 
 == Multiple instances of InternetExplorerDriver ==
 
-Unlike other WebDriver classes, there should only ever be a single InternetExplorerDriver instance at one time. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the Remote!WebDriver? and virtual machines.
+Unlike other WebDriver classes, there should only ever be a single InternetExplorerDriver instance at one time for some language bindings. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the Remote!WebDriver? and virtual machines.
