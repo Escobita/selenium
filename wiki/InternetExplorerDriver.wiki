@@ -33,7 +33,7 @@ As the InternetExplorerDriver is Windows-only, it attempts to use so-called "nat
 
 The challenge is that IE itself appears to not fully respect the Windows messages we send the IE browser window (WM_MOUSEDOWN and WM_MOUSEUP) if the window doesn't have the focus. Specifically, the element being clicked on will receive a focus window around it, but the click will not be processed by the element. Arguably, we shouldn't be sending messages at all; rather, we should be using the SendInput() API, but that API explicitly requires the window to have the focus. We have two conflicting goals with the WebDriver project.
 
-First, we strive to emulate the user as closely as possible. This means using so-called "native events" at the OS level rather than simulating the events using JavaScript.
+First, we strive to emulate the user as closely as possible. This means using native events rather than simulating the events using JavaScript.
 
 Second, we want to not require focus of the browser window being automated. This means that just forcing the browser window to the foreground is suboptimal.
 
