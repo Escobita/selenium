@@ -3,6 +3,7 @@
 
 ==1.7.0 (not yet released)==
 
+  * New - Added additional useful menu items to the help menu
   * New - Added support for Firefox 11
   * Bug - Stored variables can safely contain consecutive dollar signs - issue 834
   * Bug - Don't trim whitespace when decoding HTML testcases - issue 755
