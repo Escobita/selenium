@@ -1,6 +1,0 @@
-
-java_library(name = "iphone",
-  srcs = [ "*.java" ],
-  deps = [
-    "//java/client/src/org/openqa/selenium/remote",
-  ])

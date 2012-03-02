@@ -1,7 +1,0 @@
-
-java_library(name = "chrome",
-  srcs = [ "*.java" ],
-  deps = [
-    "//java/client/src/org/openqa/selenium/remote",
-  ],
- resources = [ "//javascript/chrome-driver" ])
