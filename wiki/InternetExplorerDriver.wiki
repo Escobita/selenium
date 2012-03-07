@@ -45,6 +45,10 @@ The discussion around the requirements of the driver and how to prioritize these
 
 When you attempt to hover over elements, and your physical mouse cursor is within the boundaries of the IE browser window, the hover will not work. More specifically, the hover will appear to work for a fraction of a second, and then the element will revert back to its previous state. The prevailing theory why this occurs is that IE is doing hit-testing of some sort during its event loop, which causes it to respond to the physical mouse position when the physical cursor is within the window bounds. The WebDriver development team has been unable to discover a workaround for this behavior of IE.
 
+=== Clicking <option> Elements and alert() ===
+
+There is one place where the IE driver does not interact with elements using native events. This is in clicking <option> elements within a <select> element. Under normal circumstances, the IE driver calculates where to click based on the position and size of the element, typically as returned by the JavaScript getBoundingClientRect() method. However, for <option> elements, getBoundingClientRect() returns a rectangle with zero position and zero size. The IE driver handles this one scenario by using the click() Automation Atom, which essentially sets the .selected property of the element and simulates the onChange event in JavaScript. However, this means that if the onChange event of the <select> element contains JavaScript code that calls alert(), confirm() or prompt(), calling WebElement's click() method will hang until the modal dialog is manually dismissed. There is no known workaround for this behavior using only WebDriver code.
+
 == How InternetExplorerDriver Selects the IE Binary ==
 
 This is done by the client side code. The client side checks to see if the OS is x64. If this succeeds then it checks that the process running the client side code is a 64-bit process. If that succeeds then the client code will try load the 64-bit version of Internet Explorer. If any of the checks for x64 fail the code will try use 32-bit version of Internet Explorer.
