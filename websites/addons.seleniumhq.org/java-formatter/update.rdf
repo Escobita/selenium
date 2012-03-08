@@ -12,9 +12,9 @@
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>3.6.0</em:minVersion> 
-                <em:maxVersion>10.*</em:maxVersion>
+                <em:maxVersion>11.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/1.7.0/java-format-1.7.0.xpi</em:updateLink>
-                <em:updateHash>sha1:b6597ddcf679c7a01cd757483e3f88d2cce3c4f6</em:updateHash>
+                <em:updateHash>sha1:498b6ea7fef8cf13d268a0ee70be0df58514f84b</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
