@@ -127,6 +127,18 @@ platform={WINDOWS, LINUX, MAC}
 
  * -registerCycle = how often in ms the node will try to register itself again.Allow to restart the hub without having to restart the nodes.
 
+== Configuring timeouts (Version 2.21 required) ==
+
+Timeouts in the grid should normally be handled through webDriver.manage().timeouts(), which will control how the different operations time out.
+
+To preserve run-time integrity of a grid with selenium-servers, there are three other timeout values that can be set.
+
+On the hub, setting the -nodeTimeout command line option to "30" seconds will ensure all resources are reclaimed 30 seconds after a test-runner crashes.
+
+On the individual nodes, setting -Dselenium.server.session.timeout to "31" will additionally ensure that all resources are reclaimed 31 seconds after the test-runner crashes. If grid is being used, it typically makes sense to use -nodeTimeout + 1, since this case will cover when the grid hub is taken down.
+
+And finally, setting -Dselenium.server.browser.timeout=20 will ensure that we only hang inside the browser for 20 seconds, at which point the process is killed. This should generally be a higher value than what is used in webDriver.manage().timeouts(), since this mechanism is a "last line of defense".
+
 ==Hub diagnostic messages==
 Upon detecting anomalious usage patterns, the hub can give the following message:
 {{{
