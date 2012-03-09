@@ -27,6 +27,8 @@ java -jar selenium-server-standalone-{VERSION}.jar -Dselenium.server.browser.tim
 || selenium.server.browser.timeout || Controls how long the browser is allowed to hang (value in seconds)||
 || selenium.server.session.timeout || Controls how long the client is  is allowed to be gone before the session is reclaimed (value in seconds)||
 
+Please note that the "selenium.server.browser.timeout" is intended as a backup timeout mechanism when the ordinary timeout mechanism fails, which should be used mostly in grid/server environments to ensure that crashed/lost processes do not stay around for too long, polluting the runtime environment.
+
 ==Configuring the Server in Code ==
 
 In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
