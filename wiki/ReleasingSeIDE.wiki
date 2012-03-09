@@ -15,6 +15,7 @@ The steps to releasing Se-IDE (because I keep forgetting something)
     # Copy all XPIs to /tmp
     # Switch to the release user (sudo su - release)
     # Copy the XPIs to the relevant locations in release.openqa.org/htdocs/selenium-ide
+    # Make sure the multi-xpi is in selenium-ide/x.x.x and the editor is in selenium-ide/editor/x.x.x
   # Update download page on seleniumhq.org with new release details
   # Test download
   # Add the release to the update.rdf files the IDE iteself and all bundled plugins
