@@ -18,6 +18,15 @@ The caller is expected to terminate each session properly, calling either Seleni
 
 The selenium-server keeps in-memory logs for each ongoing session, which are cleared when Selenium#stop() or WebDriver#quit is called. If you forget to terminate these sessions your server may leak memory. If you keep extremely long-running sessions you will probably need to stop/quit every now and then (or increase memory with -Xmx jvm option)
 
+=== Timeouts (from version 2.21) ===
+The server has two different timeouts, which can be set as follows: 
+{{{
+java -jar selenium-server-standalone-{VERSION}.jar -Dselenium.server.browser.timeout=123
+}}}
+
+|| selenium.server.browser.timeout || Controls how long the browser is allowed to hang (value in seconds)||
+|| selenium.server.session.timeout || Controls how long the client is  is allowed to be gone before the session is reclaimed (value in seconds)||
+
 ==Configuring the Server in Code ==
 
 In theory, the process is as simple as mapping the "DriverServlet" to a URL, but it's also possible to host the page in a lightweight container, such as Jetty configured entirely in code. Steps to do this follow.
