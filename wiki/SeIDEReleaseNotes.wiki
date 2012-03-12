@@ -1,6 +1,10 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.7.1==
+
+  * Bug - Fixed regression with stored variables - issue 3520
+
 ==1.7.0==
 
   * New - Added additional useful menu items to the help menu
