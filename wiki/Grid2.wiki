@@ -127,6 +127,8 @@ platform={WINDOWS, LINUX, MAC}
 
  * -registerCycle = how often in ms the node will try to register itself again.Allow to restart the hub without having to restart the nodes.
 
+ * Relly large (>50 node) Hub installations may need to increase the jetty threads by setting -DPOOL_MAX=512 (or larger) on the java command line.
+
 == Configuring timeouts (Version 2.21 required) ==
 
 Timeouts in the grid should normally be handled through webDriver.manage().timeouts(), which will control how the different operations time out.
