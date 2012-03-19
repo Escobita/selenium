@@ -288,6 +288,8 @@ Given these mappings, the server should always route requests whose final path s
 || GET || [#GET_/session/:sessionId/window/:windowHandle/size /session/:sessionId/window/:windowHandle/size] || Get the size of the specified window. ||
 || POST || [#POST_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Change the position of the specified window. ||
 || GET || [#GET_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Get the position of the specified window. ||
+|| POST || [#POST_/session/:sessionId/window/:windowHandle/maximize /session/:sessionId/window/:windowHandle/maximize] || Maximize the currently selected window if not already maximized. ||
+|| POST || [#POST_/session/:sessionId/window/:windowHandle/restore /session/:sessionId/window/:windowHandle/restore] || Restore currently selected window if maximized. ||
 || GET || [#GET_/session/:sessionId/cookie /session/:sessionId/cookie] || Retrieve all cookies visible to the current page. ||
 || POST || [#POST_/session/:sessionId/cookie /session/:sessionId/cookie] || Set a cookie. ||
 || DELETE || [#DELETE_/session/:sessionId/cookie /session/:sessionId/cookie] || Delete all cookies visible to the current page. ||
@@ -1217,6 +1219,60 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{x: number, y: number}` The X and Y coordinates for the window, relative to the upper left corner of the screen.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the specified window cannot be found.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window/:windowHandle/maximize ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/window/:windowHandle/maximize ====
+</dd>
+<dd>
+<dl>
+<dd>Maximize the currently selected window if not already maximized.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the specified window cannot be found.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/window/:windowHandle/restore ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/window/:windowHandle/restore ====
+</dd>
+<dd>
+<dl>
+<dd>Restore currently selected window if maximized.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
 </dl>
 </dd>
 <dd>
