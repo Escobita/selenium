@@ -1,6 +1,10 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.7.2==
+
+  * Bug - Fixed regression with typing into file input fields - issue 3549
+
 ==1.7.1==
 
   * Bug - Fixed regression with stored variables - issue 3520
