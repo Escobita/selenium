@@ -1,0 +1,138 @@
+#summary Information about the Safari Driver
+#labels WebDriver
+
+= The !SafariDriver =
+
+The !SafariDriver is implemented as a Safari browser extension.  The driver inverts the traditional client/server relationship and communicates with the !WebDriver client using [http://en.wikipedia.org/wiki/WebSocket WebSockets].
+
+The !SafariDriver requires Safari 5.0+
+
+== Getting Started ==
+
+First, sign up for Apple's (free) [https://developer.apple.com/programs/safari/ Safari Developer Program] and generate a signed certificate for the extension.
+
+Next, build the !SafariDriver extension:
+{{{
+$ ./go safari
+}}}
+
+Finally, install the extension.
+  # Launch Safari
+  # Open the Extension Builder (Develop > Show Extension Builder)
+  # Add a new extension: `$SELENIUM_CLIENT/build/javascript/safari-driver/SafariDriver.safariextension`
+  # Click Install
+
+Once you've installed the extension, you can start writing tests:
+{{{
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeThat;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+@RunWith(JUnit4.class)
+public class SafariDriverTests {
+
+  private WebDriver driver = null;
+
+  private static boolean isSupportedPlatform() {
+    Platform current = Platform.getCurrent();
+    return Platform.MAC.is(current) || Platform.WINDOWS.is(current);
+  }
+
+  @Before
+  public void createDriver() {
+    assumeThat(isSupportedPlatform(), is(true));
+    driver = new SafariDriver();
+  }
+
+  @After
+  public void quitDriver() {
+    driver.quit();
+  }
+
+  @Test
+  public void shouldBeAbleToPerformAGoogleSearch() {
+    driver.get("http://www.google.com");
+    driver.findElement(By.name("q")).sendKeys("webdriver");
+    driver.findElement(By.name("btnG")).click();
+    new WebDriverWait(driver, 3)
+        .until(ExpectedConditions.titleIs("webdriver - Google Search"));
+  }
+}
+}}}
+
+== Communicating with the !SafariDriver ==
+
+The !SafariDriver communicates with clients using !WebSockets. While the !SafariDriver browser extension maintains the client-end of the !WebSocket extension, this section refers to it as the "server" end of the !WebDriver API. Similarly, the term "client" refers to the user-facing !WebDriver API that issues commands to the server.
+
+=== Command ===
+
+|| *Key* || *Type* || *Description* ||
+|| id || string || A random ID assigned to the command by the client; may be any string value. ||
+|| name || string || The name of the command. Should be one of the values defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/DriverCommand.html org.openqa.selenium.remote.DriverCommand]. ||
+|| parameters || `Object` || The command parameters as a JSON object. All parameter (key, value) pairs are consistent with those documented in the [JsonWireProtocol#Command_Reference JSON wire protocol]. ||
+
+Commands that rely on a URL parameter in the wire protocol should include those parameters in the parameter map using the same name as documented in the JsonWireProtocol. For instance, the wire protocol command
+{{{
+POST /session/:sessionId/window/:windowHandle/size
+
+{"width":250, "height":250}
+}}}
+Should be encoded for the !SafariDriver as
+{{{
+{
+  "id": "random-id-1234",
+  "name": "setWindowSize",
+  "parameters": {
+    "sessionId": "mySessionId",
+    "windowHandle": "current"
+  }
+}
+}}}
+The !SafariDriver tracks sessions by !WebSocket connection, so the `sessionId` parameter may actually be excluded from the parameter set.
+
+=== Response ===
+
+The !SafariDriver's response objects are identical to those returned by the [JsonWireProtocol#Responses JSON wire protocol], except each response should also include an `id` field, which echoes the ID sent with the corresponding command object.
+
+=== On Command/Response IDs ===
+
+The !SafariDriver will synchronize the execution of every command it receives. Thus, each response should always match the original command sent by the client. Upon receiving a response, the client should check that the ID matches the one sent with the original command. It is a catastrophic failure if these IDs do not match.
+
+=== Connecting to the !SafariDriver ===
+
+Clients may connect to the !SafariDriver by opening a page with the following:
+{{{
+<!DOCTYPE html>
+<script>
+window.onload = function() {
+  window.postMessage({
+    'message': 'connect',
+    'source': 'webdriver',
+    'url': 'ws://localhost:1234/wd'
+  }, '*');
+};
+</script>
+}}}
+The posted message is intercepted by the injected script and passed along to the extension's global page, which will in turn establish the !WebSocket connection with the requested server.
+
+Safari will not load extensions for `file://` URLs. In order to open the connection page, as shown above, it is recommended that this page be served by the !WebSocket server maintained by the !SafariDriver client.
+
+The !SafariDriver supports multiple !WebSocket connections. Each connection is treated as a separate session with its own timeout state (i.e., for implicit waits). All sessions share state for window and frame focus. Furthermore, the execution of commands is synchronized globally, across all sessions.
+
+== Known Issues ==
+
+  # The !SafariDriver requires a persistent extension install.
+  # Safari does not load extensions for `file://` URLs, thus these are not supported by the !SafariDriver.
+  # When navigating forwards or backwards in browser history, the injected script of a Safari extension will loses its tab proxy reference and ability to communicate with the extension global script along with it. Consequently, the !SafariDriver will return an error when attempting to go back or forwards in page history.
