@@ -131,6 +131,14 @@ Safari will not load extensions for `file://` URLs. In order to open the connect
 
 The !SafariDriver supports multiple !WebSocket connections. Each connection is treated as a separate session with its own timeout state (i.e., for implicit waits). All sessions share state for window and frame focus. Furthermore, the execution of commands is synchronized globally, across all sessions.
 
+== Debugging ==
+
+Sometimes, a test may hang after sending a command to the !SafariDriver. This usually indicates something blew up. Thankfully, the !SafariDriver is quite chatty.
+
+First open the !WebKit inspector on the page under test and check the console output. The console is cleared each time a page is loaded, so you'll only be able to see the logs for the most recent injected script. You can select the injected script and set break points inside the inspector, but it is sandboxed from the page, so you can't play with it using the inspector's REPL.
+
+Next, check the global page: Develop > Show Extension Builder. Select the WebDriver extension, and click "Inspect global page." Again, the !SafariDriver is super chatty, so you should see what went wrong on the console.  You can set script break points for the injected page and interact with it using the REPL.
+
 == Known Issues ==
 
   # The !SafariDriver requires a persistent extension install.
