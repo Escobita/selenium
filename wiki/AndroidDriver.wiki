@@ -242,8 +242,6 @@ Android WebDriver requires the following permissions in the application's manife
    * android.permission.WRITE_EXTERNAL_STORAGE
    * android.permission.WRITE_APN_SETTINGS
 
-== Demo == 
-<wiki:video url="http://www.youtube.com/watch?v=2m-eRtXnCF4"/>
 
 = Get Involved =
 
