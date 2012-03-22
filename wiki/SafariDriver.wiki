@@ -139,6 +139,13 @@ First open the !WebKit inspector on the page under test and check the console ou
 
 Next, check the global page: Develop > Show Extension Builder. Select the WebDriver extension, and click "Inspect global page." Again, the !SafariDriver is super chatty, so you should see what went wrong on the console.  You can set script break points for the injected page and interact with it using the REPL.
 
+== Unimplemented Features ==
+
+The !SafariDrive is a work in progress. As such, there are a handful of key features which have yet to be implemented:
+  # JavaScript execution (e.g. `WebDriver.executeScript()`)
+  # Frame switching
+  # The advanced interactions API
+
 == Known Issues ==
 
   # The !SafariDriver requires a persistent extension install.
