@@ -2730,8 +2730,8 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`element` - `{string}` ID of the element where the scroll starts.</dd>
-<dd>`xOffset` - `{number}` The x offset in pixels to scroll by.</dd>
-<dd>`yOffset` - `{number}` The y offset in pixels to scroll by.</dd>
+<dd>`xoffset` - `{number}` The x offset in pixels to scroll by.</dd>
+<dd>`yoffset` - `{number}` The y offset in pixels to scroll by.</dd>
 </dl>
 </dd>
 </dl>
@@ -2758,8 +2758,8 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`xOffset` - `{number}` The x offset in pixels to scrollby.</dd>
-<dd>`yOffset` - `{number}` The y offset in pixels to scrollby.</dd>
+<dd>`xoffset` - `{number}` The x offset in pixels to scrollby.</dd>
+<dd>`yoffset` - `{number}` The y offset in pixels to scrollby.</dd>
 </dl>
 </dd>
 </dl>
@@ -2841,7 +2841,7 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`element` - `{string}` ID of the element where the flick starts.</dd>
-<dd>`xOffset` - `{number}` The x offset in pixels to flick by.</dd>
+<dd>`xoffset` - `{number}` The x offset in pixels to flick by.</dd>
 <dd>`yOffset` - `{number}` The y offset in pixels to flick by.</dd>
 <dd>`speed` - `{number}` The speed in pixels per seconds.</dd>
 </dl>
