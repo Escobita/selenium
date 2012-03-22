@@ -2842,7 +2842,7 @@ location for correctly generating native events.</dd>
 <dt>*JSON Parameters:*</dt>
 <dd>`element` - `{string}` ID of the element where the flick starts.</dd>
 <dd>`xoffset` - `{number}` The x offset in pixels to flick by.</dd>
-<dd>`yOffset` - `{number}` The y offset in pixels to flick by.</dd>
+<dd>`yoffset` - `{number}` The y offset in pixels to flick by.</dd>
 <dd>`speed` - `{number}` The speed in pixels per seconds.</dd>
 </dl>
 </dd>
