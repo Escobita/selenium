@@ -131,7 +131,17 @@ Safari will not load extensions for `file://` URLs. In order to open the connect
 
 The !SafariDriver supports multiple !WebSocket connections. Each connection is treated as a separate session with its own timeout state (i.e., for implicit waits). All sessions share state for window and frame focus. Furthermore, the execution of commands is synchronized globally, across all sessions.
 
-== Debugging ==
+== Development ==
+
+Once you have manually installed the !SafariDriver extension, as outlined above,
+you can reload your changes by re-compiling the extension, opening the extension builder, and clicking the "Reload" button for the !WebDriver extension.
+
+If you are using Mac OSX, you can automate this process by running
+{{{
+$ ./go safari:reinstall
+}}}
+
+=== Debugging ===
 
 Sometimes, a test may hang after sending a command to the !SafariDriver. This usually indicates something blew up. Thankfully, the !SafariDriver is quite chatty.
 
