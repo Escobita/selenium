@@ -510,7 +510,7 @@ Configure the amount of time that a particular type of operation can execute for
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`type` - `{string}` The type of operation to set the timeout for. Valid values are: "script" for script timeouts and "implicit" for modifying the implicit wait timeout.</dd>
+<dd>`type` - `{string}` The type of operation to set the timeout for. Valid values are: "script" for script timeouts, "implicit" for modifying the implicit wait timeout and "page load" for setting a page load timeout.</dd>
 <dd>`ms` - `{number}` The amount of time, in milliseconds, that time-limited commands are permitted to run.</dd>
 </dl>
 </dd>
