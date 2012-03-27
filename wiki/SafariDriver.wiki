@@ -151,8 +151,8 @@ Next, check the global page: Develop > Show Extension Builder. Select the WebDri
 
 == Unimplemented Features ==
 
-The !SafariDrive is a work in progress. As such, there are a handful of key features which have yet to be implemented:
-  # JavaScript execution (e.g. `WebDriver.executeScript()`)
+The !SafariDriver is a work in progress. As such, there are a handful of key features which have yet to be implemented:
+  # !JavaScript execution (e.g. `WebDriver.executeScript()`)
   # Frame switching
   # The advanced interactions API
 
@@ -161,3 +161,12 @@ The !SafariDrive is a work in progress. As such, there are a handful of key feat
   # The !SafariDriver requires a persistent extension install.
   # Safari does not load extensions for `file://` URLs, thus these are not supported by the !SafariDriver.
   # When navigating forwards or backwards in browser history, the injected script of a Safari extension will loses its tab proxy reference and ability to communicate with the extension global script along with it. Consequently, the !SafariDriver will return an error when attempting to go back or forwards in page history.
+
+== Reporting Bugs ==
+
+If you think you've found a bug, please open a [http://code.google.com/p/selenium/issues/list bug] on our issue tracker.  When filing a bug, please adhere to the following guidelines:
+  # Prefix your summary line with "`[SafariDriver]`."  For example: "`[SafariDriver] Unable to execute JavaScript`".
+  # Include the injected script's log output (see [#Debugging above]).
+  # Include the global page's log output (again, see [#Debugging above]).
+  # Include a [http://www.webkit.org/quality/reduction.html reduced] test case for your bug.
+  # Avoid filing bugs for the aforementioned [#Unimplemented_Features unimplemented features] and [#Known_Issues known issues].
