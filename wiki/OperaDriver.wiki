@@ -3,70 +3,92 @@
 
 = OperaDriver =
 
-!OperaDriver is a vendor-supported !WebDriver implementation developed by [http://opera.com/ Opera Software] and volunteers that implements !WebDriver's [JsonWireProtocol wire protocol].
+!OperaDriver is a vendor-supported !WebDriver implementation developed by [http://opera.com/ Opera Software] and volunteers that implements [http://code.google.com/p/selenium/ WebDriver] for Opera.
+
+!OperaDriver can drive the browser running various tests on your web pages, just as if a real user was navigating through them.  It can emulate actions like clicking links, entering text and submitting forms, and reports results back to you so you know your website works as intended.
+
+!OperaDriver's end-user emulation ensures that your entire stack (HTML, scripts, styling embedded resources and backend setup) is functioning correctly, and this without tedious manual testing routines.
 
 == Requirements ==
 
-The !OperaDriver uses the [http://dragonfly.opera.com/app/scope-interface/ Scope interface] (same as for [http://www.opera.com/dragonfly/ Dragonfly]) to communicate directly with Opera from Java.  Consequently, the !OperaDriver is only compatible with Opera version 11.5 or newer.
+You will need a Java Runtime Environment 1.5 or newer (Oracle or OpenJDK) to use OperaDriver.  It uses the [http://dragonfly.opera.com/app/scope-interface/ Scope interface] (same as for [http://www.opera.com/dragonfly/ Dragonfly]) to communicate directly with Opera from Java.  Consequently, it is compatible out-of-the-box with Opera version 11.6 or newer, although it works for older versions with some tweaks.
 
-The server expects you to have Opera installed in the default location for each system:
+The !OperaDriver server expects you to have Opera or Opera Next installed in the default location for each system:
 
 || *OS* || *Expected Location of Opera* ||
-|| Linux || /usr/bin/opera ||
-|| Mac || /Applications/Opera.app/Contents/MacOS/Opera ||
-|| Windows || \%PROGRAMFILES%\Opera\opera.exe ||
+|| GNU/Linux || /usr/bin/opera<br />/usr/bin/opera-next<br />/usr/bin/operamobile ||
+|| Mac || /Applications/Opera.app/Contents/MacOS/Opera<br />/Applications/Opera Next.app/Contents/MacOS/Opera<br />/Applications/Opera Mobile Emulator.app/Contents/Resources/Opera Mobile.app/Contents/MacOS/operamobile ||
+|| Windows || %PROGRAMFILES%\Opera\opera.exe<br />%PROGRAMFILES%\Opera Next\opera.exe<br />%PROGRAMFILES%\Opera Mobile Emulator\OperaMobileEmu.exe ||
 
-However, you can override this and specify a custom location to Opera by setting the `OPERA_PATH` environmental variable which you can read more about under [#Settings].
+However, you can override this and specify a custom location to Opera by setting the capability `opera.binary` or environmental variable `OPERA_PATH`.  You can read more about configuring !OperaDriver under Advanced Usage.
+
+=== !OperaDriver on 11.52 or older ===
+
+The use !OperaDriver on Opera < 11.52, make sure you set the capabilities `opera.port` to `-1` and `opera.profile` to `""` (empty string) to disable `-debugproxy` and `-pd` command-line arguments which older versions of Opera do not support.  For even older versions (11.01 or older) you might need a wrapper script (see below).
 
 == Getting Started ==
 
-To get set up [http://code.google.com/p/selenium/downloads/list please download] either _selenium-server_ or _selenium-server-standalone_ and make sure you have a fairly recent version of Opera.  All you need to do is to create a new `OperaDriver` instance:
+=== Remotely ===
+
+To get set up [http://code.google.com/p/selenium/downloads/list please download] either *selenium-server-standalone* or *selenium-server* and make sure you have a fairly recent version of Opera installed.  All you need to do is create a new [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.html `WebDriver`] instance:
 
 {{{
 WebDriver driver = new OperaDriver();
-driver.navigate().to("http://www.opera.com/");
+driver.navigate().to("http://opera.com/");
 }}}
 
-=== Running the server as a standalone process ===
-
-Since the !OperaDriver implements the wire protocol, it is fully compatible with any RemoteWebDriver client.  Simply start up your server, create a client, and away you go:
+Since !WebDriver provides APIs (called *bindings*) for several languages, you can do the same in [http://selenium.googlecode.com/svn/trunk/docs/api/rb/index.html Ruby] (using the [http://rubygems.org/gems/selenium-webdriver selenium-webdriver] gem) by setting the environmental variable ´SELENIUM_SERVER_JAR` to the full path of the *selenium-server-standalone` JAR you just downloaded:
 
 {{{
-WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.opera());
-driver.navigate().to("http://www.opera.com/");
+export SELENIUM_SERVER_JAR=/path/to/selenium-server-standalone.jar
 }}}
 
-=== Using the Ruby bindings ===
-
-_[RubyBindings selenium-webdriver]_, the Ruby bindings for Selenium 2/!WebDriver also support Opera out of the box.  First, install the gem:
+And then do the following in Ruby:
 
 {{{
-gem install selenium-webdriver
-}}}
-
-Next, [http://code.google.com/p/selenium/downloads/list download the selenium-server-standalone] jar and set environmental variable `SELENIUM_SERVER_JAR` to point to its location:
-
-{{{
-export SELENIUM_SERVER_JAR=~/server-standalone.jar
-}}}
-
-Then all you have to do is to create a new instance of `Selenium::WebDriver`:
-
-{{{
-require 'rubygems'
 require 'selenium-webdriver'
-
 driver = Selenium::WebDriver.for :opera
 driver.navigate.to 'http://opera.com/'
 }}}
 
-If you prefer using the Watir API, you can have a look at the [http://rubygems.org/gems/watir-webdriver watir-webdriver] gem.
+In Python you'd set the same environmental variable and invoke Opera this way:
+
+{{{
+from selenium import webdriver
+driver = webdriver.Opera()
+driver.get('http://opera.com/')
+}}}
+
+=== Running the server as a standalone process ===
+
+!OperaDriver is fully compatible with any RemoteWebDriver client.  Simply start up your server, create a remote client, and away you go:
+
+{{{
+WebDriver driver = new RemoteWebDriver("http://localhost:9515", DesiredCapabilities.opera());
+}}}
+
+=== Separate !OperaDriver ===
+
+You can also use !OperaDriver as a standalone dependency in your project.  Download the package from the [https://github.com/operasoftware/operadriver/downloads Github project's download section] and extract it to a location of your choice.  To see some examples look at the [https://github.com/operasoftware/operadriver/tree/master/examples examples/] directory.  For your own projects include the lib/* directory on your classpath, for example:
+
+{{{
+javac -classpath "lib/*:." Example.java
+}}}
+
+In Eclipse this can be done under _Project_ > _Properties_ > _Java Build Path_ and then *"Add JARs..."* or *"Add External JARs..."* depending on the layout of your project.
+
+You can also use Maven.  The group ID is `com.opera` and the artifact ID is `operadriver`.
+
+== Documentation ==
+
+* [http://operasoftware.github.com/operadriver/docs/ API documentation]
+* [http://seleniumhq.org/docs/03_webdriver.html Selenium WebDriver documentation]
 
 == Advanced Usage ==
 
-=== Desired capabilities ===
+=== Capabilities ===
 
-You can use the !DesiredCapabilites class to set some settings inside OperaDriver. The capabilities we support are:
+You can use the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/DesiredCapabilities.html DesiredCapabilities] class to specify settings for OperaDriver.  The capabilities supported are:
 
 ==== opera.logging.level ====
 
