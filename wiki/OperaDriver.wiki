@@ -90,133 +90,87 @@ You can also use Maven.  The group ID is `com.opera` and the artifact ID is `ope
 
 You can use the [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/remote/DesiredCapabilities.html DesiredCapabilities] class to specify settings for OperaDriver.  The capabilities supported are:
 
-==== opera.logging.level ====
+|| *Capability* || *Type* || *Default* || *Description* ||
+|| *opera.logging.level* || String/[http://docs.oracle.com/javase/1.4.2/docs/api/java/util/logging/Level.html Level] || Level.INFO || How verbose the logging should be.  Available levels are: SEVERE (highest value), WARNING, INFO, CONFIG, FINE, FINER, FINEST (lowest value), ALL. ||
+|| *opera.logging.file* || String || null || Where to send the output of the logging.  Default is to not write to file. ||
+|| *opera.binary* || String || _system Opera binary_ || Absolute path to the Opera binary to use.  If not specified, OperaDriver will guess the path to your Opera installation. ||
+|| *opera.arguments* || String || null || Arguments to pass on to Opera, separated by spaces.  See `opera -help` for available command-line arguments. ||
+|| *opera.host* || String || "127.0.0.1" || The host Opera should connect to.  Unless your starting Opera on another machine you won't need this. ||
+|| *opera.port* || Integer || _random port_ || The port Opera should connect to.  0 = Random port, -1 = Opera default (port 7001) (for use with Opera < 12). ||
+|| *opera.launcher* || String || ~/.launcher/LAUNCHER || Absolute path to the launcher binary to use.  The launcher is a gateway between OperaDriver and the Opera browser, and is being used for controlling and monitoring the binary, and taking external screenshots.  If left blank, OperaDriver will use the launcher supplied with the package. ||
+|| *opera.profile* || String/OperaProfile || OperaProfile || Directory string for the Opera profile to use.  If left empty, a new random profile will be used.  If "", an empty string, then the default autotest directory is used. ||
+|| *opera.idle* || Boolean || false || Whether to use Opera's alternative implicit wait imlpementation.  It will use an in-browser heuristic to guess when a page has finished loading, allowing us to determine with great accuracy whether there are any planned events in the document.  This functionality is useful for very simple test cases, but not designed for real-world testing.  It is disable by default. ||
+|| *opera.display* || Integer || null || The X display to use, typically if you want to use Xvfb or tightvncserver.  (Only works on UNIX-like OSes.) ||
+|| *opera.autostart* || Boolean || true || Whether to auto-start the Opera binary.  If false, OperaDriver will wait for a connection from the browser.  Go to "opera:debug", enter the correct port number and hit "Connect" to connect manually. ||
+|| *opera.no_restart* || Boolean || false || Whether to restart. ||
+|| *opera.no_quit* || Boolean || false || Whether to quit Opera when OperaDriver is shut down.  If enabled, it will keep the browser running after the driver is shut down. ||
+|| *opera.product* || String || null || The product we are using, for example "desktop", "core-desktop" or "sdk".  See [https://github.com/operasoftware/operadriver/blob/master/src/com/opera/core/systems/OperaProduct.java OperaProduct] for all available values. ||
 
-(String) How verbose the logging should be.  Available levels are: SEVERE (highest value),
-WARNING, INFO, CONFIG, FINE, FINER, FINEST (lowest value), ALL.  Default is INFO.
-
-==== opera.logging.file ====
-
-(String) Where to send the output of the logging.  Default is to not write to file.
-
-==== opera.binary ====
-
-(String) Path to the Opera binary to use.  If not specified, OperaDriver will
-guess the path to your Opera installation (typically `/usr/bin/opera`> or
-`C:\Program Files\Opera\opera.exe`).
-
-==== opera.host ====
-
-(String) The host Opera should connect to.  Unless you're starting Opera manually you won't
-need this.
-
-==== opera.port ====
-
-(Integer) The port to Opera should connect to.  0 = Random, -1 = Opera default (for use with
-Opera < 12).
-
-==== opera.launcher ====
-
-(String) Path to the launcher binary to use.  The launcher is a gateway between OperaDriver and
-the Opera browser, and is being used for controlling the binary and taking external
-screenshots.  If left blank, OperaDriver will use the launcher supplied with the package.
-
-==== opera.arguments ====
-
-(String) Arguments to pass to Opera, separated by spaces.  See `opera -help`
-for available command-line switches.
-
-==== opera.profile ====
-
-(String) Directory to use for the Opera profile. If null a random temporary directory is used.
-If "", an empty string, then the default autotest profile directory is used.
-
-==== opera.idle ====
-
-(Boolean) Whether to use Opera's alternative implicit wait implementation.  It will use an
-in-browser heuristic to guess when a page has finished loading, allowing us with great accuracy
-tell whether there are any planned events in the document.  This functionality is useful for
-very simple test cases, but not designed for real-world testing.  It is disabled by default.
-
-==== opera.display ====
-
-(Integer) The X display to use.  (Only works on UNIX-like OSes.)
-
-==== opera.autostart ====
-
-(Boolean) Whether to auto-start the Opera binary.  If false, OperaDriver will wait for a
-connection from the browser.  Go to "opera:debug", enter the correct port number, and hit
-"Connect" to connect manually.
-
-==== opera.no_restart ====
-
-(Boolean) Whether to restart.
-
-==== opera.no_quit ====
-
-(Boolean) Whether to quit Opera when OperaDriver is shut down.  If enabled, it will keep the
-browser running after the driver is shut down.
-
-==== opera.guess_binary_path ====
-
-(Boolean) Whether to guess the path to Opera if it isn't set in `opera.binary`.
-
-
-==== opera.binary_profile ====
-
-(String) The profile configuration we are using, for example "desktop" or "core-gogi".
-
-=== Settings ===
-
-To specify such things as a custom location of the Opera binary and command-line arguments you may use environmental variables or the !OperaDriverSettings object.  This is a list of the environmental variables which can be set on any OS:
-
- * `OPERA_PATH`: The full path to the Opera binary.
- * `OPERA_ARGS`: A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.
- * `OPERA_IDLE`: If set to a truthy value ("true", "1") you will enable a built-in browser-side checker for when a page is finished loading.
- * `OPERA_LAUNCHER`: Full path to the Opera binary launcher, typically located in `~/.launcher/launcher-*` on GNU/Linux and Mac.
-
-You may also pass in the !OperaDriverSettings object to the constructor in OperaDriver:
+To use capabilities:
 
 {{{
-OperaDriverSettings settings = new OperaDriverSettings();
-settings.setOperaBinaryLocation("/path/to/opera");
-settings.setOperaBinaryArguments("-nowindow -someothervalue");
-settings.setUseOperaIdle(true);
-settings.setOperaLauncherXvfbDisplay(8);
-WebDriver driver = new OperaDriver(settings);
+DesiredCapabilities capabilities = DesiredCapabilities.opera();
+capabilities.setCapability("opera.profile", new OperaProfile("/path/to/existing/profile"));
+capabilities.setCapability("opera.logging.level", Level.CONFIG);
+capabilities.setCapability("opera.logging.file", "/var/log/operadriver.log");
+capabilities.setCapability("opera.display", 8);
+
+// Now use it
+WebDriver driver = new OperaDriver(capabilities);
+driver.navigate().to("http://opera.com/");
 }}}
 
-== opera-launcher ==
+=== Custom profile ===
 
-!OperaDriver extracts a program called opera-launcher to a sub-directory in your home directory called _.launcher_.  This is a server spawned by OperaDriver which handles the management of the Opera browser binary, as well as taking screenshots.  OperaDriver communicates with the launcher over the !OperaLauncherProtocol, which is not related to the !Scope protocol in any way.
+You can also provide a profile for Opera to use.  You can use a new, fresh random profile (default) or specify an existing profile on your system.  You can manipulate the profile before Opera is started to i.e. set preferences you wish to use:
 
-The opera-launcher is a way to circumvent various problems related to process management on Windows and taking reliable, external screenshots for testing.
+{{{
+OperaProfile profile = new OperaProfile();  // fresh, random profile
+profile.preferences().set("User Prefs", "Ignroe Unrequested Popups", false);
+
+DesiredCapabilities capabilities = DesiredCapabilities.opera();
+capabilities.setCapability("opera.profile", profile);
+
+WebDriver driver = new OperaDriver(capabilities);
+}}}
+
+=== Environment variables ===
+
+To specify such things as a custom location of the Opera binary and the command-line arguments to use, you may use environmental variables also.  This is a list of the environmental variables which can be set on any operating system:
+
+|| *Name* || *Description* ||
+|| *OPERA_PATH* || The absolute path to the Opera binary you want to use.  If not set OperaDriver will try to locate Opera on your system. ||
+|| *OPERA_ARGS* || A space-delimited list of arguments to pass on to Opera, e.g. `-nowindow`, `-dimensions 1600x1200`, &c.  See `opera -help` to view available arguments. ||
+|| *OPERA_PRODUCT* || To override the product check when running the OperaDriver tests. ||
+
+To set environment variables:
+
+* *GNU/Linux and Mac*: `export OPERA_PATH=...`, and add this line to ~/.bashrc (or your shell's configuration file) to use in all future sessions.
+* *Windows*: Please follow this guide: http://support.microsoft.com/kb/310519
 
 == Supported Opera versions ==
 
 === Desktop ===
 
-This is a list of the official Opera Desktop versions we support:
+This is a list of the official Opera Desktop versions supported by OperaDriver:
 
 || *Version* || *Workaround/tweaks needed* ||
-|| 12.00 || _(Not released yet.)_ ||
-|| 11.51 || Set `opera.port` to 0 and `opera.profile` to null to enable parallelization on GNU/Linux ||
-|| 11.50 ||  ||
-|| 11.11 ||  ||
-|| 11.10 ||  ||
-|| 11.01 || `-autotestmode` command-line argument is not supported, use a [#Wrapper_script wrapper script] ||
-|| 11.00 || `-autotestmode` command-line argument is not supported, use a [#Wrapper_script wrapper script] ||
-
-The ability to run multiple instances of Opera in parallell is currently only
-supported in the latest Opera version 11.51 on GNU/Linux (see comment above),
-but support for Windows and Mac is planned in Opera 12.
-
-We don't officially support Opera versions prior to 11.00, although it should
-be possible to get OperaDriver working on Opera 10.6 with some minor tweaks.
+|| 12.00 || _(Not released yet)_ ||
+|| 11.62 || ||
+|| 11.61 || ||
+|| 11.60 || ||
+|| 11.52 || Set `opera.port` to `-1` and `opera.profile` to `""` (empty string) to disable `-debugproxy` and `-pd` command-line arguments ||
+|| 11.51 || ||
+|| 11.50 || ||
+|| 11.51 || ||
+|| 11.11 || ||
+|| 11.10 || ||
+|| 11.01 || `-autotestmode` command-line argument is not supported, use a wrapper script ||
+|| 11.00 || ||
 
 ==== Wrapper script ====
 
-Some Opera versions don't accept the `-autotestmode` or `-debugproxy arguments`.  Since
+Some Opera versions don't support the `-autotestmode`, `-debugproxy` or `-pd` arguments sent by OperaDriver by default.  You can bypass this problem by creating a wrapper script like this and pointing the capability `opera.binary` to its absolute path:
 
 {{{
 #!/bin/sh
@@ -225,24 +179,16 @@ Some Opera versions don't accept the `-autotestmode` or `-debugproxy arguments`.
 `dirname $0`/opera
 }}}
 
-== Known Issues ==
+== Known issues ==
 
- * Currently limited to one instance of Opera per machine
- * Problems with Operas with IME feature enabled (Opera Mobile, Android, bream)
- * Not using !WebDriver atoms yet
- * !JavaScript JIT is disabled for injected scripts
-
-=== Think you've found a bug? ===
-
-Check if the bug has been [https://github.com/operasoftware/operadriver/issues reported] yet.  If it hasn't, please open a new issue and be sure to include the [SeleniumHelp following]:
-
- * What platform are you running on?
- * What version of Selenium/OperaDriver are you using?
- * What version of Opera are you using?
- * The failure stacktrace, if available.
-
-Of course, if your bug has already been reported, you can update the issue with the information above.  Having more information to work on makes it easier for us to track down the cause of the bug.
-
-== Source Code ==
-
-!OperaDriver is [https://github.com/operasoftware/operadriver/ available on Github].  It's distributed under the Apache License version 2.
+* Modifier keys' states are not preserved across multiple `.sendKeys()` calls in `Actions`
+* Problems with Operas with IME feature enabled (Opera Mobile, Android)
+* No support for Opera Mini
+* No support for JavaScript alert/popup dialogues
+* `getScreenshotAs()` only returns image data of the current viewport, other parts of the image will be black
+* Requires Administrator privileges on Windows Vista and 7 when Opera 11.5x is installed in the default location (Program Files)
+* Not possible to move into an image enclosed in a link
+* Problems with coordinates on moving mouse back and forth past view port
+* Tests for typing multibyte characters will fail on Windows unless you have the correct charset
+* EcmaScript dblclick events are not triggered when double clicking an element
+* Opera requires full focus when testing on Mac
