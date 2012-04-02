@@ -97,7 +97,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 === RC ===
 || mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
 || killProcessesByName || boolean || Whether to try to kill processes by name, instead (or addition) to killing processes we happen to have handles to. ||
-|| honorSystemProxy || boolean || Whether to honor the sysem proxy. ||
+|| honorSystemProxy || boolean || Whether to honor the system proxy. ||
 || ensureCleanSession || boolean || Whether to make sure the session has no cookies or temporary internet files on Windows. I believe this is passed to the IEDriver as well, but ignored by it. ||
 
 == Safari specific ==
