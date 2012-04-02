@@ -161,7 +161,7 @@ driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)
 You may want to set the proxy settings of the remote browser (this currently only works for Firefox):
 
 {{{
-caps = Selenium::WebDriver::Remote::Capabilities.firefox(:proxy => WebDriver::Proxy.new(:http => "myproxyaddress:8080"))
+caps = Selenium::WebDriver::Remote::Capabilities.firefox(:proxy => Selenium::WebDriver::Proxy.new(:http => "myproxyaddress:8080"))
 driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)
 }}}
 
