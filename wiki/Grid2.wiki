@@ -111,7 +111,7 @@ Tip: If you need to provide a space somewhere in your browser parameters, then s
 == Optional parameters ==
 
  * -port 4444 	(4444 is default) 
- * -nodeTimeout 30 	(30 is default) The timeout in seconds before the hub automatically releases a node that hasn't received any requests for more than the specified number of seconds. After this time, the node will be released for another test in the queue. This helps to clear client crashes without manual intervention. To remove the timeout completely, specify -nodeTimeout 0 and the hub will never release the node.
+ * -timeout 30 	(30 is default) The timeout in seconds before the hub automatically releases a node that hasn't received any requests for more than the specified number of seconds. After this time, the node will be released for another test in the queue. This helps to clear client crashes without manual intervention. To remove the timeout completely, specify -timeout 0 and the hub will never release the node.
 
  Note: This is NOT the WebDriver timeout for all ”wait for WebElement” type of commands. 
 
