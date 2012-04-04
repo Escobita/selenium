@@ -1,0 +1,45 @@
+#summary History, anecdotes, and memories of how Selenium got to be what it is
+
+= Introduction =
+
+This is a work in progress.  Feel free to add things you know or remember.
+
+
+= How did the Automation Atoms come about? =
+
+On 2012-04-04, jimevans asked on the #selenium IRC channel: 
+ "What I wanted to ask you about was the history of the automation atoms.  I seem to remember them springing fully formed, as if from the head of Zeus, and I'm sure that wasn't the case. Can you refresh my memory as to how the concept happened?"
+
+simonstewart then proceeded to tell us a nice little story:
+ Sure.  Are we sitting comfortably?  Then I'll begin.  (Brit joke, there)
+
+ Imagine wavy lines as the screen dissolves and we're transported back to when selenium and webdriver were different projects.  Before the projects merged, there was an awful lot of congruent code in webdriver.  Congruent, but not shared.  The Firefox driver was in JS.  The IE driver was mostly C++.  The Chrome driver was mostly JS, but different JS from the Firefox driver. And HtmlUnit was unique.
+
+ We then added Selenium Core to the mix.  Yet more JS that did basically the same thing.
+
+ Within Google, I was becoming the TL of the browser automation team.  And was corralling a framework of our own into the mix.  Which was written in JS, and had once been based on Core before it span off on its own path.
+
+ So: multiple codebases, lots of JS doing more or less the same thing.  And loads of bugs.  Weird mismatches of behaviour in edge-cases.
+
+ `*shudder*`
+
+ So I had a bit of a think. (Dangerous, I know) The idea was to extract the "best of breed" code from all three frameworks (Core, WebDriver and the Google tool).  Break them down into code that could be shared.  "The smallest, indivisible unit of browser automation" .
+
+ Or "atoms" for short.
+
+ These could be used as the basis the _everything_.  Consistent behaviour between browsers.  and apis.  The other important point was that the JS code in webdriver and core was grown organically.  Which is a polite way of saying "I'd rather never edit it again".  Which is a polite way of saying that it was of dubious quality .  In places.
+
+ So: high quality was important.  And I wanted the code broken up into modules.  Because editing a 10k LOC file isn't a bright idea.
+
+ Within Google we had a library called Closure.  Which not only allowed modularization, but "denormalization" of modules into a single file via compilation.  And I knew it was being open sourced.  So we started building the library in the google codebase.  (Where we had access to the unreleased library, code review tools and our amazing testing infrastructure).  Using Closure Library.
+
+ "dom.js" was probably the first file I wrote.  (We can check).  Greg Dennis and Jason Leyba joined in the fun.  And the atoms have been growing ever since.
+
+ Technically, we should be calling anything outside of "javascript/atoms" molecules.  But then we can't say that we have atomic drivers.  and use imagery from the 50s to describe them.
+
+ `*sigh*`
+
+jimevans replied: "molecular drivers?"
+
+And simonstewart finished with:
+ Indeed :)  The idea is that the atoms are the lowest level.  And we compose the atoms to conform to the WebDriver or RC apis in "javascript/{selenium,webdriver}-atoms" respecitively.  And then suck those in as necessary.
