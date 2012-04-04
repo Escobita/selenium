@@ -90,8 +90,12 @@ capability.setVersion(“3.6”);
 The capabilities that are not specified will be ignored. 
 If you specify capabilities that do not exist on your grid (for example, your test specifies Firefox version 4.0, but have no Firefox 4 instance) then there will be no match and the test will fail to run.
 
-== Configuring the nodes ==
+= Configuring the nodes =
 
+The node can be configured in 2 different ways; one is by specifying 
+command line parameters, the other is by specifying a json file. 
+
+== Configuring the nodes by command line ==
 By default, this starts 11 browsers : 5 Firefox, 5 Chrome, 1 Internet Explorer.  The maximum number of concurrent tests is set to 5 by default. To change this and other browser settings, you can pass in parameters to each -browser switch (each switch represents a node based on your parameters). If you use the -browser parameter, the default browsers will be ignored and only what you specify command line will be used.
 {{{
 -browser browserName=firefox,version=3.6,maxInstances=5,platform=LINUX
@@ -141,7 +145,20 @@ On the individual nodes, setting -Dselenium.server.session.timeout to "31" will 
 
 And finally, setting -Dselenium.server.browser.timeout=20 will ensure that we only hang inside the browser for 20 seconds, at which point the process is killed. This should generally be a higher value than what is used in webDriver.manage().timeouts(), since this mechanism is a "last line of defense".
 
-==Hub diagnostic messages==
+== Configuring the nodes by JSON ==
+
+  java -jar selenium-server-standalone.jar -role node -nodeConfig nodeconfig.json
+
+A sample nodeconfig file can be seen at http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/grid/common/defaults/DefaultNode.json
+
+== Configuring the hub by JSON ==
+
+  java -jar selenium-server-standalone.jar -role hub -hubConfig hubconfig.json
+
+A sample hubconfig.json file can be seen at http://code.google.com/p/selenium/source/browse/trunk/java/server/src/org/openqa/grid/common/defaults/DefaultHub.json
+
+
+=Hub diagnostic messages=
 Upon detecting anomalious usage patterns, the hub can give the following message:
 {{{
 Client requested session XYZ that was terminated due to REASON
@@ -149,6 +166,7 @@ Client requested session XYZ that was terminated due to REASON
 
 || *Reason* || *Cause/fix* ||
 || TIMEOUT || The session timed out because the client did not access it within the timeout. If the client has been somehow suspended, this may happen when it wakes up ||
+|| BROWSER_TIMEOUT || The node timed out the browser because it was hanging for too long (parameter browserTimeout) ||
 || ORPHAN || A client waiting in queue has given up once it was offered a new session ||
 || CLIENT_STOPPED_SESSION || The session was stopped using an ordinary call to stop/quit on the client. Why are you using it again?? ||
 || CLIENT_GONE || The client process (_your_ code) appears to have died or otherwise not responded to our requests, intermittent network issues may also cause ||
