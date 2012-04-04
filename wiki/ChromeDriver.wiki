@@ -153,6 +153,13 @@ Or in Ruby:
 
 The ‘chrome.extensions’ capability can be used to specify a list of extensions, each in the form of a base64 encoded crx file, to install on startup.
 
+=== Troubleshooting ===
+
+If you are using the Remote WebDriver and you get the _The path to the chromedriver executable must be set by the webdriver.chrome.driver system property_ error message you likely need to check that one of these conditions is met:
+
+  * The chromedriver binary is in the system path, or
+  * The Selenium Server was started with -Dwebdriver.chrome.driver=c:\path\to\your\chromedriver.exe
+
 == Known Issues ==
 
 There are a handful of known issues with !ChromeDriver, listed below:
