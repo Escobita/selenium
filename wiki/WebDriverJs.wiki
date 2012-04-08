@@ -29,7 +29,7 @@ $ ./go selenium-server-standalone webdriverjs
 Once both targets have compiled, start the server, launch node, and start writing tests:
 
 {{{
-$ java -jar build/java/server/src/org/openqa/selenium/server/server-standalone.jar &
+$ java -jar build/java/server/src/org/openqa/grid/selenium/selenium-standalone.jar &
 $ node
 
 var webdriver = require('./build/javascript/webdriver/webdriver');
