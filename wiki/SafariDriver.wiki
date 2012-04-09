@@ -161,6 +161,7 @@ The !SafariDriver is a work in progress. As such, there are a handful of key fea
   # The !SafariDriver requires a persistent extension install.
   # Safari does not load extensions for `file://` URLs, thus these are not supported by the !SafariDriver.
   # When navigating forwards or backwards in browser history, the injected script of a Safari extension will loses its tab proxy reference and ability to communicate with the extension global script along with it. Consequently, the !SafariDriver will return an error when attempting to go back or forwards in page history.
+  # Windows cannot be opened using !JavaScript (i.e. window.open()).  See issue 3693.
 
 == Reporting Bugs ==
 
