@@ -2,6 +2,15 @@
 
 <wiki:toc depth=2>
 
+= Release criteria =
+
+The release manager needs to evaluate if the codebase is ready for release. This normally involves some subjective judgements. A few things can be noted:
+
+ * `go test_selenium` should pass
+ * chromedriver is not part of the project. While test failures are /interesting/, they are normally not blocking. Running tests without chromedriver on your path simplifies things a bit.
+
+Known issues can be added to the release notes.
+
 = For Everything =
 
   # Gather feedback from other developers about the release: Define a time for the release, ask for release blockers and provide additional details that will help developers participate in the release process. This should be emailed to  'selenium-developers'. 
