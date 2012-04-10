@@ -1052,7 +1052,7 @@ should switch to the page's default content.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`id` - `{string|number|null}` Identifier for the frame to change focus to.</dd>
+<dd>`id` - `{string|number|null|WebElement JSON Object}` Identifier for the frame to change focus to.</dd>
 </dl>
 </dd>
 <dd>
