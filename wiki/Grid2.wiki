@@ -137,13 +137,13 @@ platform={WINDOWS, LINUX, MAC}
 
 Timeouts in the grid should normally be handled through webDriver.manage().timeouts(), which will control how the different operations time out.
 
-To preserve run-time integrity of a grid with selenium-servers, there are three other timeout values that can be set.
+To preserve run-time integrity of a grid with selenium-servers, there are two other timeout values that can be set.
 
-On the hub, setting the -nodeTimeout command line option to "30" seconds will ensure all resources are reclaimed 30 seconds after a client crashes.
+On the hub, setting the -timeout command line option to "30" seconds will ensure all resources are reclaimed 30 seconds after a client crashes. On the hub you can also set -browserTimeout 60 to make the maximum time a node is willing to hang inside the browser 60 seconds. This will ensure all resources are reclaimed slightly after 60 seconds. All the nodes use these two values from the hub if they are set. Locally set parameters on a single node has precedence, it is generally recommended not to set these timeouts on the node.
 
-On the individual nodes, setting -Dselenium.server.session.timeout to "31" will additionally ensure that all resources are reclaimed 31 seconds after the client crashes. If grid is being used, it typically makes sense to use -nodeTimeout + 1, since this case will cover when the grid hub is taken down.
-
-And finally, setting -Dselenium.server.browser.timeout=20 will ensure that we only hang inside the browser for 20 seconds, at which point the process is killed. This should generally be a higher value than what is used in webDriver.manage().timeouts(), since this mechanism is a "last line of defense".
+The browserTimeout *should* be:
+   * Higher than the socket lock timeout (45 seconds)
+   * Generally higher than values used in webDriver.manage().timeouts(), since this mechanism is a "last line of defense".
 
 == Configuring the nodes by JSON ==
 
