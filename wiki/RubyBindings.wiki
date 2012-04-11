@@ -307,6 +307,16 @@ driver = Selenium::WebDriver.for :opera
 driver.navigate.to 'http://opera.com/'
 }}}
 
+== Safari ==
+
+A Safari driver is available as of v2.21. See SafariDriver for details on usage. From Ruby:
+
+{{{
+driver = Selenium::WebDriver.for :safari
+driver.navigate.to "http://apple.com"
+}}}
+
+
 == Timeouts ==
 
 === Implicit waits ===
