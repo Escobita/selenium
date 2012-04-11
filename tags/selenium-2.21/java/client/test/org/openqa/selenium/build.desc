@@ -1,0 +1,106 @@
+java_library(name = "selenium",
+  deps = [
+    ":base",
+    "//java/client/src/org/openqa/selenium/htmlunit",
+    "//java/client/src/org/openqa/selenium/firefox",
+    "//java/client/src/org/openqa/selenium/iphone",
+    "//java/client/src/org/openqa/selenium/remote",
+  ])
+
+java_library(name = "build",
+  srcs = [
+    "Build.java",
+  ],
+  deps = [
+    "//java/client/src/org/openqa/selenium/os",
+    "//java/client/test/org/openqa/selenium/testing:dev_mode",
+    "//java/client/test/org/openqa/selenium/testing:util",
+    "//third_party/java/junit",
+  ])
+
+java_library(name = "base",
+  srcs = [
+    "AbstractDriverTestCase.java",
+    "DriverTestDecorator.java",
+    "EmptyTest.java",
+    "EnvironmentStarter.java",
+    "Messages.java",
+    "NeedsDriver.java",
+    "NeedsFreshDriver.java",
+    "NoDriverAfterTest.java",
+    "Pages.java",
+    "ParallelTestRunner.java",
+    "StubDriver.java",
+    "StubElement.java",
+    "StubTargetLocator.java",
+    "StubRenderedWebElement.java",
+    "TestNameDecorator.java",
+    "TestSuiteBuilder.java",
+    "TestWaiter.java",
+    "WaitingConditions.java",
+  ],
+  resources = [
+    { "messages.properties" : "org/openqa/selenium/messages.properties" },
+  ],
+  deps = [
+    ":build",
+    "//java/client/src/org/openqa/selenium",
+    "//java/client/src/org/openqa/selenium/remote",
+    "//java/client/test/org/openqa/selenium/environment",
+    "//java/client/test/org/openqa/selenium/testing",
+    "//java/client/test/org/openqa/selenium/testing:annotations",
+    "//third_party/java/junit",
+    "//third_party/java/hamcrest",
+  ])
+
+java_library(name = "tests",
+  srcs = [
+    "SmallTests.java",
+    "StandardSeleniumTests.java",
+    "html5/Html5Tests.java",
+    "interactions/InteractionTests.java",
+    "*Test.java",
+    "browserlaunchers/**/*Test.java",
+    "html5/*Test.java",
+    "interactions/*.java",
+    "interactions/touch/*.java",
+    "internal/**/*.java",
+    "io/*.java",
+    "net/*.java",
+    "os/*.java",
+  ],
+  deps = [
+    ":base",
+    "//java/client/src/org/openqa/selenium/remote:common",
+    "//java/client/src/org/openqa/selenium/interactions",
+    "//java/client/src/org/openqa/selenium/interactions/touch:api",
+    "//java/client/src/org/openqa/selenium/internal/seleniumemulation:api",
+    "//java/client/test/org/openqa/selenium/environment",
+    "//java/client/test/org/openqa/selenium/testing:junit_4",
+    "//java/client/test/org/openqa/selenium/testing:tests",
+    "//third_party/java/commons-io",
+    "//third_party/java/easymock",
+    "//third_party/java/jmock",
+    "//third_party/java/junit",
+  ])
+
+java_test(name = "SmallTests",
+  srcs = [
+    "SmallTests.java"
+  ],
+  deps = [
+    ":tests",
+  ])
+
+java_test(name = "RcBrowserLauncherTests",
+  scs = [
+    "browserlaunchers/RcBrowserLauncherTests.java",
+  ],
+  deps = [
+    ":tests",
+  ])
+
+java_library(name = "dump-ignores",
+  deps = [ ":tests" ],
+  main = "org.openqa.selenium.internal.IgnoredTestPrinter"
+)
