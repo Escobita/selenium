@@ -68,8 +68,7 @@ Known issues can be added to the release notes.
 }}} 
  # Update the version number in all pom.xml files under the maven directory (but do not check in those changes) (`mvn versions:set -DnewVersion=2.3.0` inside the "maven" folder)
  # Execute:
-   # `./go //java/client/src/org/openqa/selenium:client-combined:project`
-   # `./go //java/server/src/org/openqa/grid/selenium:selenium:project`
+   # `./go release`
    # `cd maven`
    # `mvn -Dtest=skip -DfailIfNoTests=false install`
  # Execute:
