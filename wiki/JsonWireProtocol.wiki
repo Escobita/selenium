@@ -1041,7 +1041,7 @@ Note that this is a platform-independent method of activating IME
 </dd>
 <dd>
 <dl>
-<dd>Change focus to another frame on the page. If the frame ID is `null`, the server
+<dd>Change focus to another frame on the page. If the frame `id` is `null`, the server
 should switch to the page's default content.</dd>
 <dd>
 <dl>
