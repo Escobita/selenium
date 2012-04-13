@@ -1,6 +1,10 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
+==1.8.0 (not yet release)==
+
+  * New - Added support for Firefox 12
+
 ==1.7.2==
 
   * Bug - Fixed regression with typing into file input fields - issue 3549
