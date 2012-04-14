@@ -288,7 +288,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || [#GET_/session/:sessionId/window/:windowHandle/size /session/:sessionId/window/:windowHandle/size] || Get the size of the specified window. ||
 || POST || [#POST_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Change the position of the specified window. ||
 || GET || [#GET_/session/:sessionId/window/:windowHandle/position /session/:sessionId/window/:windowHandle/position] || Get the position of the specified window. ||
-|| POST || [#POST_/session/:sessionId/window/:windowHandle/maximize /session/:sessionId/window/:windowHandle/maximize] || Maximize the currently selected window if not already maximized. ||
+|| POST || [#POST_/session/:sessionId/window/:windowHandle/maximize /session/:sessionId/window/:windowHandle/maximize] || Maximize the specified window if not already maximized. ||
 || GET || [#GET_/session/:sessionId/cookie /session/:sessionId/cookie] || Retrieve all cookies visible to the current page. ||
 || POST || [#POST_/session/:sessionId/cookie /session/:sessionId/cookie] || Set a cookie. ||
 || DELETE || [#DELETE_/session/:sessionId/cookie /session/:sessionId/cookie] || Delete all cookies visible to the current page. ||
@@ -1240,7 +1240,7 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 </dd>
 <dd>
 <dl>
-<dd>Maximize the currently selected window if not already maximized.</dd>
+<dd>Maximize the specified window if not already maximized. If the :windowHandle URL parameter is "current", the currently active window will be maximized.</dd>
 <dd>
 <dl>
 <dt>*URL Parameters:*</dt>
