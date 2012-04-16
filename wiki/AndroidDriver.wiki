@@ -18,7 +18,7 @@ We try to stay as close as possible to what the user interaction with the browse
    * [http://google-opensource.blogspot.com/2011/10/test-your-mobile-web-apps-with.html Android WebDriver on Google Open Source Blog]
 = Get Started =
 == Install the Android SDK ==
-Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it in a directory, say ~/android_sdk/ .
+Download the [http://developer.android.com/sdk/index.html Android SDK], and unpack it to ~/android_sdk/. NOTE: The location of the Android SDK must exist in `../android_sdk`, relative to the directory containing the Selenium repository.
 
 == Setup the Environment  ==
 Android WebDriver test can run on emulators or real devices for phone and tablets.
