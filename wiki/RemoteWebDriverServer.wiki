@@ -1,7 +1,7 @@
 #summary Setting up the remote webdriver server
 #labels WebDriver
 
-= The RemoteWebDriver Server =
+ = The RemoteWebDriver Server =
 
 The RemoteWebDriver is composed of two pieces: a client and a server. The client is your WebDriver test and the server is simply a Java servlet, which can be hosted in any modern JEE app server. The server will always run on the machine with the browser you want to test. There are two ways to user the server: command line or configured in code.
 
@@ -21,13 +21,15 @@ The selenium-server keeps in-memory logs for each ongoing session, which are cle
 === Timeouts (from version 2.21) ===
 The server has two different timeouts, which can be set as follows: 
 {{{
-java -jar selenium-server-standalone-{VERSION}.jar -Dselenium.server.browser.timeout=123
+java -jar selenium-server-standalone-{VERSION}.jar -timeout=20 -browserTimeout=60
 }}}
 
-|| selenium.server.browser.timeout || Controls how long the browser is allowed to hang (value in seconds)||
-|| selenium.server.session.timeout || Controls how long the client is  is allowed to be gone before the session is reclaimed (value in seconds)||
+|| browserTimeout || Controls how long the browser is allowed to hang (value in seconds)||
+|| timeout || Controls how long the client is  is allowed to be gone before the session is reclaimed (value in seconds)||
 
-Please note that the "selenium.server.browser.timeout" is intended as a backup timeout mechanism when the ordinary timeout mechanism fails, which should be used mostly in grid/server environments to ensure that crashed/lost processes do not stay around for too long, polluting the runtime environment.
+System property "selenium.server.session.timeout" is no longer supported as of 2.21.
+
+Please note that the "browserTimeout" is intended as a backup timeout mechanism when the ordinary timeout mechanism fails, which should be used mostly in grid/server environments to ensure that crashed/lost processes do not stay around for too long, polluting the runtime environment.
 
 ==Configuring the Server in Code ==
 
