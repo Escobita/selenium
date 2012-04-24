@@ -118,7 +118,7 @@ Clients may connect to the !SafariDriver by opening a page with the following:
 <script>
 window.onload = function() {
   window.postMessage({
-    'message': 'connect',
+    'type': 'connect',
     'origin': 'webdriver',
     'url': 'ws://localhost:1234/wd'
   }, '*');
