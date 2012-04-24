@@ -115,11 +115,15 @@ POST /session/:sessionId/window/:windowHandle/size
 Should be encoded for the !SafariDriver as
 {{{
 {
-  "id": "random-id-1234",
-  "name": "setWindowSize",
-  "parameters": {
-    "sessionId": "mySessionId",
-    "windowHandle": "current"
+  "origin": "webdriver",
+  "type": "command",
+  "command": {
+    "id": "random-id-1234",
+    "name": "setWindowSize",
+    "parameters": {
+      "sessionId": "mySessionId",
+      "windowHandle": "current"
+    }
   }
 }
 }}}
@@ -127,7 +131,19 @@ The !SafariDriver tracks sessions by !WebSocket connection, so the `sessionId` p
 
 ==== Response ====
 
-The !SafariDriver's response objects are identical to those returned by the [JsonWireProtocol#Responses JSON wire protocol], except each response should also include an `id` field, which echoes the ID sent with the corresponding command object.
+The !SafariDriver's response objects have a similar structure to commands:
+{{{
+{
+  "origin": "webdriver",
+  "type": "response",
+  "id": "random-id-1234",
+  "response": {
+    "status": 0,
+    "value": null
+  }
+}
+}}}
+The `id` field in each response should echoe the ID sent with the corresponding command object.  The `response` field has the same format as specified by the [JsonWireProtocol#Responses JSON wire protocol].
 
 ==== On Command/Response IDs ====
 
