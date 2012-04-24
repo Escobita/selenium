@@ -1,7 +1,7 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
-==1.8.0 (not yet release)==
+==1.8.0 (released: 24/April/2012)==
 
   * New - Added support for Firefox 12
 
