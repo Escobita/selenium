@@ -72,11 +72,34 @@ public class SafariDriverTests {
 }
 }}}
 
-== Communicating with the !SafariDriver ==
+=== Debugging ===
+
+Sometimes, a test may hang after sending a command to the !SafariDriver. This usually indicates something blew up. Thankfully, the !SafariDriver is quite chatty.
+
+First open the !WebKit inspector on the page under test and check the console output. The console is cleared each time a page is loaded, so you'll only be able to see the logs for the most recent injected script. You can select the injected script and set break points inside the inspector, but it is sandboxed from the page, so you can't play with it using the inspector's REPL.
+
+Next, check the global page: Develop > Show Extension Builder. Select the WebDriver extension, and click "Inspect global page." Again, the !SafariDriver is super chatty, so you should see what went wrong on the console.  You can set script break points for the injected page and interact with it using the REPL.
+
+== Known Issues ==
+
+All known issues with the !SafariDriver may be found on our [http://code.google.com/p/selenium/issues/list?colspec=ID%20Stars%20Type%20Status%20Priority%20Owner%20Summary%20Browser%20Component&cursor=selenium%3A2648&q=browser%3DSafari%20component%3DWebDriver&ts=1335052784&updated=2648 issue tracker].
+
+== Reporting Bugs ==
+
+If you think you've found a bug, please open a [http://code.google.com/p/selenium/issues/list bug] on our issue tracker.  When filing a bug, please adhere to the following guidelines:
+  # Prefix your summary line with "`[SafariDriver]`."  For example: "`[SafariDriver] Unable to execute JavaScript`".
+  # Include the injected script's log output (see [#Debugging above]).
+  # Include the global page's log output (again, see [#Debugging above]).
+  # Include a [http://www.webkit.org/quality/reduction.html reduced] test case for your bug.
+  # Avoid filing bugs for the aforementioned [#Unimplemented_Features unimplemented features] and [#Known_Issues known issues].
+
+== !SafariDriver Internals ==
+
+=== Communicating with the !SafariDriver ===
 
 The !SafariDriver communicates with clients using !WebSockets. While the !SafariDriver browser extension maintains the client-end of the !WebSocket extension, this section refers to it as the "server" end of the !WebDriver API. Similarly, the term "client" refers to the user-facing !WebDriver API that issues commands to the server.
 
-=== Command ===
+==== Command ====
 
 || *Key* || *Type* || *Description* ||
 || id || string || A random ID assigned to the command by the client; may be any string value. ||
@@ -102,15 +125,15 @@ Should be encoded for the !SafariDriver as
 }}}
 The !SafariDriver tracks sessions by !WebSocket connection, so the `sessionId` parameter may actually be excluded from the parameter set.
 
-=== Response ===
+==== Response ====
 
 The !SafariDriver's response objects are identical to those returned by the [JsonWireProtocol#Responses JSON wire protocol], except each response should also include an `id` field, which echoes the ID sent with the corresponding command object.
 
-=== On Command/Response IDs ===
+==== On Command/Response IDs ====
 
 The !SafariDriver will synchronize the execution of every command it receives. Thus, each response should always match the original command sent by the client. Upon receiving a response, the client should check that the ID matches the one sent with the original command. It is a catastrophic failure if these IDs do not match.
 
-=== Connecting to the !SafariDriver ===
+==== Connecting to the !SafariDriver ====
 
 Clients may connect to the !SafariDriver by opening a page with the following:
 {{{
@@ -131,7 +154,7 @@ Safari will not load extensions for `file://` URLs. In order to open the connect
 
 The !SafariDriver supports multiple !WebSocket connections. Each connection is treated as a separate session with its own timeout state (i.e., for implicit waits). All sessions share state for window and frame focus. Furthermore, the execution of commands is synchronized globally, across all sessions.
 
-== Development ==
+=== Development ===
 
 Once you have manually installed the !SafariDriver extension, as outlined above,
 you can reload your changes by re-compiling the extension, opening the extension builder, and clicking the "Reload" button for the !WebDriver extension.
@@ -140,31 +163,3 @@ If you are using Mac OSX, you can automate this process by running
 {{{
 $ ./go safari:reinstall
 }}}
-
-=== Debugging ===
-
-Sometimes, a test may hang after sending a command to the !SafariDriver. This usually indicates something blew up. Thankfully, the !SafariDriver is quite chatty.
-
-First open the !WebKit inspector on the page under test and check the console output. The console is cleared each time a page is loaded, so you'll only be able to see the logs for the most recent injected script. You can select the injected script and set break points inside the inspector, but it is sandboxed from the page, so you can't play with it using the inspector's REPL.
-
-Next, check the global page: Develop > Show Extension Builder. Select the WebDriver extension, and click "Inspect global page." Again, the !SafariDriver is super chatty, so you should see what went wrong on the console.  You can set script break points for the injected page and interact with it using the REPL.
-
-== Unimplemented Features ==
-
-The !SafariDriver is a work in progress. As such, there are a handful of key features which have yet to be implemented:
-  # !JavaScript execution (e.g. `WebDriver.executeScript()`)
-  # Frame switching
-  # The advanced interactions API
-
-== Known Issues ==
-
-All known issues with the !SafariDriver may be found on our [http://code.google.com/p/selenium/issues/list?colspec=ID%20Stars%20Type%20Status%20Priority%20Owner%20Summary%20Browser%20Component&cursor=selenium%3A2648&q=browser%3DSafari%20component%3DWebDriver&ts=1335052784&updated=2648 issue tracker].
-
-== Reporting Bugs ==
-
-If you think you've found a bug, please open a [http://code.google.com/p/selenium/issues/list bug] on our issue tracker.  When filing a bug, please adhere to the following guidelines:
-  # Prefix your summary line with "`[SafariDriver]`."  For example: "`[SafariDriver] Unable to execute JavaScript`".
-  # Include the injected script's log output (see [#Debugging above]).
-  # Include the global page's log output (again, see [#Debugging above]).
-  # Include a [http://www.webkit.org/quality/reduction.html reduced] test case for your bug.
-  # Avoid filing bugs for the aforementioned [#Unimplemented_Features unimplemented features] and [#Known_Issues known issues].
