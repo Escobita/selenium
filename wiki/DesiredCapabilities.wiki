@@ -94,8 +94,10 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 
 == IE specific ==
 === WebDriver ===
-|| ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. ||
+|| ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. Only "best effort" support is provided when using this capability. ||
+|| initialBrowserUrl || string || Allows the user to specify the initial URL loaded when IE starts. Intended to be used with `ignoreProtectedModeSettings` to allow the user to initialize IE in the proper Protected Mode zone. Using this capability may cause browser instability or flaky and unresponsive code. Only "best effort" support is provided when using this capability. ||
 || useLegacyInternalServer || boolean || Whether to use the internal server for the IE driver. If set to false or not set, looks for the standalone IE driver server executable. Used by the client language bindings, not the server-side components. ||
+|| enableNativeEvents || boolean || Whether to use native events for interacting with elements. Defaults to true. Currently ignored, pending implementation of synthetic events in the IE driver. ||
 
 === RC ===
 || mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
