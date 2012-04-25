@@ -7,11 +7,25 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
-            <em:version>1.7.2</em:version>
+            <em:version>1.8.0</em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>12.*</em:maxVersion>
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/1.8.0/java-format-1.8.0.xpi</em:updateLink>
+                <em:updateHash>sha1:ed0b7678a1db85250b50127b6e58c9d8a056ec42</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
+            <em:version>1.7.2</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion>
                 <em:maxVersion>11.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/formatters/java/1.7.2/java-format-1.7.2.xpi</em:updateLink>
                 <em:updateHash>sha1:26c4ddcde328826b46d0f1c46c95b100c844803f</em:updateHash>

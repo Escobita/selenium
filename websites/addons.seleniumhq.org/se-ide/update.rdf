@@ -7,11 +7,25 @@
         <!-- one li for each new release; newest first according to some sources -->
         <RDF:li>
           <RDF:Description>
-            <em:version>1.7.2</em:version>
+            <em:version>1.8.0/em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>3.6.0</em:minVersion> 
+                <em:maxVersion>12.*</em:maxVersion>
+                <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.8.0/selenium-ide-1.8.0.xpi</em:updateLink>
+                <em:updateHash>sha1:50b03d3befaff78aff0b9cc64a930e1aa27807ba</em:updateHash>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+        <RDF:li>
+          <RDF:Description>
+            <em:version>1.7.2</em:version>
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>3.6.0</em:minVersion>
                 <em:maxVersion>11.*</em:maxVersion>
                 <em:updateLink>http://release.seleniumhq.org/selenium-ide/1.7.2/selenium-ide-1.7.2.xpi</em:updateLink>
                 <em:updateHash>sha1:3b09f0afbb2086abb8febed1cecde7b5469c1302</em:updateHash>
