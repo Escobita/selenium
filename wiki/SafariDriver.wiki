@@ -91,7 +91,7 @@ If you think you've found a bug, please open a [http://code.google.com/p/seleniu
   # Include the injected script's log output (see [#Debugging above]).
   # Include the global page's log output (again, see [#Debugging above]).
   # Include a [http://www.webkit.org/quality/reduction.html reduced] test case for your bug.
-  # Avoid filing bugs for the aforementioned [#Unimplemented_Features unimplemented features] and [#Known_Issues known issues].
+  # Avoid filing duplicate bugs for the aforementioned [#Known_Issues known issues].
 
 == !SafariDriver Internals ==
 
