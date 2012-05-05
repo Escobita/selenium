@@ -10,7 +10,8 @@ Android WebDriver allows to run automated end-to-end tests that ensure your site
 We try to stay as close as possible to what the user interaction with the browser is. To do so, Android WebDriver runs the tests against a WebView (rendering component used by the Android browser) configured like the Android browser. To interact with the page Android WebDriver uses native touch and key events. To query the DOM, it uses the JavaScript Atoms libraries. 
 
 == Supported Platforms ==
-   * The [http://code.google.com/p/selenium/downloads/list current apk] will only work with Gingerbread (2.3.x), Honeycomb (3.x), Ice Cream Sandwich (4.0.x) and later. Note that there is an *emulator bug on Gingerbread* that might cause !WebDriver to crash.
+   * The [http://code.google.com/p/selenium/downloads/list current apk] will only work with Gingerbread (2.3.x), Honeycomb (3.x), Ice Cream Sandwich (4.0.x) and later. 
+     * Note that there is an *emulator bug on Gingerbread* that might cause !WebDriver to crash.
    * The last version to support Froyo (2.2) is [http://code.google.com/p/selenium/downloads/detail?name=android-server-2.16.apk 2.16].
 
 == Useful Related Links ==
@@ -45,7 +46,7 @@ Make sure the target level you selected corresponds to a supported SDK platform.
 
 When prompted "Do you wish to create a custom hardware profile `[`no`]`" enter "no".
 
-*Note: An Android emulator bug prevents WebDriver from running on emulators on platforms 2.3 (Gingerbread).*
+*Note: An Android emulator bug prevents WebDriver from running on emulators on platforms 2.3 (Gingerbread). Please refer to [AndroidDriver#Supported_Platforms] for more information*
 
 Now, start the emulator. This can take a while, but take a look at the FAQ below for tips on how to improve performance of the emulator.
 {{{
