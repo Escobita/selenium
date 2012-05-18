@@ -1,7 +1,9 @@
 #summary Instructions for running tests against SauceLabs
 
 Set the env vars:
+
 SAUCE_USERNAME=selenium-ci
+
 SAUCE_APIKEY=OUR_SECRET_KEY_WHICH_YOU_CAN_GET_FROM_DAWAGNER
 
 Run ./go debug-server somewhere publicly accessible
