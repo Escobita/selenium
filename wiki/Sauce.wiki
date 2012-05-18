@@ -7,6 +7,7 @@ SAUCE_USERNAME=selenium-ci
 SAUCE_APIKEY=OUR_SECRET_KEY_WHICH_YOU_CAN_GET_FROM_DAWAGNER
 
 Run ./go debug-server somewhere publicly accessible
+
 USE_SAUCE=true HOSTNAME=public.host.name TEST_HTTP_PORT=2310 TEST_HTTPS_PORT=2410 SAUCE_SELENIUM_VERSION=http://url/to/version/of/selenium-server-standalone.jar SAUCE_BROWSER_VERSION=10 SAUCE_OS=xp SAUCE_JOB_NAME=my-job-name ./go test_firefox method=myTest
 
 SAUCE_OS is a stringification of something recognised by the Platform Java enum.
