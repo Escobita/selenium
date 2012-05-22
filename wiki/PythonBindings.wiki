@@ -55,11 +55,11 @@ driver = webdriver.Firefox()
 
 When developing Selenium, it is recommended you run the tests before and after making any changes to the code base. To perform these tests, run 
 {{{
-./go //py:test_firefox:run
+./go //py:firefox_test:run
 }}}
 from the root of your local copy. Other browsers can be tested by changing `firefox` to the browser you wish to test, for example:
 {{{
-./go //py:test_chrome:run
+./go //py:chrome_test:run
 }}} 
 
 = Usage =
