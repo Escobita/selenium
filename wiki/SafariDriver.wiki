@@ -86,7 +86,7 @@ Next, check the global page: Develop > Show Extension Builder. Select the WebDri
 
 == Known Issues ==
 
-All known issues with the !SafariDriver may be found on our [http://code.google.com/p/selenium/issues/list?colspec=ID%20Stars%20Type%20Status%20Priority%20Owner%20Summary%20Browser%20Component&cursor=selenium%3A2648&q=browser%3DSafari%20component%3DWebDriver&ts=1335052784&updated=2648 issue tracker].
+All known issues with the !SafariDriver may be found on our [http://code.google.com/p/selenium/issues/list?can=1&q=browser%3DSafari+component%3DWebDriver+status%3ANew%2CAccepted%2CWorkingAsIntended%2CWontFix&colspec=ID+Stars+Type+Status+Priority+Owner+Summary+Browser+Component&cells=tiles issue tracker].
 
 == Reporting Bugs ==
 
