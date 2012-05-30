@@ -14,6 +14,8 @@ From the checked-out copy, run:
 ./go iphone
 Which will build the iPhone driver and the application to be installed. It's easier to start up the SDK manually and run it.
 
+ * if you are on Lion and have installed Xcode through the App Store and you get this message "XCode not found. Not building the iphone driver."  try running this on the command line: "sudo /usr/bin/xcode-select -switch /Applications/Xcode.app"
+
 = Installing =
 
 The iphone driver application is not currently on the Apple store. To run it, you will need the iphone development tools on your local machine. These tools must be downloaded from [http://developer.apple.com/xcode/index.php apple] at least version 4.2 at the time of this writing. To run it on your device, you will also need a provisioning profile (which requires a developer license).
