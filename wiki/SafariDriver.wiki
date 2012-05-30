@@ -28,8 +28,7 @@ Finally, install the extension.
 
 Once you've installed the extension, you can start writing tests:
 {{{
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Platform;
@@ -56,7 +55,7 @@ public class SafariDriverTests {
 
   @Before
   public void createDriver() {
-    assumeThat(isSupportedPlatform(), is(true));
+    assumeTrue(isSupportedPlatform());
     driver = new SafariDriver();
   }
 
@@ -179,7 +178,7 @@ The !SafariDriver supports multiple !WebSocket connections. Each connection is t
 Once you have manually installed the !SafariDriver extension, as outlined above,
 you can reload your changes by re-compiling the extension, opening the extension builder, and clicking the "Reload" button for the !WebDriver extension.
 
-If you are using Mac OSX, you can automate this process by running
+If you are using Mac OS X, you can automate this process by running
 {{{
 $ ./go safari:reinstall
 }}}
