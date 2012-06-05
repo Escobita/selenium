@@ -96,6 +96,18 @@ alert.getText();
 alert.accept();
 }}}
 
+=== Q: Does !WebDriver support file uploads? ===
+
+A: Yes.
+
+You can't interact with the native OS file browser dialog directly, but we do some magic so that if you call WebElement#sendKeys("/path/to/file") on a file upload element, it does the right thing.  Make sure you don't WebElement#click() the file upload element, or the browser will probably hang.
+
+Handy hint: You can't interact with hidden elements without making them un-hidden.  If your element is hidden, it can probably be un-hidden with some code like:
+
+{{{
+((JavascriptExecutor)driver).executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.height = '1px'; arguments[0].style.width = '1px'; arguments[0].style.opacity = 1", fileUploadElement);
+}}}
+
 === Q: The "onchange" event doesn't fire after a call "sendKeys" ===
 
 A: !WebDriver leaves the focus in the element you called "sendKeys" on. The "onchange" event will only fire when focus leaves that element. As such, you need to move the focus, perhaps using a "click" on another element.
