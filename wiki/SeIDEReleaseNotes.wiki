@@ -1,7 +1,7 @@
 #labels ide,releasenotes
 =Selenium IDE - Release Notes=
 
-==1.8.1 (not yet released)==
+==1.8.1==
 
   * New - Added support for Firefox 13
 
