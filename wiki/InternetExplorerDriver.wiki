@@ -9,7 +9,8 @@ The driver supports running 32-bit and 64-bit versions of the browser, but the c
 
 == Installing ==
 
-Simply add the {{{selenium-server-standalone.jar}}} to your CLASSPATH. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
+The InternetExplorerDriver is a standalone server which implements WebDriver's wire protocol. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
+The standalone server executable must be downloaded from the [http://code.google.com/p/selenium/downloads/list Downloads] page and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].
 
 == Pros ==
 
@@ -22,6 +23,7 @@ Simply add the {{{selenium-server-standalone.jar}}} to your CLASSPATH. You do no
 
 == Required Configuration ==
 
+ * The IEDriverServer exectuable must be [http://code.google.com/p/selenium/downloads/list downloaded] and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].
  * On IE 7 or higher on Windows Vista or Windows 7, you must set the Protected Mode settings for each zone to be the same value. The value can be on or off, as long as it is the same for every zone. To set the Protected Mode settings, choose "Internet Options..." from the Tools menu, and click on the Security tab. For each zone, there will be a check box at the bottom of the tab labeled "Enable Protected Mode".
  * The browser zoom level must be set to 100% so that the native mouse events can be set to the correct coordinates.
 
