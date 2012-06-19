@@ -97,6 +97,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. Only "best effort" support is provided when using this capability. ||
 || initialBrowserUrl || string || Allows the user to specify the initial URL loaded when IE starts. Intended to be used with `ignoreProtectedModeSettings` to allow the user to initialize IE in the proper Protected Mode zone. Using this capability may cause browser instability or flaky and unresponsive code. Only "best effort" support is provided when using this capability. ||
 || useLegacyInternalServer || boolean || Whether to use the internal server for the IE driver. If set to false or not set, looks for the standalone IE driver server executable. Used by the client language bindings, not the server-side components. ||
+|| elementScrollBehavior || integer || Allows the user to specify whether elements are scrolled into the viewport for interaction to align with the top (0) or bottom (1) of the viewport. The default value is to align with the top of the viewport. ||
 
 === RC ===
 || mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
