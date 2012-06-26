@@ -2471,7 +2471,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`element` - `{string}` ID of the element to move to. If not specified or is null, the offset is relative to current position of the mouse.</dd>
+<dd>`element` - `{string}` Opaque ID assigned to the element to move to, as described in the WebElement JSON Object. If not specified or is null, the offset is relative to current position of the mouse.</dd>
 <dd>`xoffset` - `{number}` X offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</dd>
 <dd>`yoffset` - `{number}` Y offset to move to, relative to the top-left corner of the element. If not specified, the mouse will move to the middle of the element.</dd>
 </dl>
@@ -2524,6 +2524,12 @@ location for correctly generating native events.</dd>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`button` - `{number}` Which button, enum: `{LEFT = 0, MIDDLE = 1 , RIGHT = 2}`. Defaults to the left mouse button if not specified.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -2543,6 +2549,12 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`button` - `{number}` Which button, enum: `{LEFT = 0, MIDDLE = 1 , RIGHT = 2}`. Defaults to the left mouse button if not specified.</dd>
 </dl>
 </dd>
 </dl>
