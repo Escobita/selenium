@@ -182,6 +182,8 @@ The wire protocol will inherit its status codes from those used by the InternetE
 || 30 || `IMENotAvailable` || IME was not available. ||
 || 31 || `IMEEngineActivationFailed` || An IME engine could not be started. ||
 || 32 || `InvalidSelector` || Argument was an invalid selector (e.g. XPath/CSS). ||
+|| 33 || `SessionNotCreatedException` || A new session could not be created. ||
+|| 34 || `MoveTargetOutOfBounds` || Target provided for a move action is out of bounds. ||
 
 The client should interpret a 404 Not Found response from the server as an "Unknown command" response. All other 4xx and 5xx responses from the server that do not define a status field should be interpreted as "Unknown error" responses.
 
