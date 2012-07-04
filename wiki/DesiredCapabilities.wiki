@@ -23,7 +23,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 == Read-write capabilities ==
 
 || *Key* || *Type* || *Description* ||
-|| javascriptEnabled || boolean || Whether the session supports executing user supplied JavaScript in the context of the current page. (Only on HTMLUnitDriver) ||
+|| javascriptEnabled || boolean || Whether the session supports executing user supplied JavaScript in the context of the current page  (only on HTMLUnitDriver). ||
 || databaseEnabled || boolean || Whether the session can interact with database storage. ||
 || locationContextEnabled || boolean || Whether the session can set and query the browser's location context. ||
 || applicationCacheEnabled || boolean || Whether the session can interact with the application cache. ||
