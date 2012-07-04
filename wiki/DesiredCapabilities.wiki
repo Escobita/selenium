@@ -24,7 +24,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 
 || *Key* || *Type* || *Description* ||
 || javascriptEnabled || boolean || Whether the session supports executing user supplied JavaScript in the context of the current page. (Only on HTMLUnitDriver) ||
-|| databaseEnabled || boolean || Whether the session can interact database storage. ||
+|| databaseEnabled || boolean || Whether the session can interact with database storage. ||
 || locationContextEnabled || boolean || Whether the session can set and query the browser's location context. ||
 || applicationCacheEnabled || boolean || Whether the session can interact with the application cache. ||
 || browserConnectionEnabled || boolean || Whether the session can query for the browser's connectivity and disable it if desired. ||
