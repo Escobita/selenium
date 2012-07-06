@@ -23,7 +23,7 @@ The standalone server executable must be downloaded from the [http://code.google
 
 == Required Configuration ==
 
- * The IEDriverServer exectuable must be [http://code.google.com/p/selenium/downloads/list downloaded] and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].
+ * The IEDriverServer exectuable must be [http://code.google.com/p/selenium/downloads/list downloaded] and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].  Starting in release 2.25 this will be required for Java.  It is already required if you use .NET and Ruby or Python.
  * On IE 7 or higher on Windows Vista or Windows 7, you must set the Protected Mode settings for each zone to be the same value. The value can be on or off, as long as it is the same for every zone. To set the Protected Mode settings, choose "Internet Options..." from the Tools menu, and click on the Security tab. For each zone, there will be a check box at the bottom of the tab labeled "Enable Protected Mode".
  * The browser zoom level must be set to 100% so that the native mouse events can be set to the correct coordinates.
 
