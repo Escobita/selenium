@@ -65,4 +65,7 @@ Similarly, there are some scenarios when submitting an HTML form via WebElement'
 
 == Multiple instances of InternetExplorerDriver ==
 
-With the creation of the IEDriverServer.exe, it should be possible to create and use multiple simultaneous instances of the InternetExplorerDriver. However, this functionality is largely untested, and there may be issues with cookies, window focus, and the like. If you attempt to use multiple instances of the IE driver, and run into such issues, consider using the Remote!WebDriver? and virtual machines.
+With the creation of the IEDriverServer.exe, it should be possible to create and use multiple simultaneous instances of the InternetExplorerDriver. However, this functionality is largely untested, and there may be issues with cookies, window focus, and the like. If you attempt to use multiple instances of the IE driver, and run into such issues, consider using the RemoteWebDriver and virtual machines.
+
+== Running IEDriverServer.exe Remotely ==
+The HTTP server started by the IEDriverServer.exe sets an access control list to only accept connections from the local machine, and disallows incoming connections from remote machines. At present, this cannot be changed without modifying the source code to the IEDriverServer.exe. To run the Internet Explorer driver on a remote machine, use the Java standalone remote server in connection with your language binding's equivalent of RemoteWebDriver.
