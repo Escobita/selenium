@@ -9,7 +9,7 @@ When developing WebDriver, it is common to want to run a single test rather than
 
 You can run all the tests in a given test class this way:
 {{{
-go test_firefox onlyRun=CombinedInputActionsTest
+./go test_firefox onlyRun=CombinedInputActionsTest
 }}}
 
 You can also run a single test directly from the command line by typing:
