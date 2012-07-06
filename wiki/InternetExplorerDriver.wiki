@@ -63,10 +63,6 @@ There are two places where the IE driver does not interact with elements using n
 
 Similarly, there are some scenarios when submitting an HTML form via WebElement's submit() method may have the same effect. This can happen if the driver calls the JavaScript submit() function on the form, and there is an onSubmit event handler that calls the JavaScript alert(), confirm(), or prompt() functions. 
 
-== How InternetExplorerDriver Selects the IE Binary ==
-
-This is done by the client side code. The client side checks to see if the OS is x64. If this succeeds then it checks that the process running the client side code is a 64-bit process. If that succeeds then the client code will try load the 64-bit version of Internet Explorer. If any of the checks for x64 fail the code will try use 32-bit version of Internet Explorer.
-
 == Multiple instances of InternetExplorerDriver ==
 
 With the creation of the IEDriverServer.exe, it should be possible to create and use multiple simultaneous instances of the InternetExplorerDriver. However, this functionality is largely untested, and there may be issues with cookies, window focus, and the like. If you attempt to use multiple instances of the IE driver, and run into such issues, consider using the Remote!WebDriver? and virtual machines.
