@@ -3,13 +3,13 @@
 
 = Internet Explorer Driver =
 
-This driver has been tested with IE 6, 7, 8 and 9 on appropriate combinations of XP, Vista and Windows 7. 
+The InternetExplorerDriver is a standalone server which implements WebDriver's wire protocol. This driver has been tested with IE 6, 7, 8 and 9 on appropriate combinations of XP, Vista and Windows 7. 
 
-The driver supports running 32-bit and 64-bit versions of the browser, but the choice of how to determine which "bit-ness" to use in launching the browser is left to the language bindings. However, the general rule of thumb is that if the code that instantiates the driver is running in a 32-bit process, the 32-bit version of IE will be launched. Similarly, if the code intantiating the driver is in a 64-bit process, the 64-bit version of IE will be launched.
+The driver supports running 32-bit and 64-bit versions of the browser. The choice of how to determine which "bit-ness" to use in launching the browser depends on which version of the IEDriverServer.exe is launched. If the 32-bit version of IEDriverServer.exe is launched, the 32-bit version of IE will be launched. Similarly, if the 64-bit version of IEDriverServer.exe is launched, the 64-bit version of IE will be launched.
 
 == Installing ==
 
-The InternetExplorerDriver is a standalone server which implements WebDriver's wire protocol. You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
+You do not need to run an installer before using the InternetExplorerDriver, though some configuration is required.
 The standalone server executable must be downloaded from the [http://code.google.com/p/selenium/downloads/list Downloads] page and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].
 
 == Pros ==
@@ -21,9 +21,19 @@ The standalone server executable must be downloaded from the [http://code.google
  * Obviously the InternetExplorerDriver will only work on Windows!
  * Comparatively slow (though still pretty snappy :)
 
+== Command-Line Switches ==
+
+As a standalone executable, the behavior of the IE driver can be modified through various command-line arguments. To set the value of these command-line arguments, you should consult the documentation for the language binding you are using. The command line switches supported are described in the table below.
+
+|| Switch || Meaning ||
+|| --port=`<portNumber>` || Specifies the port on which the HTTP server of the IE driver will listen for commands from language bindings. Defaults to 5555. ||
+|| --host=`<hostAdapterIPAddress>` || Specifies the IP address of the host adapter on which the HTTP server of the IE driver will listen for commands from language bindings. Defaults to 127.0.0.1. ||
+|| --log-level=`<logLevel>` || Specifies the level at which logging messages are output. Valid values are FATAL, ERROR, WARN, INFO, DEBUG, and TRACE. Defaults to FATAL. ||
+|| --log-file=`<logFile>` || Specifies the full path and file name of the log file. Defaults to stdout. ||
+
 == Required Configuration ==
 
- * The IEDriverServer exectuable must be [http://code.google.com/p/selenium/downloads/list downloaded] and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].  Starting in release 2.25 this will be required for Java.  It is already required if you use .NET and Ruby or Python.
+ * The IEDriverServer exectuable must be [http://code.google.com/p/selenium/downloads/list downloaded] and placed in your [http://en.wikipedia.org/wiki/PATH_(variable) PATH].
  * On IE 7 or higher on Windows Vista or Windows 7, you must set the Protected Mode settings for each zone to be the same value. The value can be on or off, as long as it is the same for every zone. To set the Protected Mode settings, choose "Internet Options..." from the Tools menu, and click on the Security tab. For each zone, there will be a check box at the bottom of the tab labeled "Enable Protected Mode".
  * The browser zoom level must be set to 100% so that the native mouse events can be set to the correct coordinates.
 
@@ -47,9 +57,11 @@ The discussion around the requirements of the driver and how to prioritize these
 
 When you attempt to hover over elements, and your physical mouse cursor is within the boundaries of the IE browser window, the hover will not work. More specifically, the hover will appear to work for a fraction of a second, and then the element will revert back to its previous state. The prevailing theory why this occurs is that IE is doing hit-testing of some sort during its event loop, which causes it to respond to the physical mouse position when the physical cursor is within the window bounds. The WebDriver development team has been unable to discover a workaround for this behavior of IE.
 
-=== Clicking `<option>` Elements and alert() ===
+=== Clicking `<option>` Elements or Submitting Forms and alert() ===
 
-There is one place where the IE driver does not interact with elements using native events. This is in clicking `<option>` elements within a `<select>` element. Under normal circumstances, the IE driver calculates where to click based on the position and size of the element, typically as returned by the JavaScript getBoundingClientRect() method. However, for `<option>` elements, getBoundingClientRect() returns a rectangle with zero position and zero size. The IE driver handles this one scenario by using the click() Automation Atom, which essentially sets the .selected property of the element and simulates the onChange event in JavaScript. However, this means that if the onChange event of the `<select>` element contains JavaScript code that calls alert(), confirm() or prompt(), calling WebElement's click() method will hang until the modal dialog is manually dismissed. There is no known workaround for this behavior using only WebDriver code.
+There are two places where the IE driver does not interact with elements using native events. This is in clicking `<option>` elements within a `<select>` element. Under normal circumstances, the IE driver calculates where to click based on the position and size of the element, typically as returned by the JavaScript getBoundingClientRect() method. However, for `<option>` elements, getBoundingClientRect() returns a rectangle with zero position and zero size. The IE driver handles this one scenario by using the click() Automation Atom, which essentially sets the .selected property of the element and simulates the onChange event in JavaScript. However, this means that if the onChange event of the `<select>` element contains JavaScript code that calls alert(), confirm() or prompt(), calling WebElement's click() method will hang until the modal dialog is manually dismissed. There is no known workaround for this behavior using only WebDriver code.
+
+Similarly, there are some scenarios when submitting an HTML form via WebElement's submit() method may have the same effect. This can happen if the driver calls the JavaScript submit() function on the form, and there is an onSubmit event handler that calls the JavaScript alert(), confirm(), or prompt() functions. 
 
 == How InternetExplorerDriver Selects the IE Binary ==
 
@@ -57,4 +69,4 @@ This is done by the client side code. The client side checks to see if the OS is
 
 == Multiple instances of InternetExplorerDriver ==
 
-Unlike other WebDriver classes, there should only ever be a single InternetExplorerDriver instance at one time for some language bindings. If you need to run more than one instance of the InternetExplorerDriver at a time, consider using the Remote!WebDriver? and virtual machines.
+With the creation of the IEDriverServer.exe, it should be possible to create and use multiple simultaneous instances of the InternetExplorerDriver. However, this functionality is largely untested, and there may be issues with cookies, window focus, and the like. If you attempt to use multiple instances of the IE driver, and run into such issues, consider using the Remote!WebDriver? and virtual machines.
