@@ -122,6 +122,18 @@ A JSON object describing a Cookie.
 ^1^ When returning Cookie objects, the server should only omit an optional field if it is incapable of providing the information.</dd>
 
 <dt>
+==== Log Entry JSON Object ====
+</dt>
+<dd>
+A JSON object describing a log entry.
+
+|| *Key* || *Type* || *Description* ||
+|| timestamp || number || The timestamp of the entry. ||
+|| level || number || The log level of the entry. ||
+|| message || string || The log message. ||
+</dd>
+
+<dt>
 === Proxy JSON Object ===
 </dt>
 <dd>
@@ -354,6 +366,7 @@ Given these mappings, the server should always route requests whose final path s
 || GET || [#GET_/session/:sessionId/session_storage/key/:key /session/:sessionId/session_storage/key/:key] || Get the storage item for the given key. ||
 || DELETE || [#DELETE_/session/:sessionId/session_storage/key/:key /session/:sessionId/session_storage/key/:key] || Remove the storage item for the given key. ||
 || GET || [#GET_/session/:sessionId/session_storage/size /session/:sessionId/session_storage/size] || Get the number of items in the storage. ||
+|| POST || [#POST_/session/:sessionId/log /session/:sessionId/log] || Get the log for a given log type. ||
 
 
 == Command Detail ==
@@ -3178,6 +3191,39 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{number}` The number of items in the storage.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/log ===
+
+<dl>
+<dd>
+==== POST /session/:sessionId/log ====
+</dd>
+<dd>
+<dl>
+<dd>Get the log for a given log type. Log buffer is reset after each request.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*JSON Parameters:*</dt>
+<dd>`type` - `{string}` The type of the log as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/logging/LogType.html LogType]: `{DRIVER|PROFILER}. A log type must be provided.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<object>}` The list of [Log_Entry_JSON_Object log entries].</dd>
 </dl>
 </dd>
 </dl>
