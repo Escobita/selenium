@@ -3217,13 +3217,13 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`type` - `{string}` The type of the log as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/logging/LogType.html LogType]: `{DRIVER|PROFILER}. A log type must be provided.</dd>
+<dd>`type` - `{string}` The log type, as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/logging/LogType.html LogType]. The log type must be provided.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
-<dd>`{Array.<object>}` The list of [Log_Entry_JSON_Object log entries].</dd>
+<dd>`{Array.<object>}` The list of [#Log_Entry_JSON_Object log entries].</dd>
 </dl>
 </dd>
 </dl>
