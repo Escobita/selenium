@@ -139,7 +139,7 @@ A JSON object describing a Proxy configuration.
 A json object describing logging preferences.
 
 || *Key* || *Type* || *Description* ||
-|| driver || Level || How verbose the logging should be. Available levels are: OFF, SEVERE, WARNING, INFO, FINE, ALL. Default is INFO. ||
+|| driver || Level || How verbose the logging should be. Available levels are: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL. Default is INFO. ||
 
 == FirefoxProfile settings ==
 Preferences accepted by the FirefoxProfile with special meaning, in the WebDriver API:
