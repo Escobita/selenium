@@ -33,6 +33,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || rotatable || boolean || Whether the session can rotate the current page's current layout between portrait and landscape orientations (only applies to mobile platforms). ||
 || nativeEvents || boolean || Whether the session is capable of generating native events when simulating user input. ||
 || proxy || proxy object || Details of any proxy to use. If no proxy is specified, whatever the system's current or default state is used. The format is specified under Proxy JSON Object. ||
+|| unexpectedAlertBehaviour || string || What the browser should do with an unhandled alert before throwing out the !UnhandledAlertException. Possible values are "accept", "dismiss" and "ignore" ||
 
 
 
