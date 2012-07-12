@@ -10,8 +10,10 @@ The iphone driver allows testing on a UIWebView (a webkit browser accessible for
  * To test on a device you need the iphone SDK and a provisioning profile (for running on an actual device)
 
 = Building =
-From the checked-out copy, run:
+From your [http://code.google.com/p/selenium/source/checkout checked-out copy of trunk], run:
+{{{
 ./go iphone
+}}}
 Which will build the iPhone driver and the application to be installed. It's easier to start up the SDK manually and run it.
 
  * if you are on Lion and have installed Xcode through the App Store and you get this message "XCode not found. Not building the iphone driver."  try running this on the command line: "sudo /usr/bin/xcode-select -switch /Applications/Xcode.app"
