@@ -414,17 +414,24 @@ Query the server's current status.  The server should respond with a general "HT
 <dd>
 <dl>
 <dd>
-Create a new session. The server should attempt to create a session that most closely matches the desired capabilities.</dd>
+Create a new session. The server should attempt to create a session that most closely matches the desired and required capabilities. Required capabilities have higher priority than desired capabilities and must be set for the session to be created.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`desiredCapabilities` - `{object}` An object describing the session's [#Desired_Capabilities desired capabilities].</dd>
+<dd>`requiredCapabilities` - `{object}` An object describing the session's [#Desired_Capabilities required capabilities] (Optional).</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>A `303 See Other` redirect to `/session/:sessionId`, where `:sessionId` is the ID of the newly created session.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`SessionNotCreatedException` - If a required capability could not be set.</dd>
 </dl>
 </dd>
 </dl>
