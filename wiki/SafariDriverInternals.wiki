@@ -5,7 +5,7 @@
 
 = Introduction =
 
-This document describes the implementation details of the !SafariDriver.
+This document provides a primer on the browser extension that powers the !SafariDriver. It is not intended to be a full-fledged design document. When in doubt, refer to the source!
 
 ----
 
@@ -164,7 +164,11 @@ The `id` field in each response should echoe the ID sent with the corresponding 
 
 The !SafariDriver will synchronize the execution of every command it receives. Thus, each response should always match the original command sent by the client. Upon receiving a response, the client should check that the ID matches the one sent with the original command. It is a catastrophic failure if these IDs do not match.
 
-=== Connecting to the !SafariDriver ===
+----
+
+= Control Flow =
+
+== Connecting to the !SafariDriver ==
 
 Clients may connect to the !SafariDriver by opening a page with the following:
 {{{
@@ -185,15 +189,23 @@ Safari will not load extensions for `file://` URLs. In order to open the connect
 
 The !SafariDriver supports multiple !WebSocket connections. Each connection is treated as a separate session with its own timeout state (i.e., for implicit waits). All sessions share state for window and frame focus. Furthermore, the execution of commands is synchronized globally, across all sessions.
 
-----
+== Executing Commands ==
 
-= Synchronizing Commands =
+Once a connection has been established, the WebDriver client may start sending commands.  Command messages are received by the `safaridriver.extension.Server`. Some commands, like setting script timeouts or closing a window, can be handled directly by the extension.  Others must be sent to the injected script for execution (`safaridriver.extension.Tab.prototype.send`).
 
-`TODO`
+=== Page Loading ===
 
-----
+Before a command can be sent to the injected script, the extension must wait for there to be an injected script _to send the command to_.  While Safari will emit navigation events whenever a new page is loaded, these events are not a sufficient indicator that the injected script has been initialized.  Therefore, each time the injected script is loaded and initialized, it sends a notification of the extension.  The extension will then execute the next queued command, if any.
 
-= Alert Handling =
+=== Frame Handling ===
+
+Safari loads an injected script for each frame in a page. Furthermore, when the extension sends a message to a tab, it is broadcasted to every frame within that tab.  To compensate, the injected script in the !SafariDriver keeps track of which frame currently has focus.
+
+The topmost frame in a tab (`safaridriver.inject.Tab`) always has focus after a page is loaded.   Whenever a command is received, the top frame first checks if it's a command that must be handled by top (e.g. `getWindowSize`), otherwise, it forwards the command to the currently focused tab for execution.
+
+As with the extension, the injected script relies on frames sending notifications when they have loaded/unloaded their contents; the tab will not execute a command until the current frame is fully loaded.
+
+== Alert Handling ==
 
 The !SafariDriver is not capable of interacting with alerts like the other driver implementations (see [http://code.google.com/p/selenium/issues/detail?id=3862 issue 3862]). It is, however, capable of suppressing alerts so they do not cause the browser to hang.
 
@@ -210,6 +222,8 @@ Sometimes, a test may hang after sending a command to the !SafariDriver. This us
 First open the !WebKit inspector on the page under test and check the console output. The console is cleared each time a page is loaded, so you'll only be able to see the logs for the most recent injected script. You can select the injected script and set break points inside the inspector, but it is sandboxed from the page, so you can't play with it using the inspector's REPL.
 
 Next, check the global page: Develop > Show Extension Builder. Select the WebDriver extension, and click "Inspect global page." Again, the !SafariDriver is super chatty, so you should see what went wrong on the console.  You can set script break points for the injected page and interact with it using the REPL.
+
+----
 
 = Development =
 
