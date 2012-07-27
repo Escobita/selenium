@@ -143,6 +143,7 @@ A JSON object describing a Proxy configuration.
 || proxyType || string || (Required) The type of proxy being used. Possible values are: *direct* - A direct connection - no proxy in use, *manual* - Manual proxy settings configured, e.g. setting a proxy for HTTP, a proxy for FTP, etc, *pac* - Proxy autoconfiguration from a URL), autodetect (proxy autodetection, probably with WPAD, *system* - Use system settings ||
 || proxyAutoconfigUrl || string || (Required if proxyType == pac, Ignored otherwise) Specifies the URL to be used for proxy autoconfiguration. Expected format example: http://hostname.com:1234/pacfile ||
 || ftpProxy, httpProxy, sslProxy || string || (Optional, Ignored if proxyType != manual) Specifies the proxies to be used for FTP, HTTP and HTTPS requests respectively. Behaviour is undefined if a request is made, where the proxy for the particular protocol is undefined, if proxyType is manual. Expected format example: hostname.com:1234 ||
+
 </dd>
 </dl>
 
@@ -622,6 +623,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dd>`{string}` The current window handle.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -676,6 +683,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dd>`{string}` The current URL.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -699,6 +712,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dd>`url` - `{string}` The URL to navigate to.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -718,6 +737,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -741,6 +766,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -760,6 +791,12 @@ If this command is never sent, the driver should default to an implicit wait of 
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -804,6 +841,7 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is not attached to the page's DOM.</dd>
 <dd>`JavaScriptError` - If the script throws an Error.</dd>
 </dl>
@@ -852,6 +890,7 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If one of the script arguments is a !WebElement that is not attached to the page's DOM.</dd>
 <dd>`Timeout` - If the script callback is not invoked before the timout expires. Timeouts are controlled by the `/session/:sessionId/timeout/async_script` command.</dd>
 <dd>`JavaScriptError` - If the script throws an Error or if an `unload` event is fired while waiting for the script to finish.</dd>
@@ -882,6 +921,12 @@ Arguments may be any JSON-primitive, array, or JSON object.  JSON objects that d
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string}` The screenshot as a base64 encoded PNG.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -1080,6 +1125,7 @@ should switch to the page's default content.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`NoSuchFrame` - If the frame specified by `id` cannot be found.</dd>
 </dl>
 </dd>
@@ -1111,6 +1157,12 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dd>`name` - `{string}` The window to change focus to.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the window specified by `name` cannot be found.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1131,7 +1183,7 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
-<dd>`NoSuchWindow` - If the window specified by `name` cannot be found.</dd>
+<dd>`NoSuchWindow` - If the currently selected window is already closed</dd>
 </dl>
 </dd>
 </dl>
@@ -1219,6 +1271,12 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dd>`y` - `{number}` The Y coordinate to position the window at, relative to the upper left corner of the screen.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the specified window cannot be found.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1302,6 +1360,12 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dd>`{Array.<object>}` A list of [#Cookie_JSON_Object cookies].</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1346,6 +1410,7 @@ server assigned window handle, or by the value of its `name` attribute.</dd>
 <dl>
 <dt>*Potential Errors:*</dt>
 <dd>`InvalidCookieDomain` - If the cookie's `domain` is not visible from the current page.</dd>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`UnableToSetCookie` - If attempting to set a cookie on a page that does not support cookies (e.g. pages with mime-type `text/plain`).</dd>
 </dl>
 </dd>
@@ -1370,6 +1435,12 @@ such cookie visible to the current page.</dd>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
 <dd>`:name` - The name of the cookie to delete.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -1399,6 +1470,12 @@ such cookie visible to the current page.</dd>
 <dd>`{string}` The current page source.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1424,6 +1501,12 @@ such cookie visible to the current page.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{string}` The current page title.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -1475,6 +1558,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`NoSuchElement` - If the element cannot be found.</dd>
 <dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
@@ -1528,6 +1612,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
 </dd>
@@ -1558,6 +1643,12 @@ such cookie visible to the current page.</dd>
 <dd>`{ELEMENT:string}` A WebElement JSON object for the active element.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -1585,6 +1676,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -1638,6 +1730,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 <dd>`NoSuchElement` - If the element cannot be found.</dd>
 <dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
@@ -1693,6 +1786,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 <dd>`XPathLookupError` - If using XPath and the input expression is invalid.</dd>
 </dl>
@@ -1722,6 +1816,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 <dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 </dl>
@@ -1751,6 +1846,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -1779,6 +1875,7 @@ such cookie visible to the current page.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -1898,6 +1995,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 <dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 </dl>
@@ -1927,6 +2025,12 @@ The server must process the key sequence as follows:
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`value` - `{Array.<string>}` The keys sequence to be sent. The sequence is defined in the[JsonWireProtocol#/session/:sessionId/element/:id/value send keys] command.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -1960,6 +2064,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -1988,6 +2093,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 <dd>`ElementNotVisible` - If the referenced element is not visible on the page (either is hidden by CSS, has 0-width, or has 0-height)</dd>
 <dd>`InvalidElementState` - If the referenced element is disabled.</dd>
@@ -2024,6 +2130,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2058,6 +2165,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2092,6 +2200,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2127,6 +2236,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If either the element refered to by `:id` or `:other` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2161,6 +2271,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2195,6 +2306,7 @@ The server must process the key sequence as follows:
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2232,6 +2344,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2266,6 +2379,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2300,6 +2414,7 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 <dd>`StaleElementReference` - If the element referenced by `:id` is no longer attached to the page's DOM.</dd>
 </dl>
 </dd>
@@ -2330,6 +2445,12 @@ location for correctly generating native events.</dd>
 <dd>`{string}` The current browser orientation corresponding to a value defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -2351,6 +2472,12 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
 <dd>`orientation` - `{string}` The new browser orientation as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/ScreenOrientation.html ScreenOrientation]: `{LANDSCAPE|PORTRAIT}`.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -2957,6 +3084,12 @@ location for correctly generating native events.</dd>
 <dd>`{Array.<string>}` The list of keys.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -2981,6 +3114,12 @@ location for correctly generating native events.</dd>
 <dd>`value` - `{string}` The value to set.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -2996,6 +3135,12 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -3020,6 +3165,12 @@ location for correctly generating native events.</dd>
 <dd>`:key` - The key to get.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -3036,6 +3187,12 @@ location for correctly generating native events.</dd>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
 <dd>`:key` - The key to remove.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -3065,6 +3222,12 @@ location for correctly generating native events.</dd>
 <dd>`{number}` The number of items in the storage.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -3092,6 +3255,12 @@ location for correctly generating native events.</dd>
 <dd>`{Array.<string>}` The list of keys.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -3116,6 +3285,12 @@ location for correctly generating native events.</dd>
 <dd>`value` - `{string}` The value to set.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -3131,6 +3306,12 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -3155,6 +3336,12 @@ location for correctly generating native events.</dd>
 <dd>`:key` - The key to get.</dd>
 </dl>
 </dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -3171,6 +3358,12 @@ location for correctly generating native events.</dd>
 <dt>*URL Parameters:*</dt>
 <dd>`:sessionId` - ID of the session to route the command to.</dd>
 <dd>`:key` - The key to remove.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
@@ -3198,6 +3391,12 @@ location for correctly generating native events.</dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{number}` The number of items in the storage.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Potential Errors:*</dt>
+<dd>`NoSuchWindow` - If the currently selected window has been closed.</dd>
 </dl>
 </dd>
 </dl>
