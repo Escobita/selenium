@@ -1,6 +1,6 @@
 #summary (still under work) A specification of how logging works in WebDriver .
 
-= Logging in WebDriver =
+= Logging in !WebDriver =
 (Still under work)
 
 Logging is important both for developers and users of !WebDriver. Users might need to be able to find details about why a test failed, while developers might need to be able to find details of why !WebDriver in itself failed. Good logging support can make these debugging tasks much easier. 
