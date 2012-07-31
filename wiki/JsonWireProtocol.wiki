@@ -149,6 +149,20 @@ Log levels in order, with finest level on top and coarsest level at the bottom.
 </dd>
 
 <dt>
+==== Log Type ====
+</dt>
+<dd>
+The table below lists common log types. Other log types, for instance, for
+performance logging may also be available.
+
+|| *Log Type* || *Description* ||
+|| client || Logs from the client. ||
+|| driver || Logs from the webdriver. ||
+|| browser || Logs from the browser. ||
+|| server || Logs from the server. ||
+</dd>
+
+<dt>
 === Proxy JSON Object ===
 </dt>
 <dd>
@@ -383,6 +397,7 @@ Given these mappings, the server should always route requests whose final path s
 || DELETE || [#DELETE_/session/:sessionId/session_storage/key/:key /session/:sessionId/session_storage/key/:key] || Remove the storage item for the given key. ||
 || GET || [#GET_/session/:sessionId/session_storage/size /session/:sessionId/session_storage/size] || Get the number of items in the storage. ||
 || POST || [#POST_/session/:sessionId/log /session/:sessionId/log] || Get the log for a given log type. ||
+|| GET || [#GET_/session/:sessionId/log/types /session/:sessionId/log/types] || Get available log types. ||
 
 
 == Command Detail ==
@@ -3438,13 +3453,40 @@ location for correctly generating native events.</dd>
 <dd>
 <dl>
 <dt>*JSON Parameters:*</dt>
-<dd>`type` - `{string}` The log type, as defined in [http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/logging/LogType.html LogType]. The log type must be provided.</dd>
+<dd>`type` - `{string}` The [#Log_Type log type]. This must be provided.</dd>
 </dl>
 </dd>
 <dd>
 <dl>
 <dt>*Returns:*</dt>
 <dd>`{Array.<object>}` The list of [#Log_Entry_JSON_Object log entries].</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+----
+
+=== /session/:sessionId/log/types ===
+
+<dl>
+<dd>
+==== GET /session/:sessionId/log/types ====
+</dd>
+<dd>
+<dl>
+<dd>Get available log types.</dd>
+<dd>
+<dl>
+<dt>*URL Parameters:*</dt>
+<dd>`:sessionId` - ID of the session to route the command to.</dd>
+</dl>
+</dd>
+<dd>
+<dl>
+<dt>*Returns:*</dt>
+<dd>`{Array.<string>}` The list of available [#Log_Type log types].</dd>
 </dl>
 </dd>
 </dl>
