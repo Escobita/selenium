@@ -126,7 +126,7 @@ You can also provide a profile for Opera to use.  You can use a new, fresh rando
 
 {{{
 OperaProfile profile = new OperaProfile();  // fresh, random profile
-profile.preferences().set("User Prefs", "Ignroe Unrequested Popups", false);
+profile.preferences().set("User Prefs", "Ignore Unrequested Popups", false);
 
 DesiredCapabilities capabilities = DesiredCapabilities.opera();
 capabilities.setCapability("opera.profile", profile);
