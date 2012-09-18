@@ -23,7 +23,7 @@ A: The process is described in the Selenium documentation at http://seleniumhq.o
 
 === Q: Which browsers does !WebDriver support? ===
 
-A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver, OperaDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages. There is also support for mobile testing via the AndroidDriver and IPhoneDriver.
+A: The existing drivers are the ChromeDriver, InternetExplorerDriver, FirefoxDriver, OperaDriver and HtmlUnitDriver. For more information about each of these, including their relative strengths and weaknesses, please follow the links to the relevant pages. There is also support for mobile testing via the AndroidDriver, OperaMobileDriver and IPhoneDriver.
 
 === Q: What does it mean to be "developer focused"? ===
 
