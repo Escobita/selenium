@@ -92,7 +92,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || chrome.extensions || list || A list of base64 encoded crx files to be installed in Chrome before the test ||
 
 == Firefox specific ==
-=== WebDriver ===
+=== !WebDriver ===
 || firefox_profile || string || Base64-encoded profile.  TODO: Document format ||
 || loggingPrefs || LoggingPreferences object || Preferences for logging ||
 || firefox_binary || string || Path to firefox binary file to use. ||
@@ -107,7 +107,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || profile || string || ??? See FirefoxChromeLauncher ||
 
 == IE specific ==
-=== WebDriver ===
+=== !WebDriver ===
 || ignoreProtectedModeSettings || boolean || Whether to skip the protected mode check. If set, tests may become flaky, unresponsive, or browsers may hang. If not set, and protected mode settings are not the same for all zones, an exception will be thrown on driver construction. Only "best effort" support is provided when using this capability. ||
 || initialBrowserUrl || string || Allows the user to specify the initial URL loaded when IE starts. Intended to be used with `ignoreProtectedModeSettings` to allow the user to initialize IE in the proper Protected Mode zone. Using this capability may cause browser instability or flaky and unresponsive code. Only "best effort" support is provided when using this capability. ||
 || useLegacyInternalServer || boolean || Whether to use the internal server for the IE driver. If set to false or not set, looks for the standalone IE driver server executable. Used by the client language bindings, not the server-side components. ||
@@ -120,6 +120,9 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || ensureCleanSession || boolean || Whether to make sure the session has no cookies or temporary internet files on Windows. I believe this is passed to the IEDriver as well, but ignored by it. ||
 
 == Safari specific ==
+=== !WebDriver ===
+|| safari.cleanSession || boolean || Whether to make sure the session has no cookies, cache entries, local storage, or databases. ||
+
 === RC ===
 || mode || string || Mode for browser. Possible values: filebased, proxyInjectionMode, proxy. Defaults to filebased. Note: filebased does not work on newer Safaris. proxyInjection requires -proxyInjection to be passed to server command line. ||
 || honorSystemProxy || boolean || Whether to honour the sysem proxy. ||
