@@ -63,6 +63,8 @@ There are two places where the IE driver does not interact with elements using n
 
 Similarly, there are some scenarios when submitting an HTML form via WebElement's submit() method may have the same effect. This can happen if the driver calls the JavaScript submit() function on the form, and there is an onSubmit event handler that calls the JavaScript alert(), confirm(), or prompt() functions. 
 
+This restriction is filed as issue 3508.
+
 == Multiple instances of InternetExplorerDriver ==
 
 With the creation of the IEDriverServer.exe, it should be possible to create and use multiple simultaneous instances of the InternetExplorerDriver. However, this functionality is largely untested, and there may be issues with cookies, window focus, and the like. If you attempt to use multiple instances of the IE driver, and run into such issues, consider using the RemoteWebDriver and virtual machines.
