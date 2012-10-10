@@ -61,6 +61,10 @@ from the root of your local copy. Other browsers can be tested by changing `fire
 {{{
 ./go //py:chrome_test:run
 }}} 
+To rerun a single test method that may have failed, you can do that like this:
+{{{
+./go //py:firefox_test:run method=testShouldExplicitlyWaitForASingleElement
+}}}
 
 = Usage =
 
