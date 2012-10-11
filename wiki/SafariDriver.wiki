@@ -9,7 +9,7 @@ The !SafariDriver requires Safari 5.1+
 
 == Getting Started ==
 
-While ready for use, the !SafariDriver still requires a bit of manual intervention before you can start writing tests.  If you're not comfortable checking out and building the Selenium project from source, you may want to wait for us to make a general !SafariDriver release.
+While ready for use, the !SafariDriver still requires a bit of manual intervention before you can start writing tests.  If you're not comfortable checking out and [BuildingWebDriver building the Selenium project] from source, you may want to wait for us to make a general !SafariDriver release.
 
 Still here? Ok, let's get started:
 
