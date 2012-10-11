@@ -10,6 +10,8 @@
 ==1.9.1==
 
   * New - Added support for Firefox 15
+  * New - Added support for assertTextPresent, verifyTextPresent, waitForTextPresent, assertTextNotPresent, verifyTextNotPresent, waitForTextNotPresent commands to WebDriver Formatters. (http://blog.reallysimplethoughts.com/2012/08/26/selenium-ide-webdriver-formatters-updated-to-support-textpresent-commands/)
+  * New - Added the target and value parameters in comments when the WebDriver formatters do not support the command
 
 ==1.9.0==
 
