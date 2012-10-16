@@ -112,6 +112,7 @@ Not all server implementations will support every !WebDriver feature. Therefore,
 || initialBrowserUrl || string || Allows the user to specify the initial URL loaded when IE starts. Intended to be used with `ignoreProtectedModeSettings` to allow the user to initialize IE in the proper Protected Mode zone. Using this capability may cause browser instability or flaky and unresponsive code. Only "best effort" support is provided when using this capability. ||
 || useLegacyInternalServer || boolean || Whether to use the internal server for the IE driver. If set to false or not set, looks for the standalone IE driver server executable. Used by the client language bindings, not the server-side components. ||
 || elementScrollBehavior || integer || Allows the user to specify whether elements are scrolled into the viewport for interaction to align with the top (0) or bottom (1) of the viewport. The default value is to align with the top of the viewport. ||
+|| enablePersistentHover || boolean || Determines whether persistent hovering is enabled (true by default). Persistent hovering is achieved by continuously firing mouse over events at the last location the mouse cursor has been moved to. ||
 
 === RC ===
 || mode || string || Mode for browser. Possible values: iehta, proxyInjectionMode, proxy. Defaults to iehta if not set. proxyInjection requires -proxyInjection to be passed to server command line. ||
