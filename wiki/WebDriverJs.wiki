@@ -12,18 +12,12 @@ The !JavaScript bindings for !WebDriver (WebDriverJS) are designed to allow !Jav
 
 == Getting Started ==
 
-Compile a single !JavaScript module, which may be deployed in either node or the browser, by running
-
-{{{
-$ ./go webdriverjs
-}}}
-
 === Node ===
 
-While WebDriverJS may be used in node, it currently does not have native driver support (eg, you can only write tests against a remote !WebDriver server). Thus, in addition to `webdriverjs`, you must also compile `selenium-server-standalone`:
+While WebDriverJS may be used in node, it currently does not have native driver support (eg, you can only write tests against a remote !WebDriver server). Thus, you must also compile the Selenium server in addition to the WebDriverJS module.  In the root of your Selenium client, execute:
 
 {{{
-$ ./go selenium-server-standalone webdriverjs
+$ ./go selenium-server-standalone //javascript/node:webdriver
 }}}
 
 Once both targets have compiled, start the server, launch node, and start writing tests:
@@ -32,7 +26,7 @@ Once both targets have compiled, start the server, launch node, and start writin
 $ java -jar build/java/server/src/org/openqa/grid/selenium/selenium-standalone.jar &
 $ node
 
-var webdriver = require('./build/javascript/webdriver/webdriver');
+var webdriver = require('./build/javascript/node/webdriver');
 
 var driver = new webdriver.Builder().
     usingServer('http://localhost:4444/wd/hub').
@@ -57,7 +51,12 @@ driver.quit();
 
 === In the Browser ===
 
-In addition to node, WebDriverJS may also be used directly in the browser.  In order to communicate with a !WebDriver server which may be on a different domain, the client uses a modified version of the JsonWireProtocol and [#Cross-Origin_Resource_Sharing cross-origin resource sharing]:
+In addition to node, WebDriverJS may also be used directly in the browser.  To compile the browser module, which has a smaller set of dependencies than node, run:
+{{{
+$ ./go //javascript/webdriver:webdriver
+}}}
+
+In order to communicate with a !WebDriver server which may be on a different domain, the client uses a modified version of the JsonWireProtocol and [#Cross-Origin_Resource_Sharing cross-origin resource sharing]:
 
 {{{
 <!DOCTYPE html>
