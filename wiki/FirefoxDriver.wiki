@@ -36,7 +36,7 @@ Normally the Firefox binary is assumed to be in the default location for your pa
 
 || *OS* || *Expected Location of Firefox* ||
 || Linux || firefox (found using "which") ||
-|| Mac || /Applications/Firefox.app/Contents/MacOS/firefox ||
+|| Mac || /Applications/Firefox.app/Contents/MacOS/firefox-bin ||
 || Windows || %PROGRAMFILES%\Mozilla Firefox\firefox.exe ||
 
 By default, the Firefox driver creates an anonymous profile
