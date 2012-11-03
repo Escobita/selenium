@@ -4,7 +4,7 @@
 ==1.10.0 (to be released)==
 
   * New - Added support for Firefox 16
-  * New - Implemented formatting for alert handling commands (Java)
+  * New - Implemented formatting for alert handling commands
   * Bug - Fixed options for Java 4 WebDriver formatter
 
 ==1.9.1==
