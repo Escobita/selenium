@@ -30,7 +30,7 @@ svn co http://selenium.googlecode.com/svn/websites/www.seleniumhq.org/
 
 
 == Access ==
-In order to be able to commit you need an Google account with the appropriate privileges - if you don't have one already contact the dev list (selenium-developers@googlegroups.com)
+In order to be able to commit you need an Google account with the appropriate privileges - after showing a significant 'commitment' to the project you'll be granted access. In the meantime please create a new issue and attach a patch (in the form of `svn diff > myPatch.txt`) then get someone's attention to apply it by emailing the dev list or joining the IRC channel. Please be sure to sign the CLA: http://goo.gl/qC50R
 
 == Working process ==
  * Communicate to the others what your plans are and what you're currently working on to be synchronized with other team members
@@ -94,14 +94,6 @@ If you want to work in eclipse, prepare the project to be imported with:
 After making changes you can see them reflected in your local server by opening a new terminal and executing:
 {{{
   mvn clean compile
-}}}
-
-==== Optional Docs as PDF ====
-
-Install pdf-LaTeX and run:
-
-{{{
-  mvn compile
 }}}
 
 ===== Checking for broken links =====
