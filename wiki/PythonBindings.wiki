@@ -81,9 +81,11 @@ Using the latest official release:
 from selenium import webdriver
 }}}
 
-== Viewing Available Functionality ==
+== API Documentation / Viewing Available Functionality ==
 
-To view all commands available to you [while inside your python shell], after importing perform:
+To read the API documentation of the Python Bindings go to the [http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html Python bindings API doc page].
+
+Alternatively use your python shell to view all commands available to you, after importing perform:
 
 Selenium 1:
 {{{
