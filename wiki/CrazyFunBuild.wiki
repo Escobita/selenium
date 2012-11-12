@@ -55,6 +55,10 @@ The py_test and js_test rules have special handling for running the same tests i
 As an example, if we had a js_test rule //foo/bar, we would run its tests in firefox by running the target //foo/bar_ff:run or we would run in all available browsers by running the target //foo/bar:run
 
 = Build Targets = 
+You can list all the build targets using the {{{-T}}} option. e.g. 
+{{{
+./go -T
+}}}
 
 Being a brief description of the available targets that you can use.
 
