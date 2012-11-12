@@ -1,5 +1,5 @@
 #summary Information about the iPhone Driver
-#labels Phase-Deploy,WebDriver
+#labels Phase-Deploy,WebDriver,Mobile
 
 = iPhone Driver =
 
