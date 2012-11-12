@@ -84,3 +84,27 @@ In order to get detailed information from IEDriverServer.exe you can run tests w
 == Adding a test ==
 Most of WebDriver's test cases live under java/client/test/org/openqa/selenium. For example, to demonstrate an issue with clicking on elements, a test case should be added to  ClickTest. The test cases already have a driver instance - no need to create one.
 The test use pages that are served by an in-process server, served from common/src/web. Their URLs are provided by the Pages class, so when adding a page and add it to the Pages class as well.
+
+== Manually interacting with RemoteWebDriverServer ==
+We can use a web browser or tools such as telnet to interact with a RemoteWebDriverServer e.g. to debug the JSON protocol. Here's a simple example of checking the status of a server installed on the local machine
+
+In a web browser
+{{{
+http://localhost:8080/wd/hub/status/
+
+}}}
+
+In telnet
+{{{
+telnet localhost 8080
+
+GET /wd/hub/status/ HTTP/1.0
+
+}}}
+
+In both cases the RemoteWebDriverServer should respond with 
+{{{
+
+{status:0} 
+
+}}}
