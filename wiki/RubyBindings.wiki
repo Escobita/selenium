@@ -59,6 +59,10 @@ driver.switch_to.frame driver.find_element(:id, 'some-frame') # frame element
 
 # switch back to the main document
 driver.switch_to.default_content
+
+# repositionning and resizing browser window:
+driver.manage.move_to 0,0
+driver.manage.resize_to 500,800
 }}}
 
 Element examples:
@@ -88,6 +92,7 @@ element.send_keys :space
 # get the text of an element
 element.text
 }}}
+
 
 Advanced user interactions (see [http://selenium.googlecode.com/svn/trunk/docs/api/rb/Selenium/WebDriver/ActionBuilder.html ActionBuilder]):
 
